@@ -23,8 +23,11 @@ First of all, you need to have installed and fine working **[Moodle](https://git
 Its very-very simple. You have two methods: PHP-code or static HTML-code.
 
 1. **PHP-code**. Copy PHP-code from skins table at LenAuth plugin screen opposite skin you need and paste the code into your current Moodle theme. All updates of LenAuth settings will automatically apply in theme.
+
 **Sample PHP-code:**
+
 `<?php include_once $CFG->dirroot . '/auth/lenauth/out.php'; echo lenauth_out::getInstance()->output('style3-text'); ?>`
+
 
 2. Static HTML-code. Click **Static HTML-code** link under PHP-code. In new window you will see static HTML-code, so you can copy it and paste in your current theme. **BUT!** this is static code, so if you will change some settings in LenAuth you need to update this HTML-code!
 
