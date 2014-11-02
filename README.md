@@ -31,7 +31,7 @@ Sample of PHP-code: `<?php include_once $CFG->dirroot . '/auth/lenauth/out.php';
 You're welcome for pull requests but against master branch. Thanks!
 
 ## Changelog
-### Version 1.0 (2014110200)
+#### Version 1.0 (2014110200)
 - initial release.
 
 ## Author
