@@ -13,7 +13,9 @@ This plugin allows easy auth method for your Moodle. You just need to register a
 - international/russian logos in settings
 
 ## Download Installation
-[plugin Russian documentation](http://lmstech.ru/lenauth-plugin-oauth-moodle/)
+[English plugin documentation](http://lms-service.org/lenauth-plugin-oauth-moodle/)
+
+[Russian plugin documentation](http://lmstech.ru/lenauth-plugin-oauth-moodle/)
 
 First of all, you need to have installed and fine working **[Moodle](https://github.com/moodle/moodle) 2.6.5+**
 - upload **lenauth** folder to **/auth** folder, so files need to be inside **/auth/lenauth/**
