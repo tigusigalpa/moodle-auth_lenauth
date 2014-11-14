@@ -40,89 +40,89 @@ function xmldb_auth_lenauth_install() {
     
     //Facebook
     $facebook_info_field = new stdClass;
-    $facebook_info_field->shortname = 'lenauth_facebook_social_id';
-    $facebook_info_field->name = get_string( 'facebook_binding', 'auth_lenauth' );
+    $facebook_info_field->shortname = 'auth_lenauth_facebook_social_id';
+    $facebook_info_field->name = get_string( 'auth_lenauth_facebook_binding', 'auth_lenauth' );
     $facebook_info_field_obj = (object) array_merge((array) $facebook_info_field, (array) $default_info_field);
     
     if ( $DB->insert_record('user_info_field', $facebook_info_field_obj ) ) {
-        set_config( 'facebook_social_id_field', 'lenauth_facebook_social_id', 'auth/lenauth' );
-        set_config( 'facebook_button_text', get_string( 'facebook_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
+        set_config( 'auth_lenauth_facebook_social_id_field', 'auth_lenauth_facebook_social_id', 'auth/lenauth' );
+        set_config( 'auth_lenauth_facebook_button_text', get_string( 'auth_lenauth_facebook_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
     }
     
     //Google
     $google_info_field = new stdClass;
-    $google_info_field->shortname = 'lenauth_google_social_id';
-    $google_info_field->name = get_string( 'google_binding', 'auth_lenauth' );
+    $google_info_field->shortname = 'auth_lenauth_google_social_id';
+    $google_info_field->name = get_string( 'auth_lenauth_google_binding', 'auth_lenauth' );
     $google_info_field_obj = (object) array_merge((array) $google_info_field, (array) $default_info_field);
     
     if ( $DB->insert_record('user_info_field', $google_info_field_obj ) ) {
-        set_config( 'google_social_id_field', 'lenauth_google_social_id', 'auth/lenauth' );
-        set_config( 'google_button_text', get_string( 'google_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
+        set_config( 'auth_lenauth_google_social_id_field', 'auth_lenauth_google_social_id', 'auth/lenauth' );
+        set_config( 'auth_lenauth_google_button_text', get_string( 'auth_lenauth_google_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
     }
     
     //Yahoo
     $yahoo_info_field = new stdClass;
-    $yahoo_info_field->shortname = 'lenauth_yahoo_social_id';
-    $yahoo_info_field->name = get_string( 'yahoo_binding', 'auth_lenauth' );
+    $yahoo_info_field->shortname = 'auth_lenauth_yahoo_social_id';
+    $yahoo_info_field->name = get_string( 'auth_lenauth_yahoo_binding', 'auth_lenauth' );
     $yahoo_info_field_obj = (object) array_merge((array) $yahoo_info_field, (array) $default_info_field);
     
     if ( $DB->insert_record( 'user_info_field', $yahoo_info_field_obj ) ) {
-        set_config( 'yahoo_social_id_field', 'lenauth_yahoo_social_id', 'auth/lenauth' );
-        set_config( 'yahoo_button_text', get_string( 'yahoo_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
+        set_config( 'auth_lenauth_yahoo_social_id_field', 'auth_lenauth_yahoo_social_id', 'auth/lenauth' );
+        set_config( 'auth_lenauth_yahoo_button_text', get_string( 'auth_lenauth_yahoo_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
     }
     
     //Twitter
     $twitter_info_field = new stdClass;
-    $twitter_info_field->shortname = 'lenauth_twitter_social_id';
-    $twitter_info_field->name = get_string( 'twitter_binding', 'auth_lenauth' );
+    $twitter_info_field->shortname = 'auth_lenauth_twitter_social_id';
+    $twitter_info_field->name = get_string( 'auth_lenauth_twitter_binding', 'auth_lenauth' );
     $twitter_info_field_obj = (object) array_merge((array) $twitter_info_field, (array) $default_info_field);
     
     if ( $DB->insert_record( 'user_info_field', $twitter_info_field_obj ) ) {
-        set_config( 'twitter_social_id_field', 'lenauth_twitter_social_id', 'auth/lenauth' );
-        set_config( 'twitter_button_text', get_string( 'twitter_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
+        set_config( 'auth_lenauth_twitter_social_id_field', 'auth_lenauth_twitter_social_id', 'auth/lenauth' );
+        set_config( 'auth_lenauth_twitter_button_text', get_string( 'auth_lenauth_twitter_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
     }
     
     //VK
     $vk_info_field = new stdClass;
-    $vk_info_field->shortname = 'lenauth_vk_social_id';
-    $vk_info_field->name = get_string( 'vk_binding', 'auth_lenauth' );
+    $vk_info_field->shortname = 'auth_lenauth_vk_social_id';
+    $vk_info_field->name = get_string( 'auth_lenauth_vk_binding', 'auth_lenauth' );
     $vk_info_field_obj = (object) array_merge((array) $vk_info_field, (array) $default_info_field);
     
     if ( $DB->insert_record( 'user_info_field', $vk_info_field_obj ) ) {
-        set_config( 'vk_social_id_field', 'lenauth_vk_social_id', 'auth/lenauth' );
-        set_config( 'vk_button_text', get_string( 'vk_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
+        set_config( 'auth_lenauth_vk_social_id_field', 'auth_lenauth_vk_social_id', 'auth/lenauth' );
+        set_config( 'auth_lenauth_vk_button_text', get_string( 'auth_lenauth_vk_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
     }
     
     //Yandex
     $yandex_info_field = new stdClass;
-    $yandex_info_field->shortname = 'lenauth_yandex_social_id';
-    $yandex_info_field->name = get_string( 'yandex_binding', 'auth_lenauth' );
+    $yandex_info_field->shortname = 'auth_lenauth_yandex_social_id';
+    $yandex_info_field->name = get_string( 'auth_lenauth_yandex_binding', 'auth_lenauth' );
     $yandex_info_field_obj = (object) array_merge((array) $yandex_info_field, (array) $default_info_field);
     
     if ( $DB->insert_record( 'user_info_field', $yandex_info_field_obj ) ) {
-        set_config( 'yandex_social_id_field', 'lenauth_yandex_social_id', 'auth/lenauth' );
-        set_config( 'yandex_button_text', get_string( 'yandex_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
+        set_config( 'auth_lenauth_yandex_social_id_field', 'auth_lenauth_yandex_social_id', 'auth/lenauth' );
+        set_config( 'auth_lenauth_yandex_button_text', get_string( 'auth_lenauth_yandex_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
     }
     
     //MailRu
     $mailru_info_field = new stdClass;
-    $mailru_info_field->shortname = 'lenauth_mailru_social_id';
-    $mailru_info_field->name = get_string( 'mailru_binding', 'auth_lenauth' );
+    $mailru_info_field->shortname = 'auth_lenauth_mailru_social_id';
+    $mailru_info_field->name = get_string( 'auth_lenauth_mailru_binding', 'auth_lenauth' );
     $mailru_info_field_obj = (object) array_merge((array) $mailru_info_field, (array) $default_info_field);
     
     if ( $DB->insert_record( 'user_info_field', $mailru_info_field_obj ) ) {
-        set_config( 'mailru_social_id_field', 'lenauth_mailru_social_id', 'auth/lenauth' );
-        set_config( 'mailru_button_text', get_string( 'mailru_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
+        set_config( 'auth_lenauth_mailru_social_id_field', 'auth_lenauth_mailru_social_id', 'auth/lenauth' );
+        set_config( 'auth_lenauth_mailru_button_text', get_string( 'auth_lenauth_mailru_button_text_default', 'auth_lenauth' ), 'auth/lenauth' );
     }
 
 
-    set_config('display_buttons',      'inline-block', 'auth/lenauth');
-    set_config('display_div',          'block',        'auth/lenauth');
-    set_config('lenauth_locale',       'en',           'auth/lenauth');
+    set_config('auth_lenauth_display_buttons',      'inline-block', 'auth/lenauth');
+    set_config('auth_lenauth_display_div',          'block',        'auth/lenauth');
+    set_config('auth_lenauth_locale',               'en',           'auth/lenauth');
 
-    set_config('button_margin_top',    10,             'auth/lenauth');
-    set_config('button_margin_right',  10,             'auth/lenauth');
-    set_config('button_margin_bottom', 10,             'auth/lenauth');
-    set_config('button_margin_left',   10,             'auth/lenauth');
+    set_config('auth_lenauth_button_margin_top',    10,             'auth/lenauth');
+    set_config('auth_lenauth_button_margin_right',  10,             'auth/lenauth');
+    set_config('auth_lenauth_button_margin_bottom', 10,             'auth/lenauth');
+    set_config('auth_lenauth_button_margin_left',   10,             'auth/lenauth');
     
 }

@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file outputs buttons for Moodle website
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -10,7 +13,7 @@ class lenauth_out extends auth_plugin_lenauth {
     
     /**
      * instance var for Singleton
-     * @var type 
+     * @var void
      */
     private static $_instance;
 
@@ -20,7 +23,7 @@ class lenauth_out extends auth_plugin_lenauth {
     
     /**
      * Singleton
-     * @return type
+     * @return object
      */
     public static function getInstance() {
         if ( ! isset( self::$_instance ) && ! ( self::$_instance instanceof lenauth_out ) ) {
@@ -33,9 +36,10 @@ class lenauth_out extends auth_plugin_lenauth {
      * This method output or not output social buttons. Use it via Singleton
      * If user is not logged in - buttons shows, otherwise buttons hidden
      * 
-     * @global type $CFG
-     * @param type $style
-     * @param type $echo
+     * @global object $CFG
+     * @param string $style Buttons style to be output
+     * @param boolean $show_example Special boolean parameter to output examples of buttons in the plugin admin screen
+     * @param boolean $show_html Special boolean parameter to output only HTML code
      * @return string
      * 
      * @author Igor Sazonov
@@ -49,18 +53,18 @@ class lenauth_out extends auth_plugin_lenauth {
                 global $CFG;
 
                 //$li_class = '';
-                $style_button_str = ' style="display:' . $this->_oauth_config->display_buttons . ';';
-                if ( $this->_oauth_config->button_margin_top > 0 || $this->_oauth_config->button_margin_right > 0 || $this->_oauth_config->button_margin_bottom > 0 || $this->_oauth_config->button_margin_right > 0 ) {
-                    $style_button_str .= 'margin:' . $this->_oauth_config->button_margin_top . 'px ' . $this->_oauth_config->button_margin_right . 'px ' . $this->_oauth_config->button_margin_bottom . 'px ' . $this->_oauth_config->button_margin_right . 'px;';
+                $style_button_str = ' style="display:' . $this->_oauth_config->auth_lenauth_display_buttons . ';';
+                if ( $this->_oauth_config->auth_lenauth_button_margin_top > 0 || $this->_oauth_config->auth_lenauth_button_margin_right > 0 || $this->_oauth_config->auth_lenauth_button_margin_bottom > 0 || $this->_oauth_config->auth_lenauth_button_margin_right > 0 ) {
+                    $style_button_str .= 'margin:' . $this->_oauth_config->auth_lenauth_button_margin_top . 'px ' . $this->_oauth_config->auth_lenauth_button_margin_right . 'px ' . $this->_oauth_config->auth_lenauth_button_margin_bottom . 'px ' . $this->_oauth_config->auth_lenauth_button_margin_right . 'px;';
                 }
 
                 $class_div_str = '';
-                $style_div_str = ' style="display:' . $this->_oauth_config->display_div . ';';
-                if ( $this->_oauth_config->div_margin_top > 0 || $this->_oauth_config->div_margin_right > 0 || $this->_oauth_config->div_margin_bottom > 0 || $this->_oauth_config->div_margin_right > 0 ) {
-                    $style_div_str .= 'margin:' . $this->_oauth_config->div_margin_top . 'px ' . $this->_oauth_config->div_margin_right . 'px ' . $this->_oauth_config->div_margin_bottom . 'px ' . $this->_oauth_config->div_margin_right . 'px;';
+                $style_div_str = ' style="display:' . $this->_oauth_config->auth_lenauth_display_div . ';';
+                if ( $this->_oauth_config->auth_lenauth_div_margin_top > 0 || $this->_oauth_config->auth_lenauth_div_margin_right > 0 || $this->_oauth_config->auth_lenauth_div_margin_bottom > 0 || $this->_oauth_config->auth_lenauth_div_margin_right > 0 ) {
+                    $style_div_str .= 'margin:' . $this->_oauth_config->auth_lenauth_div_margin_top . 'px ' . $this->_oauth_config->auth_lenauth_div_margin_right . 'px ' . $this->_oauth_config->auth_lenauth_div_margin_bottom . 'px ' . $this->_oauth_config->auth_lenauth_div_margin_right . 'px;';
                 }
-                if ( $this->_oauth_config->div_width > 0 ) {
-                    $style_button_str .= 'width:' . $this->_oauth_config->div_width . 'px;';
+                if ( $this->_oauth_config->auth_lenauth_div_width > 0 ) {
+                    $style_button_str .= 'width:' . $this->_oauth_config->auth_lenauth_div_width . 'px;';
                 }
 
                 $has_text = false;
@@ -74,22 +78,33 @@ class lenauth_out extends auth_plugin_lenauth {
                 $yahoo_bca = '';
                 $twitter_bca = '';
 
-                $facebook_link = ( !$show_example ) ? 'https://www.facebook.com/dialog/oauth?client_id=' . $this->_oauth_config->facebook_app_id . '&redirect_uri=' . urlencode( $this->_redirect_uri('facebook') ) . '&scope=email' : 'javascript:;';
+                $facebook_link = ( !$show_example ) ? 'https://www.facebook.com/dialog/oauth?client_id=' . $this->_oauth_config->auth_lenauth_facebook_app_id . '&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri('facebook') ) . '&scope=email' : 'javascript:;';
 
-                $google_link = ( !$show_example ) ? 'https://accounts.google.com/o/oauth2/auth?client_id=' . $this->_oauth_config->google_client_id . '&response_type=code&scope=openid%20profile%20email&redirect_uri=' . urlencode( $this->_redirect_uri( 'google' ) ) : 'javascript:;';
+                $google_link = ( !$show_example ) ? 'https://accounts.google.com/o/oauth2/auth?client_id=' . $this->_oauth_config->auth_lenauth_google_client_id . '&response_type=code&scope=openid%20profile%20email&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'google' ) ) : 'javascript:;';
 
                 $yahoo_link = ( !$show_example ) ? $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=yahoo' : 'javascript:;';
 
                 $twitter_link = ( !$show_example ) ? $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=twitter' : 'javascript:;';
 
-                $vk_link = ( !$show_example ) ? 'https://oauth.vk.com/authorize?client_id=' . $this->_oauth_config->vk_app_id . '&scope=email&redirect_uri=' . urlencode( $this->_redirect_uri( 'vk' ) ) . '&response_type=code&v=' . parent::$vk_api_version : 'javascript:;';
+                $vk_link = ( !$show_example ) ? 'https://oauth.vk.com/authorize?client_id=' . $this->_oauth_config->auth_lenauth_vk_app_id . '&scope=email&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'vk' ) ) . '&response_type=code&v=' . parent::$vk_api_version : 'javascript:;';
+                
+                if ( !$show_example ) {
+                    switch ($this->_oauth_config->auth_lenauth_locale) {
+                        case 'en':
+                            $yandex_link = 'https://oauth.yandex.com/authorize?response_type=code&client_id=' . $this->_oauth_config->auth_lenauth_yandex_app_id . '&display=popup';
+                            break;
+                        case 'ru':
+                            $yandex_link = 'https://oauth.yandex.ru/authorize?response_type=code&client_id=' . $this->_oauth_config->auth_lenauth_yandex_app_id . '&display=popup';
+                            break;
+                    }
+                } else {
+                    $yandex_link = 'javascript:;';
+                }
 
-                $yandex_link = ( !$show_example ) ? 'https://oauth.yandex.ru/authorize?response_type=code&client_id=' . $this->_oauth_config->yandex_app_id . '&display=popup' : 'javascript:;';
-
-                $mailru_link = ( !$show_example ) ? 'https://connect.mail.ru/oauth/authorize?client_id=' . $this->_oauth_config->mailru_site_id . '&redirect_uri=' . urlencode( $this->_redirect_uri( 'mailru' ) ) . '&response_type=code' : 'javascript:;';
+                $mailru_link = ( !$show_example ) ? 'https://connect.mail.ru/oauth/authorize?client_id=' . $this->_oauth_config->auth_lenauth_mailru_site_id . '&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'mailru' ) ) . '&response_type=code' : 'javascript:;';
 
                 //$ok_class = 'ok';
-                //$ok_link = ( !$show_example ) ? 'https://accounts.google.com/o/oauth2/auth?client_id=' . $this->_oauth_config->google_client_id . '&response_type=code&scope=openid%20profile%20email&redirect_uri=' . urlencode( $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=google' ) : 'javascript:;';
+                //$ok_link = ( !$show_example ) ? 'https://accounts.google.com/o/oauth2/auth?client_id=' . $this->_oauth_config->auth_lenauth_google_client_id . '&response_type=code&scope=openid%20profile%20email&redirect_uri=' . urlencode( $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=google' ) : 'javascript:;';
 
                 switch( $style ) {
                     case 'default':
@@ -102,7 +117,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-ico-google-plus';
                         $yahoo_class = 'lenauth-ico-yahoo';
                         $twitter_class = 'lenauth-ico-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-ico-vk-en';
                                 $yandex_class = 'lenauth-ico-yandex-en';
@@ -121,7 +136,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-ico-google-plus';
                         $yahoo_class = 'lenauth-ico-yahoo';
                         $twitter_class = 'lenauth-ico-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-ico-vk-en';
                                 $yandex_class = 'lenauth-ico-yandex-en';
@@ -140,7 +155,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-ico-google-plus';
                         $yahoo_class = 'lenauth-ico-yahoo';
                         $twitter_class = 'lenauth-ico-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-ico-vk-en';
                                 $yandex_class = 'lenauth-ico-yandex-en';
@@ -160,7 +175,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-ico-google-plus';
                         $yahoo_class = 'lenauth-ico-yahoo';
                         $twitter_class = 'lenauth-ico-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-ico-vk-en';
                                 $yandex_class = 'lenauth-ico-yandex-en';
@@ -182,7 +197,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-ico-google-plus';
                         $yahoo_class = 'lenauth-ico-yahoo';
                         $twitter_class = 'lenauth-ico-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-ico-vk-en';
                                 $yandex_class = 'lenauth-ico-yandex-en';
@@ -205,7 +220,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-ico-google-plus';
                         $yahoo_class = 'lenauth-ico-yahoo';
                         $twitter_class = 'lenauth-ico-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-ico-vk-en';
                                 $yandex_class = 'lenauth-ico-yandex-en';
@@ -227,7 +242,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-ico-google-plus';
                         $yahoo_class = 'lenauth-ico-yahoo';
                         $twitter_class = 'lenauth-ico-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-ico-vk-en';
                                 $yandex_class = 'lenauth-ico-yandex-en';
@@ -247,7 +262,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -266,7 +281,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -284,7 +299,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -302,7 +317,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -320,7 +335,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -338,7 +353,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -356,7 +371,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -374,7 +389,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -392,7 +407,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -411,7 +426,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -429,7 +444,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -447,7 +462,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -465,7 +480,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -483,7 +498,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -501,7 +516,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -519,7 +534,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -537,7 +552,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -555,7 +570,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-smooth-button-googleplus';
                         $yahoo_class = 'lenauth-smooth-button-yahoo';
                         $twitter_class = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-smooth-button-vk-en';
                                 $yandex_class = 'lenauth-smooth-button-yandex-en';
@@ -574,7 +589,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-style5-googlep';
                         $yahoo_class = 'lenauth-style5-yahoo';
                         $twitter_class = 'lenauth-style5-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-style5-vk-en';
                                 $yandex_class = 'lenauth-style5-yandex-en';
@@ -593,7 +608,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-style5-googlep';
                         $yahoo_class = 'lenauth-style5-yahoo';
                         $twitter_class = 'lenauth-style5-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-style5-vk-en';
                                 $yandex_class = 'lenauth-style5-yandex-en';
@@ -611,7 +626,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-style5-googlep';
                         $yahoo_class = 'lenauth-style5-yahoo';
                         $twitter_class = 'lenauth-style5-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-style5-vk-en';
                                 $yandex_class = 'lenauth-style5-yandex-en';
@@ -629,7 +644,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-style5-googlep';
                         $yahoo_class = 'lenauth-style5-yahoo';
                         $twitter_class = 'lenauth-style5-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-style5-vk-en';
                                 $yandex_class = 'lenauth-style5-yandex-en';
@@ -648,7 +663,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-style5-googlep';
                         $yahoo_class = 'lenauth-style5-yahoo';
                         $twitter_class = 'lenauth-style5-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-style5-vk-en';
                                 $yandex_class = 'lenauth-style5-yandex-en';
@@ -667,7 +682,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-style5-googlep';
                         $yahoo_class = 'lenauth-style5-yahoo';
                         $twitter_class = 'lenauth-style5-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-style5-vk-en';
                                 $yandex_class = 'lenauth-style5-yandex-en';
@@ -685,7 +700,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-style5-googlep';
                         $yahoo_class = 'lenauth-style5-yahoo';
                         $twitter_class = 'lenauth-style5-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-style5-vk-en';
                                 $yandex_class = 'lenauth-style5-yandex-en';
@@ -703,7 +718,7 @@ class lenauth_out extends auth_plugin_lenauth {
                         $google_class = 'lenauth-style5-googlep';
                         $yahoo_class = 'lenauth-style5-yahoo';
                         $twitter_class = 'lenauth-style5-twitter';
-                        switch ($this->_oauth_config->lenauth_locale) {
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
                             case 'en':
                                 $vk_class = 'lenauth-style5-vk-en';
                                 $yandex_class = 'lenauth-style5-yandex-en';
@@ -718,8 +733,8 @@ class lenauth_out extends auth_plugin_lenauth {
 
                 if ( !empty( $class_div_str ) ) {
 
-                    if ( !$auto_width && $this->_oauth_config->button_width > 0 ) {
-                        $style_button_str .= 'width:' . $this->_oauth_config->button_width . 'px;';
+                    if ( !$auto_width && $this->_oauth_config->auth_lenauth_button_width > 0 ) {
+                        $style_button_str .= 'width:' . $this->_oauth_config->auth_lenauth_button_width . 'px;';
                     }
 
                     $style_div_str .= '"';
@@ -727,32 +742,32 @@ class lenauth_out extends auth_plugin_lenauth {
 
                     $ret .= '<div class="lenauth-buttons' . ( !empty( $class_div_str ) ? ' ' . $class_div_str : '' ) .'"' . $style_div_str . '><ul>';
 
-                    if ( ( $this->_oauth_config->facebook_enabled && !empty( $this->_oauth_config->facebook_app_id ) && !empty( $this->_oauth_config->facebook_app_secret ) && !$show_example ) || $show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $facebook_class . '" href="' . $facebook_link . '">' . $facebook_bca . ( ( $has_text ) ? $this->_oauth_config->facebook_button_text : ( '' ) ) . '</a></li>';
+                    if ( ( $this->_oauth_config->auth_lenauth_facebook_enabled && !empty( $this->_oauth_config->auth_lenauth_facebook_app_id ) && !empty( $this->_oauth_config->auth_lenauth_facebook_app_secret ) && !$show_example ) || $show_example ) {
+                        $ret .= '<li' . $style_button_str . '><a class="' . $facebook_class . '" href="' . $facebook_link . '">' . $facebook_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_facebook_button_text : ( '' ) ) . '</a></li>';
                     }
 
-                    if ( $this->_oauth_config->google_enabled && !empty( $this->_oauth_config->google_client_id ) && !empty( $this->_oauth_config->google_client_secret ) && !$show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $google_class . '" href="' . $google_link . '">' . $google_bca . ( ( $has_text ) ? $this->_oauth_config->google_button_text : ( '' ) ) . '</a></li>';
+                    if ( $this->_oauth_config->auth_lenauth_google_enabled && !empty( $this->_oauth_config->auth_lenauth_google_client_id ) && !empty( $this->_oauth_config->auth_lenauth_google_client_secret ) && !$show_example ) {
+                        $ret .= '<li' . $style_button_str . '><a class="' . $google_class . '" href="' . $google_link . '">' . $google_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_google_button_text : ( '' ) ) . '</a></li>';
                     }
 
-                    if ( $this->_oauth_config->yahoo_enabled && !empty( $this->_oauth_config->yahoo_consumer_key ) && !empty( $this->_oauth_config->yahoo_consumer_secret ) && !$show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $yahoo_class . '" href="' . $yahoo_link . '">' . $yahoo_bca . ( ( $has_text ) ? $this->_oauth_config->yahoo_button_text : ( '' ) ) . '</a></li>';
+                    if ( $this->_oauth_config->auth_lenauth_yahoo_enabled && !empty( $this->_oauth_config->auth_lenauth_yahoo_consumer_key ) && !empty( $this->_oauth_config->auth_lenauth_yahoo_consumer_secret ) && !$show_example ) {
+                        $ret .= '<li' . $style_button_str . '><a class="' . $yahoo_class . '" href="' . $yahoo_link . '">' . $yahoo_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_yahoo_button_text : ( '' ) ) . '</a></li>';
                     }
 
-                    if ( ( $this->_oauth_config->twitter_enabled && !empty( $this->_oauth_config->twitter_consumer_key ) && !empty( $this->_oauth_config->twitter_consumer_secret ) && !$show_example ) || $show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $twitter_class . '" href="' . $twitter_link . '">' . $twitter_bca . ( ( $has_text ) ? $this->_oauth_config->twitter_button_text : ( '' ) ) . '</a></li>';
+                    if ( ( $this->_oauth_config->auth_lenauth_twitter_enabled && !empty( $this->_oauth_config->auth_lenauth_twitter_consumer_key ) && !empty( $this->_oauth_config->auth_lenauth_twitter_consumer_secret ) && !$show_example ) || $show_example ) {
+                        $ret .= '<li' . $style_button_str . '><a class="' . $twitter_class . '" href="' . $twitter_link . '">' . $twitter_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_twitter_button_text : ( '' ) ) . '</a></li>';
                     }
 
-                    if ( $this->_oauth_config->vk_enabled && !empty( $this->_oauth_config->vk_app_id ) && !empty( $this->_oauth_config->vk_app_secret ) || $show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $vk_class . '" href="' . $vk_link . '">' . $vk_bca . ( ( $has_text ) ? $this->_oauth_config->vk_button_text : ( '' ) ) . '</a></li>';
+                    if ( $this->_oauth_config->auth_lenauth_vk_enabled && !empty( $this->_oauth_config->auth_lenauth_vk_app_id ) && !empty( $this->_oauth_config->auth_lenauth_vk_app_secret ) || $show_example ) {
+                        $ret .= '<li' . $style_button_str . '><a class="' . $vk_class . '" href="' . $vk_link . '">' . $vk_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_vk_button_text : ( '' ) ) . '</a></li>';
                     }
 
-                    if ( $this->_oauth_config->yandex_enabled && !empty( $this->_oauth_config->yandex_app_id ) && !empty( $this->_oauth_config->yandex_app_password ) && !$show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $yandex_class . '" href="' . $yandex_link . '">' . $yandex_bca . ( ( $has_text ) ? $this->_oauth_config->yandex_button_text : ( '' ) ) . '</a></li>';
+                    if ( $this->_oauth_config->auth_lenauth_yandex_enabled && !empty( $this->_oauth_config->auth_lenauth_yandex_app_id ) && !empty( $this->_oauth_config->auth_lenauth_yandex_app_password ) && !$show_example ) {
+                        $ret .= '<li' . $style_button_str . '><a class="' . $yandex_class . '" href="' . $yandex_link . '">' . $yandex_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_yandex_button_text : ( '' ) ) . '</a></li>';
                     }
 
-                    if ( $this->_oauth_config->mailru_enabled && !empty( $this->_oauth_config->mailru_site_id ) && !empty( $this->_oauth_config->mailru_client_private ) && !empty( $this->_oauth_config->mailru_client_secret ) && !$show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $mailru_class . '" href="' . $mailru_link . '">' . $mailru_bca . ( ( $has_text ) ? $this->_oauth_config->mailru_button_text : ( '' ) ) . '</a></li>';
+                    if ( $this->_oauth_config->auth_lenauth_mailru_enabled && !empty( $this->_oauth_config->auth_lenauth_mailru_site_id ) && !empty( $this->_oauth_config->auth_lenauth_mailru_client_private ) && !empty( $this->_oauth_config->auth_lenauth_mailru_client_secret ) && !$show_example ) {
+                        $ret .= '<li' . $style_button_str . '><a class="' . $mailru_class . '" href="' . $mailru_link . '">' . $mailru_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_mailru_button_text : ( '' ) ) . '</a></li>';
                     }
 
                     /*if ( $this->_oauth_config->ok_enabled && !empty( $this->_oauth_config->ok_app_id ) && !empty( $this->_oauth_config->ok_public_key ) && !empty( $this->_oauth_config->ok_secret_key ) && !$show_example ) {
@@ -764,7 +779,7 @@ class lenauth_out extends auth_plugin_lenauth {
                 }
             }
         } else {
-            $ret = get_string('style_not_defined', 'auth_lenauth');
+            $ret = get_string('auth_lenauth_style_not_defined', 'auth_lenauth');
         }
 
         return $ret;

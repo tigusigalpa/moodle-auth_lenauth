@@ -2,7 +2,7 @@
 
 /**
  * @author Igor Sazonov ( @tigusigalpa )
- * @link http://moodle.org
+ * @link http://lms-service.org/lenauth-plugin-oauth-moodle/
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @version 1.0
  * @uses auth_plugin_base core class
@@ -180,23 +180,23 @@ class auth_plugin_lenauth extends auth_plugin_base {
     
     /**
      * VK API version
-     * @var type 
+     * @var string
      */
     public static $vk_api_version = '5.25';
     
     /**
      * Yahoo API version
-     * @var type 
+     * @var string
      */
     public static $yahoo_oauth_version = '1.0';
     
     /**
      * Twitter API version
-     * @var type 
+     * @var string
      */
     public static $twitter_oauth_version = '1.0';
     
-    protected static $_default_country = 'RU';
+    protected static $_auth_lenauth_default_country = 'RU';
 
 
     /**
@@ -214,7 +214,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
     
     /**
      * Singleton
-     * @return type
+     * @return object
      */
     public static function getInstance() {
         if ( ! isset( self::$_instance ) && ! ( self::$_instance instanceof auth_plugin_lenauth ) ) {
@@ -307,10 +307,20 @@ class auth_plugin_lenauth extends auth_plugin_base {
     /**
      * Returns true if plugin allows confirming of new users.
      *
-     * @return bool
+     * @return boolean
      */
     function can_confirm() {
-        return isset( $this->_oauth_config->can_confirm ) ? $this->_oauth_config->can_confirm : 0;
+        return isset( $this->_oauth_config->auth_lenauth_can_confirm ) ? $this->_oauth_config->auth_lenauth_can_confirm : false;
+    }
+
+    /**
+     * Returns true if plugin allows resetting of internal password.
+     *
+     * @link https://docs.moodle.org/dev/Authentication_plugins#can_reset_password.28.29
+     * @return boolean
+     */
+    function can_reset_password() {
+        return isset( $this->_oauth_config->auth_lenauth_can_reset_password ) ? $this->_oauth_config->auth_lenauth_can_reset_password : false;
     }
 
     /**
@@ -354,7 +364,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
             $authprovider = required_param( 'authprovider', PARAM_TEXT ); // get authorization provider (webservice name)
             $config_field_str = $authprovider . '_social_id_field';
             $this->_field_shortname = $this->_oauth_config->$config_field_str;
-            $this->_field_id = $this->_get_fieldid();
+            $this->_field_id = $this->_lenauth_get_fieldid();
 
             $params = array(); // params to generate data for token request
             $encode_params = true;
@@ -367,7 +377,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
             $this->_send_oauth_request = !isset( $_COOKIE[$authprovider]['access_token'] ) ? true : false;
             
             //if service is not enabled, why should we make request? hack protect. maybe
-            $enabled_str = $authprovider . '_enabled';
+            $enabled_str = 'auth_lenauth_' . $authprovider . '_enabled';
             if ( empty( $this->_oauth_config->$enabled_str ) ) {
                 throw new moodle_exception( 'Service not enabled in your LenAuth Settings', 'auth_lenauth' );
             }
@@ -377,24 +387,24 @@ class auth_plugin_lenauth extends auth_plugin_base {
                     /**
                      * @link https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow/v2.0#exchangecode
                      */
-                    $params['client_id']     = $this->_oauth_config->facebook_app_id;
-                    $params['client_secret'] = $this->_oauth_config->facebook_app_secret;
+                    $params['client_id']     = $this->_oauth_config->auth_lenauth_facebook_app_id;
+                    $params['client_secret'] = $this->_oauth_config->auth_lenauth_facebook_app_secret;
                     break;
                 
                 case 'google':
                     /**
                      * @link https://developers.google.com/accounts/docs/OAuth2Login#exchangecode
                      */
-                    $params['client_id']     = $this->_oauth_config->google_client_id;
-                    $params['client_secret'] = $this->_oauth_config->google_client_secret;
+                    $params['client_id']     = $this->_oauth_config->auth_lenauth_google_client_id;
+                    $params['client_secret'] = $this->_oauth_config->auth_lenauth_google_client_secret;
                     $params['grant_type']    = $this->_settings[$authprovider]['grant_type'];
                     break;
                 
                 case 'yahoo':
                     if ( !isset( $_COOKIE[$authprovider]['access_token'] ) && !isset( $_COOKIE[$authprovider]['oauth_verifier'] ) ) {
                         $params = array_merge(
-                            $this->_yahoo_request_array( $this->_oauth_config->yahoo_consumer_secret . '&' )
-                            ,array( 'oauth_callback' => $this->_redirect_uri( $authprovider ) )
+                            $this->_lenauth_yahoo_request_array( $this->_oauth_config->auth_lenauth_yahoo_consumer_secret . '&' )
+                            ,array( 'oauth_callback' => $this->_lenauth_redirect_uri( $authprovider ) )
                         );
 
                         $code                             = false;
@@ -418,11 +428,11 @@ class auth_plugin_lenauth extends auth_plugin_base {
                     break;
                     
                 case 'twitter':
-                    if ( !empty( $this->_oauth_config->twitter_enabled ) ) {
+                    if ( !empty( $this->_oauth_config->auth_lenauth_twitter_enabled ) ) {
                         if ( !isset( $_COOKIE[$authprovider]['access_token'] ) ) {
                             $params = array_merge(
-                                $this->_twitter_request_array( $this->_oauth_config->twitter_consumer_secret . '&' )
-                                ,array( 'oauth_callback' => $this->_redirect_uri( $authprovider ) )
+                                $this->_lenauth_twitter_request_array( $this->_oauth_config->auth_lenauth_twitter_consumer_secret . '&' )
+                                ,array( 'oauth_callback' => $this->_lenauth_redirect_uri( $authprovider ) )
                             );
                             
                             $code                             = false;
@@ -437,10 +447,10 @@ class auth_plugin_lenauth extends auth_plugin_base {
                                 $oauth_verifier = $SESSION->twitter_oauth_verifier = optional_param( 'oauth_verifier', '', PARAM_TEXT );
                                 setcookie( $authprovider . '[oauth_verifier]', $oauth_verifier, time() + $this->_settings[$authprovider]['expire'] );
                             } else {
-                                $curl_header = $this->_set_twitter_header( $params );
+                                $curl_header = $this->_lenauth_set_twitter_header( $params );
                             }
                             
-                            //$curl_header = $this->_set_twitter_header($params, $access_token/*, $oauth_token_secret = false*/);
+                            //$curl_header = $this->_lenauth_set_twitter_header($params, $access_token/*, $oauth_token_secret = false*/);
                             /*$curl_options = array(
                                 'CURLOPT_RETURNTRANSFER' => true,
                                 'CURLOPT_FOLLOWLOCATION' => true
@@ -461,19 +471,19 @@ class auth_plugin_lenauth extends auth_plugin_base {
                     /**
                      * @link http://vk.com/dev/auth_sites
                      */
-                    $params['client_id']     = $this->_oauth_config->vk_app_id;
-                    $params['client_secret'] = $this->_oauth_config->vk_app_secret;
+                    $params['client_id']     = $this->_oauth_config->auth_lenauth_vk_app_id;
+                    $params['client_secret'] = $this->_oauth_config->auth_lenauth_vk_app_secret;
                     break;
                 
                 case 'yandex':
                     $params['grant_type']    = $this->_settings[$authprovider]['grant_type'];
-                    $params['client_id']     = $this->_oauth_config->yandex_app_id;
-                    $params['client_secret'] = $this->_oauth_config->yandex_app_password;
+                    $params['client_id']     = $this->_oauth_config->auth_lenauth_yandex_app_id;
+                    $params['client_secret'] = $this->_oauth_config->auth_lenauth_yandex_app_password;
                     break;
                     
                 case 'mailru':
-                    $params['client_id']     = $this->_oauth_config->mailru_site_id;
-                    $params['client_secret'] = $this->_oauth_config->mailru_client_secret;
+                    $params['client_id']     = $this->_oauth_config->auth_lenauth_mailru_site_id;
+                    $params['client_secret'] = $this->_oauth_config->auth_lenauth_mailru_client_secret;
                     $params['grant_type']    = $this->_settings[$authprovider]['grant_type'];
                     break;
                     
@@ -491,7 +501,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
             // url for catch token value
             // exception for Yahoo OAuth, because it like..
             if ( $code ) $params['code']                  = $authorizationcode;
-            if ( $redirect_uri ) $params['redirect_uri']  = $this->_redirect_uri( $authprovider );
+            if ( $redirect_uri ) $params['redirect_uri']  = $this->_lenauth_redirect_uri( $authprovider );
             
             //require cURL from Moodle core
             require_once( $CFG->libdir . '/filelib.php' ); // requires library with cURL class
@@ -737,7 +747,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         }
 
                         $queryparams1 = array_merge(
-                            $this->_yahoo_request_array( $this->_oauth_config->yahoo_consumer_secret . '&' . $_COOKIE[$authprovider]['oauth_token_secret'] )
+                            $this->_lenauth_yahoo_request_array( $this->_oauth_config->auth_lenauth_yahoo_consumer_secret . '&' . $_COOKIE[$authprovider]['oauth_token_secret'] )
                             ,array(
                                 'oauth_token'    => $access_token,
                                 'oauth_verifier' => $oauth_verifier
@@ -748,7 +758,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         parse_str( $curl_response_pre, $values );
 
                         $queryparams2 = array_merge(
-                            $this->_yahoo_request_array( $this->_oauth_config->yahoo_consumer_secret . '&' . $values['oauth_token_secret'] )
+                            $this->_lenauth_yahoo_request_array( $this->_oauth_config->auth_lenauth_yahoo_consumer_secret . '&' . $values['oauth_token_secret'] )
                             ,array(
                                 'oauth_token'          => $values['oauth_token'],
                                 'oauth_session_handle' => $values['oauth_session_handle']
@@ -763,7 +773,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                             'env'    => 'http://datatables.org/alltables.env',
                         );
                         $auth_array = array_merge(
-                            $this->_yahoo_request_array( $this->_oauth_config->yahoo_consumer_secret . '&' . $yet_another_values['oauth_token_secret'] )
+                            $this->_lenauth_yahoo_request_array( $this->_oauth_config->auth_lenauth_yahoo_consumer_secret . '&' . $yet_another_values['oauth_token_secret'] )
                             ,array(
                                 'realm'       => 'yahooapis.com',
                                 'oauth_token' => $yet_another_values['oauth_token']
@@ -801,16 +811,20 @@ class auth_plugin_lenauth extends auth_plugin_base {
                             die;
                         }
                         $queryparams = array_merge(
-                            $this->_twitter_request_array()
+                            $this->_lenauth_twitter_request_array()
                             ,array( 'oauth_verifier' => $oauth_verifier, 'oauth_token' => $access_token, 'oauth_token_secret' => $_COOKIE[$authprovider]['oauth_token_secret'] )
                         );
-                        $curl_header = $this->_set_twitter_header( $queryparams, $access_token, $_COOKIE[$authprovider]['oauth_token_secret'] );
+                        $curl_header = $this->_lenauth_set_twitter_header( $queryparams, $access_token, $_COOKIE[$authprovider]['oauth_token_secret'] );
                         $curl->setHeader( $curl_header );
                         
                         $curl_final_data_pre = $curl->post(
                             $this->_settings[$authprovider]['token_url'],
                             $queryparams
                         );
+                        $json_decoded = json_decode( $curl_final_data_pre, true );
+                        if ( isset( $json_decoded['error'] ) && isset( $json_decoded['request'] ) ) {
+                            throw new moodle_exception( 'Native Twitter Error: ' . $json_decoded['error'] . '. For request ' . $json_decoded['request'], 'auth_lenauth' );
+                        }
                         parse_str($curl_final_data_pre, $curl_final_data);
                         $social_uid = $curl_final_data['user_id'];
                         break;
@@ -912,7 +926,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                                 $user_lenauth = $DB->get_record('user', array('email' => $user_email, 'deleted' => 0, 'mnethostid' => $CFG->mnet_localhost_id));
                             } else {
                                 if ( empty( $user_lenauth ) ) {
-                                    $user_lenauth = $this->_get_userdata_by_social_id( $social_uid );
+                                    $user_lenauth = $this->_lenauth_get_userdata_by_social_id( $social_uid );
                                 }
                                 /*if ( empty( $user_lenauth ) ) {
                                     $user_lenauth = $DB->get_record('user', array('username' => $username, 'deleted' => 0, 'mnethostid' => $CFG->mnet_localhost_id));
@@ -927,21 +941,21 @@ class auth_plugin_lenauth extends auth_plugin_base {
                 } else {
                     throw new moodle_exception( 'Final request returns nothing', 'auth_lenauth' );
                 }
-                $last_user_number = intval( $this->_oauth_config->last_user_number );
+                $last_user_number = intval( $this->_oauth_config->auth_lenauth_last_user_number );
                 $last_user_number = empty( $last_user_number ) ? 1 : $last_user_number+1;
-                //$username = $this->_oauth_config->lenauthuserprefix . $last_user_number; //@todo
+                //$username = $this->_oauth_config->auth_lenauth_user_prefix . $last_user_number; //@todo
                 /**
                  * If user with email from webservice not exists, we will create an account
                  */
                 if ( empty( $user_lenauth ) ) {
-                    $username = $this->_oauth_config->lenauthuserprefix . $last_user_number;
+                    $username = $this->_oauth_config->auth_lenauth_user_prefix . $last_user_number;
                     
                     //check for username exists in DB
                     $user_lenauth_check = $DB->get_record( 'user', array( 'username' => $username ) );
                     $i_check = 0;
                     while( !empty( $user_lenauth_check ) ) {
                         $user_lenauth_check = $user_lenauth_check + 1;
-                        $username = $this->_oauth_config->lenauthuserprefix . $last_user_number;
+                        $username = $this->_oauth_config->auth_lenauth_user_prefix . $last_user_number;
                         $user_lenauth_check = $DB->get_record( 'user', array( 'username' => $username ) );
                         $i_check++;
                         if ( $i_check > 20 ) {
@@ -956,7 +970,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                 } else {
                     $username = $user_lenauth->username;
                 }
-                set_config( 'last_user_number', $last_user_number, 'auth/lenauth' );
+                set_config( 'auth_lenauth_last_user_number', $last_user_number, 'auth/lenauth' );
                 
                 if ( !empty( $social_uid ) ) {
                     $user_social_uid_custom_field = new stdClass;
@@ -989,8 +1003,8 @@ class auth_plugin_lenauth extends auth_plugin_base {
                 if ( !empty( $last_name ) ) {
                     $newuser->lastname = $last_name;
                 }
-                if ( !empty( $this->_oauth_config->default_country ) ) {
-                    $newuser->country = $this->_oauth_config->default_country;
+                if ( !empty( $this->_oauth_config->auth_lenauth_default_country ) ) {
+                    $newuser->country = $this->_oauth_config->auth_lenauth_default_country;
                 }
                 
                 if ( $user_lenauth ) {
@@ -1037,167 +1051,167 @@ class auth_plugin_lenauth extends auth_plugin_base {
     function config_form( $config, $err, $user_fields ) {
 
         // set to defaults if undefined
-        if ( !isset( $config->lenauthuserprefix ) ) {
-            $config->lenauthuserprefix = 'lenauth_user_';
+        if ( !isset( $config->auth_lenauth_user_prefix ) ) {
+            $config->auth_lenauth_user_prefix = 'lenauth_user_';
         }
-        if ( !isset( $config->default_country ) ) {
-            $config->default_country = '';
+        if ( !isset( $config->auth_lenauth_default_country ) ) {
+            $config->auth_lenauth_default_country = '';
         }
-        if ( !isset( $config->lenauth_locale ) ) {
-            $config->lenauth_locale = 'en';
+        if ( !isset( $config->auth_lenauth_locale ) ) {
+            $config->auth_lenauth_locale = 'en';
         }
         /*if ( empty( $config->can_change_password ) ) {
             $config->can_change_password = 0;
         } else {
             $config->can_change_password = 1;
         }*/
-        if ( empty( $config->can_reset_password ) ) {
-            $config->can_reset_password = 0;
+        if ( empty( $config->auth_lenauth_can_reset_password ) ) {
+            $config->auth_lenauth_can_reset_password = 0;
         } else {
-            $config->can_reset_password = 1;
+            $config->auth_lenauth_can_reset_password = 1;
         }
-        if ( empty( $config->can_confirm ) ) {
-            $config->can_confirm = 0;
+        if ( empty( $config->auth_lenauth_can_confirm ) ) {
+            $config->auth_lenauth_can_confirm = 0;
         } else {
-            $config->can_confirm = 1;
+            $config->auth_lenauth_can_confirm = 1;
         }
         
-        if ( !isset( $config->display_buttons ) ) {
-            $config->display_buttons = 'inline-block';
+        if ( !isset( $config->auth_lenauth_display_buttons ) ) {
+            $config->auth_lenauth_display_buttons = 'inline-block';
         }
-        if ( !isset( $config->button_width ) ) {
-            $config->button_width = 0;
+        if ( !isset( $config->auth_lenauth_button_width ) ) {
+            $config->auth_lenauth_button_width = 0;
         }
-        if ( !isset( $config->button_margin_top ) ) {
-            $config->button_margin_top = 10;
+        if ( !isset( $config->auth_lenauth_button_margin_top ) ) {
+            $config->auth_lenauth_button_margin_top = 10;
         }
-        if ( !isset( $config->button_margin_right ) ) {
-            $config->button_margin_right = 10;
+        if ( !isset( $config->auth_lenauth_button_margin_right ) ) {
+            $config->auth_lenauth_button_margin_right = 10;
         }
-        if ( !isset( $config->button_margin_bottom ) ) {
-            $config->button_margin_bottom = 10;
+        if ( !isset( $config->auth_lenauth_button_margin_bottom ) ) {
+            $config->auth_lenauth_button_margin_bottom = 10;
         }
-        if ( !isset( $config->button_margin_left ) ) {
-            $config->button_margin_left = 10;
-        }
-        
-        if ( !isset( $config->display_div ) ) {
-            $config->display_div = 'block';
-        }
-        if ( !isset( $config->div_width ) ) {
-            $config->div_width = 0;
-        }
-        if ( !isset( $config->div_margin_top ) ) {
-            $config->div_margin_top = 0;
-        }
-        if ( !isset( $config->div_margin_right ) ) {
-            $config->div_margin_right = 0;
-        }
-        if ( !isset( $config->div_margin_bottom ) ) {
-            $config->div_margin_bottom = 0;
-        }
-        if ( !isset( $config->div_margin_left ) ) {
-            $config->div_margin_left = 0;
+        if ( !isset( $config->auth_lenauth_button_margin_left ) ) {
+            $config->auth_lenauth_button_margin_left = 10;
         }
         
-        if ( !isset( $config->facebook_enabled ) ) {
-            $config->facebook_enabled = 0;
+        if ( !isset( $config->auth_lenauth_display_div ) ) {
+            $config->auth_lenauth_display_div = 'block';
         }
-        if ( !isset( $config->facebook_app_id ) ) {
-            $config->facebook_app_id = '';
+        if ( !isset( $config->auth_lenauth_div_width ) ) {
+            $config->auth_lenauth_div_width = 0;
         }
-        if ( !isset( $config->facebook_app_secret ) ) {
-            $config->facebook_app_secret = '';
+        if ( !isset( $config->auth_lenauth_div_margin_top ) ) {
+            $config->auth_lenauth_div_margin_top = 0;
         }
-        if ( !isset( $config->facebook_button_text ) ) {
-            $config->facebook_button_text = get_string( 'facebook_button_text_default', 'auth_lenauth' );
+        if ( !isset( $config->auth_lenauth_div_margin_right ) ) {
+            $config->auth_lenauth_div_margin_right = 0;
         }
-        
-        if ( !isset( $config->google_enabled ) ) {
-            $config->google_enabled = 0;
+        if ( !isset( $config->auth_lenauth_div_margin_bottom ) ) {
+            $config->auth_lenauth_div_margin_bottom = 0;
         }
-        if ( !isset( $config->google_client_id ) ) {
-            $config->google_client_id = '';
-        }
-        if ( !isset( $config->google_client_secret ) ) {
-            $config->google_client_secret = '';
-        }
-        if ( !isset( $config->google_project_id ) ) {
-            $config->google_project_id = '';
-        }
-        if ( !isset( $config->google_button_text ) ) {
-            $config->google_button_text = get_string( 'google_button_text_default', 'auth_lenauth' );
+        if ( !isset( $config->auth_lenauth_div_margin_left ) ) {
+            $config->auth_lenauth_div_margin_left = 0;
         }
         
-        if ( !isset( $config->yahoo_enabled ) ) {
-            $config->yahoo_enabled = 0;
+        if ( !isset( $config->auth_lenauth_facebook_enabled ) ) {
+            $config->auth_lenauth_facebook_enabled = 0;
         }
-        if ( !isset( $config->yahoo_application_id ) ) {
-            $config->yahoo_application_id = '';
+        if ( !isset( $config->auth_lenauth_facebook_app_id ) ) {
+            $config->auth_lenauth_facebook_app_id = '';
         }
-        if ( !isset( $config->yahoo_consumer_key ) ) {
-            $config->yahoo_consumer_key = '';
+        if ( !isset( $config->auth_lenauth_facebook_app_secret ) ) {
+            $config->auth_lenauth_facebook_app_secret = '';
         }
-        if ( !isset( $config->yahoo_consumer_secret ) ) {
-            $config->yahoo_consumer_secret = '';
-        }
-        if ( !isset( $config->yahoo_button_text ) ) {
-            $config->yahoo_button_text = get_string( 'yahoo_button_text_default', 'auth_lenauth' );
+        if ( !isset( $config->auth_lenauth_facebook_button_text ) ) {
+            $config->auth_lenauth_facebook_button_text = get_string( 'auth_lenauth_facebook_button_text_default', 'auth_lenauth' );
         }
         
-        if ( !isset( $config->twitter_enabled ) ) {
-            $config->twitter_enabled = 0;
+        if ( !isset( $config->auth_lenauth_google_enabled ) ) {
+            $config->auth_lenauth_google_enabled = 0;
         }
-        if ( !isset( $config->twitter_consumer_key ) ) {
-            $config->twitter_consumer_key = '';
+        if ( !isset( $config->auth_lenauth_google_client_id ) ) {
+            $config->auth_lenauth_google_client_id = '';
         }
-        if ( !isset( $config->twitter_consumer_secret ) ) {
-            $config->twitter_consumer_secret = '';
+        if ( !isset( $config->auth_lenauth_google_client_secret ) ) {
+            $config->auth_lenauth_google_client_secret = '';
         }
-        if ( !isset( $config->twitter_application_id ) ) {
-            $config->twitter_application_id = '';
+        if ( !isset( $config->auth_lenauth_google_project_id ) ) {
+            $config->auth_lenauth_google_project_id = '';
+        }
+        if ( !isset( $config->auth_lenauth_google_button_text ) ) {
+            $config->auth_lenauth_google_button_text = get_string( 'auth_lenauth_google_button_text_default', 'auth_lenauth' );
         }
         
-        if ( !isset( $config->vk_enabled ) ) {
-            $config->vk_enabled = 0;
+        if ( !isset( $config->auth_lenauth_yahoo_enabled ) ) {
+            $config->auth_lenauth_yahoo_enabled = 0;
         }
-        if ( !isset( $config->vk_app_id ) ) {
-            $config->vk_app_id = '';
+        if ( !isset( $config->auth_lenauth_yahoo_application_id ) ) {
+            $config->auth_lenauth_yahoo_application_id = '';
         }
-        if ( !isset( $config->vk_app_secret ) ) {
-            $config->vk_app_secret = '';
+        if ( !isset( $config->auth_lenauth_yahoo_consumer_key ) ) {
+            $config->auth_lenauth_yahoo_consumer_key = '';
         }
-        if ( !isset( $config->vk_button_text ) ) {
-            $config->vk_button_text = get_string( 'vk_button_text_default', 'auth_lenauth' );
+        if ( !isset( $config->auth_lenauth_yahoo_consumer_secret ) ) {
+            $config->auth_lenauth_yahoo_consumer_secret = '';
+        }
+        if ( !isset( $config->auth_lenauth_yahoo_button_text ) ) {
+            $config->auth_lenauth_yahoo_button_text = get_string( 'auth_lenauth_yahoo_button_text_default', 'auth_lenauth' );
+        }
+        
+        if ( !isset( $config->auth_lenauth_twitter_enabled ) ) {
+            $config->auth_lenauth_twitter_enabled = 0;
+        }
+        if ( !isset( $config->auth_lenauth_twitter_consumer_key ) ) {
+            $config->auth_lenauth_twitter_consumer_key = '';
+        }
+        if ( !isset( $config->auth_lenauth_twitter_consumer_secret ) ) {
+            $config->auth_lenauth_twitter_consumer_secret = '';
+        }
+        if ( !isset( $config->auth_lenauth_twitter_application_id ) ) {
+            $config->auth_lenauth_twitter_application_id = '';
+        }
+        
+        if ( !isset( $config->auth_lenauth_vk_enabled ) ) {
+            $config->auth_lenauth_vk_enabled = 0;
+        }
+        if ( !isset( $config->auth_lenauth_vk_app_id ) ) {
+            $config->auth_lenauth_vk_app_id = '';
+        }
+        if ( !isset( $config->auth_lenauth_vk_app_secret ) ) {
+            $config->auth_lenauth_vk_app_secret = '';
+        }
+        if ( !isset( $config->auth_lenauth_vk_button_text ) ) {
+            $config->auth_lenauth_vk_button_text = get_string( 'auth_lenauth_vk_button_text_default', 'auth_lenauth' );
         }
 
-        if ( !isset( $config->yandex_enabled ) ) {
-            $config->yandex_enabled = 0;
+        if ( !isset( $config->auth_lenauth_yandex_enabled ) ) {
+            $config->auth_lenauth_yandex_enabled = 0;
         }
-        if ( !isset( $config->yandex_app_id ) ) {
-            $config->yandex_app_id = '';
+        if ( !isset( $config->auth_lenauth_yandex_app_id ) ) {
+            $config->auth_lenauth_yandex_app_id = '';
         }
-        if ( !isset( $config->yandex_app_password ) ) {
-            $config->yandex_app_password = '';
+        if ( !isset( $config->auth_lenauth_yandex_app_password ) ) {
+            $config->auth_lenauth_yandex_app_password = '';
         }
-        if ( !isset( $config->yandex_button_text ) ) {
-            $config->yandex_button_text = get_string( 'yandex_button_text_default', 'auth_lenauth' );
+        if ( !isset( $config->auth_lenauth_yandex_button_text ) ) {
+            $config->auth_lenauth_yandex_button_text = get_string( 'auth_lenauth_yandex_button_text_default', 'auth_lenauth' );
         }
 
-        if ( !isset( $config->mailru_enabled ) ) {
-            $config->mailru_enabled = 0;
+        if ( !isset( $config->auth_lenauth_mailru_enabled ) ) {
+            $config->auth_lenauth_mailru_enabled = 0;
         }
-        if ( !isset( $config->mailru_site_id ) ) {
-            $config->mailru_site_id = '';
+        if ( !isset( $config->auth_lenauth_mailru_site_id ) ) {
+            $config->auth_lenauth_mailru_site_id = '';
         }
-        if ( !isset( $config->mailru_client_private ) ) {
-            $config->mailru_client_private = '';
+        if ( !isset( $config->auth_lenauth_mailru_client_private ) ) {
+            $config->auth_lenauth_mailru_client_private = '';
         }
-        if ( !isset( $config->mailru_client_secret ) ) {
-            $config->mailru_client_secret = '';
+        if ( !isset( $config->auth_lenauth_mailru_client_secret ) ) {
+            $config->auth_lenauth_mailru_client_secret = '';
         }
-        if ( !isset( $config->mailru_button_text ) ) {
-            $config->mailru_button_text = get_string( 'mailru_button_text_default', 'auth_lenauth' );
+        if ( !isset( $config->auth_lenauth_mailru_button_text ) ) {
+            $config->auth_lenauth_mailru_button_text = get_string( 'auth_lenauth_mailru_button_text_default', 'auth_lenauth' );
         }
 
         /*if ( !isset( $config->ok_enabled ) ) {
@@ -1238,156 +1252,156 @@ class auth_plugin_lenauth extends auth_plugin_base {
         
         if ( has_capability( 'moodle/user:update', context_system::instance() ) ) {
             // set to defaults if undefined while save
-            if ( !isset( $config->lenauthuserprefix ) ) {
-                $config->lenauthuserprefix = 'lenauth_user_';
+            if ( !isset( $config->auth_lenauth_user_prefix ) ) {
+                $config->auth_lenauth_user_prefix = 'lenauth_user_';
             }
-            if ( !isset( $config->default_country ) ) {
-                $config->default_country = '';
+            if ( !isset( $config->auth_lenauth_default_country ) ) {
+                $config->auth_lenauth_default_country = '';
             }
-            if ( !isset( $config->lenauth_locale ) ) {
-                $config->lenauth_locale = 'en';
+            if ( !isset( $config->auth_lenauth_locale ) ) {
+                $config->auth_lenauth_locale = 'en';
             }
             /*if ( empty( $config->can_change_password ) ) {
                 $config->can_change_password = 0;
             } else {
                 $config->can_change_password = 1;
             }*/
-            if ( empty( $config->can_reset_password ) ) {
-                $config->can_reset_password = 0;
+            if ( empty( $config->auth_lenauth_can_reset_password ) ) {
+                $config->auth_lenauth_can_reset_password = 0;
             } else {
-                $config->can_reset_password = 1;
+                $config->auth_lenauth_can_reset_password = 1;
             }
-            if ( empty( $config->can_confirm ) ) {
-                $config->can_confirm = 0;
+            if ( empty( $config->auth_lenauth_can_confirm ) ) {
+                $config->auth_lenauth_can_confirm = 0;
             } else {
-                $config->can_confirm = 1;
+                $config->auth_lenauth_can_confirm = 1;
             }            
             
-            if ( !isset( $config->display_buttons ) ) {
-                $config->display_buttons = 'inline-block';
+            if ( !isset( $config->auth_lenauth_display_buttons ) ) {
+                $config->auth_lenauth_display_buttons = 'inline-block';
             }
-            if ( !isset( $config->button_width ) ) {
-                $config->button_width = 0;
+            if ( !isset( $config->auth_lenauth_button_width ) ) {
+                $config->auth_lenauth_button_width = 0;
             }
-            if ( !isset( $config->button_margin_top ) ) {
-                $config->button_margin_top = 10;
+            if ( !isset( $config->auth_lenauth_button_margin_top ) ) {
+                $config->auth_lenauth_button_margin_top = 10;
             }
-            if ( !isset( $config->button_margin_right ) ) {
-                $config->button_margin_right = 10;
+            if ( !isset( $config->auth_lenauth_button_margin_right ) ) {
+                $config->auth_lenauth_button_margin_right = 10;
             }
-            if ( !isset( $config->button_margin_bottom ) ) {
-                $config->button_margin_bottom = 10;
+            if ( !isset( $config->auth_lenauth_button_margin_bottom ) ) {
+                $config->auth_lenauth_button_margin_bottom = 10;
             }
-            if ( !isset( $config->button_margin_left ) ) {
-                $config->button_margin_left = 10;
-            }
-            
-            if ( !isset( $config->display_div ) ) {
-                $config->display_div = 'block';
-            }
-            if ( !isset( $config->div_width ) ) {
-                $config->div_width = 0;
-            }
-            if ( !isset( $config->div_margin_top ) ) {
-                $config->div_margin_top = 0;
-            }
-            if ( !isset( $config->div_margin_right ) ) {
-                $config->div_margin_right = 0;
-            }
-            if ( !isset( $config->div_margin_bottom ) ) {
-                $config->div_margin_bottom = 0;
-            }
-            if ( !isset( $config->div_margin_left ) ) {
-                $config->div_margin_left = 0;
+            if ( !isset( $config->auth_lenauth_button_margin_left ) ) {
+                $config->auth_lenauth_button_margin_left = 10;
             }
             
-            $config->facebook_enabled = ( !empty( $config->facebook_enabled ) ) ? 1 : 0;
-            if ( !isset( $config->facebook_app_id ) ) {
-                $config->facebook_app_id = '';
+            if ( !isset( $config->auth_lenauth_display_div ) ) {
+                $config->auth_lenauth_display_div = 'block';
             }
-            if ( !isset( $config->facebook_app_secret ) ) {
-                $config->facebook_app_secret = '';
+            if ( !isset( $config->auth_lenauth_div_width ) ) {
+                $config->auth_lenauth_div_width = 0;
             }
-            if ( !isset( $config->facebook_button_text ) ) {
-                $config->facebook_button_text = get_string( 'auth_facebook_button_text_default', 'auth_lenauth' );
+            if ( !isset( $config->auth_lenauth_div_margin_top ) ) {
+                $config->auth_lenauth_div_margin_top = 0;
             }
-            
-            $config->google_enabled = ( !empty( $config->google_enabled ) ) ? 1 : 0;
-            if ( !isset( $config->google_client_id ) ) {
-                $config->google_client_id = '';
+            if ( !isset( $config->auth_lenauth_div_margin_right ) ) {
+                $config->auth_lenauth_div_margin_right = 0;
             }
-            if ( !isset( $config->google_client_secret ) ) {
-                $config->google_client_secret = '';
+            if ( !isset( $config->auth_lenauth_div_margin_bottom ) ) {
+                $config->auth_lenauth_div_margin_bottom = 0;
             }
-            if ( !isset( $config->google_project_id ) ) {
-                $config->google_project_id = '';
-            }
-            if ( empty( $config->google_button_text ) ) {
-                $config->google_button_text = get_string( 'auth_google_button_text_default', 'auth_lenauth' );
+            if ( !isset( $config->auth_lenauth_div_margin_left ) ) {
+                $config->auth_lenauth_div_margin_left = 0;
             }
             
-            $config->yahoo_enabled = ( !empty( $config->yahoo_enabled ) ) ? 1 : 0;
-            if ( !isset( $config->yahoo_application_id ) ) {
-                $config->yahoo_application_id = '';
+            $config->auth_lenauth_facebook_enabled = ( !empty( $config->auth_lenauth_facebook_enabled ) ) ? 1 : 0;
+            if ( !isset( $config->auth_lenauth_facebook_app_id ) ) {
+                $config->auth_lenauth_facebook_app_id = '';
             }
-            if ( !isset( $config->yahoo_consumer_key ) ) {
-                $config->yahoo_consumer_key = '';
+            if ( !isset( $config->auth_lenauth_facebook_app_secret ) ) {
+                $config->auth_lenauth_facebook_app_secret = '';
             }
-            if ( !isset( $config->yahoo_consumer_secret ) ) {
-                $config->yahoo_consumer_secret = '';
-            }
-            if ( !isset( $config->yahoo_button_text ) ) {
-                $config->yahoo_button_text = get_string( 'auth_yahoo_button_text_default', 'auth_lenauth' );
+            if ( !isset( $config->auth_lenauth_facebook_button_text ) ) {
+                $config->auth_lenauth_facebook_button_text = get_string( 'auth_lenauth_facebook_button_text_default', 'auth_lenauth' );
             }
             
-            $config->twitter_enabled = ( !empty( $config->twitter_enabled ) ) ? 1 : 0;
-            if ( !isset( $config->twitter_consumer_key ) ) {
-                $config->twitter_consumer_key = '';
+            $config->auth_lenauth_google_enabled = ( !empty( $config->auth_lenauth_google_enabled ) ) ? 1 : 0;
+            if ( !isset( $config->auth_lenauth_google_client_id ) ) {
+                $config->auth_lenauth_google_client_id = '';
             }
-            if ( !isset( $config->twitter_consumer_secret ) ) {
-                $config->twitter_consumer_secret = '';
+            if ( !isset( $config->auth_lenauth_google_client_secret ) ) {
+                $config->auth_lenauth_google_client_secret = '';
             }
-            if ( !isset( $config->twitter_application_id ) ) {
-                $config->twitter_application_id = '';
+            if ( !isset( $config->auth_lenauth_google_project_id ) ) {
+                $config->auth_lenauth_google_project_id = '';
             }
-            if ( !isset( $config->twitter_button_text ) ) {
-                $config->twitter_button_text = get_string( 'auth_twitter_button_text_default', 'auth_lenauth' );
+            if ( empty( $config->auth_lenauth_google_button_text ) ) {
+                $config->auth_lenauth_google_button_text = get_string( 'auth_lenauth_google_button_text_default', 'auth_lenauth' );
             }
             
-            $config->vk_enabled = ( !empty( $config->vk_enabled ) ) ? 1 : 0;
-            if ( !isset( $config->vk_app_id ) ) {
-                $config->vk_app_id = '';
+            $config->auth_lenauth_yahoo_enabled = ( !empty( $config->auth_lenauth_yahoo_enabled ) ) ? 1 : 0;
+            if ( !isset( $config->auth_lenauth_yahoo_application_id ) ) {
+                $config->auth_lenauth_yahoo_application_id = '';
             }
-            if ( !isset( $config->vk_app_secret ) ) {
-                $config->vk_app_secret = '';
+            if ( !isset( $config->auth_lenauth_yahoo_consumer_key ) ) {
+                $config->auth_lenauth_yahoo_consumer_key = '';
             }
-            if ( empty( $config->vk_button_text ) ) {
-                $config->vk_button_text = get_string( 'auth_vk_button_text_default', 'auth_lenauth' );
+            if ( !isset( $config->auth_lenauth_yahoo_consumer_secret ) ) {
+                $config->auth_lenauth_yahoo_consumer_secret = '';
+            }
+            if ( !isset( $config->auth_lenauth_yahoo_button_text ) ) {
+                $config->auth_lenauth_yahoo_button_text = get_string( 'auth_lenauth_yahoo_button_text_default', 'auth_lenauth' );
+            }
+            
+            $config->auth_lenauth_twitter_enabled = ( !empty( $config->auth_lenauth_twitter_enabled ) ) ? 1 : 0;
+            if ( !isset( $config->auth_lenauth_twitter_consumer_key ) ) {
+                $config->auth_lenauth_twitter_consumer_key = '';
+            }
+            if ( !isset( $config->auth_lenauth_twitter_consumer_secret ) ) {
+                $config->auth_lenauth_twitter_consumer_secret = '';
+            }
+            if ( !isset( $config->auth_lenauth_twitter_application_id ) ) {
+                $config->auth_lenauth_twitter_application_id = '';
+            }
+            if ( !isset( $config->auth_lenauth_twitter_button_text ) ) {
+                $config->auth_lenauth_twitter_button_text = get_string( 'auth_lenauth_twitter_button_text_default', 'auth_lenauth' );
+            }
+            
+            $config->auth_lenauth_vk_enabled = ( !empty( $config->auth_lenauth_vk_enabled ) ) ? 1 : 0;
+            if ( !isset( $config->auth_lenauth_vk_app_id ) ) {
+                $config->auth_lenauth_vk_app_id = '';
+            }
+            if ( !isset( $config->auth_lenauth_vk_app_secret ) ) {
+                $config->auth_lenauth_vk_app_secret = '';
+            }
+            if ( empty( $config->auth_lenauth_vk_button_text ) ) {
+                $config->auth_lenauth_vk_button_text = get_string( 'auth_lenauth_vk_button_text_default', 'auth_lenauth' );
             }
 
-            $config->yandex_enabled = ( !empty( $config->yandex_enabled ) ) ? 1 : 0;
-            if ( !isset( $config->yandex_app_id ) ) {
-                $config->yandex_app_id = '';
+            $config->auth_lenauth_yandex_enabled = ( !empty( $config->auth_lenauth_yandex_enabled ) ) ? 1 : 0;
+            if ( !isset( $config->auth_lenauth_yandex_app_id ) ) {
+                $config->auth_lenauth_yandex_app_id = '';
             }
-            if ( !isset( $config->yandex_app_password ) ) {
-                $config->yandex_app_password = '';
+            if ( !isset( $config->auth_lenauth_yandex_app_password ) ) {
+                $config->auth_lenauth_yandex_app_password = '';
             }
-            if ( !isset( $config->yandex_button_text ) ) {
-                $config->yandex_button_text = get_string( 'yandex_button_text_default', 'auth_lenauth' );
+            if ( !isset( $config->auth_lenauth_yandex_button_text ) ) {
+                $config->auth_lenauth_yandex_button_text = get_string( 'auth_lenauth_yandex_button_text_default', 'auth_lenauth' );
             }
 
-            $config->mailru_enabled = ( !empty( $config->mailru_enabled ) ) ? 1 : 0;
-            if ( !isset( $config->mailru_site_id ) ) {
-                $config->mailru_site_id = '';
+            $config->auth_lenauth_mailru_enabled = ( !empty( $config->auth_lenauth_mailru_enabled ) ) ? 1 : 0;
+            if ( !isset( $config->auth_lenauth_mailru_site_id ) ) {
+                $config->auth_lenauth_mailru_site_id = '';
             }
-            if ( !isset( $config->mailru_client_private ) ) {
-                $config->mailru_client_private = '';
+            if ( !isset( $config->auth_lenauth_mailru_client_private ) ) {
+                $config->auth_lenauth_mailru_client_private = '';
             }
-            if ( !isset( $config->mailru_client_secret ) ) {
-                $config->mailru_client_secret = '';
+            if ( !isset( $config->auth_lenauth_mailru_client_secret ) ) {
+                $config->auth_lenauth_mailru_client_secret = '';
             }
-            if ( !isset( $config->mailru_button_text ) ) {
-                $config->mailru_button_text = get_string( 'auth_mailru_button_text_default', 'auth_lenauth' );
+            if ( !isset( $config->auth_lenauth_mailru_button_text ) ) {
+                $config->auth_lenauth_mailru_button_text = get_string( 'auth_lenauth_mailru_button_text_default', 'auth_lenauth' );
             }
 
             /*$config->ok_enabled = ( !empty( $config->ok_enabled ) ) ? 1 : 0;
@@ -1408,44 +1422,44 @@ class auth_plugin_lenauth extends auth_plugin_base {
             }*/
 
             // save settings
-            set_config('facebook_enabled',        intval( $config->facebook_enabled ),                       'auth/lenauth');
-            set_config('facebook_app_id',         trim( format_string( $config->facebook_app_id ) ),         'auth/lenauth');
-            set_config('facebook_app_secret',     trim( format_string( $config->facebook_app_secret ) ),     'auth/lenauth');
-            set_config('facebook_button_text',    trim( format_string( $config->facebook_button_text ) ),    'auth/lenauth');
+            set_config('auth_lenauth_facebook_enabled',        intval( $config->auth_lenauth_facebook_enabled ),                       'auth/lenauth');
+            set_config('auth_lenauth_facebook_app_id',         trim( format_string( $config->auth_lenauth_facebook_app_id ) ),         'auth/lenauth');
+            set_config('auth_lenauth_facebook_app_secret',     trim( format_string( $config->auth_lenauth_facebook_app_secret ) ),     'auth/lenauth');
+            set_config('auth_lenauth_facebook_button_text',    trim( format_string( $config->auth_lenauth_facebook_button_text ) ),    'auth/lenauth');
             
-            set_config('google_enabled',          intval( $config->google_enabled ),                         'auth/lenauth');
-            set_config('google_client_id',        trim( format_string( $config->google_client_id ) ),        'auth/lenauth');
-            set_config('google_client_secret',    trim( format_string( $config->google_client_secret ) ),    'auth/lenauth');
-            set_config('google_project_id',       trim( format_string( $config->google_project_id ) ),       'auth/lenauth');
-            set_config('google_button_text',      trim( format_string( $config->google_button_text ) ),      'auth/lenauth');
+            set_config('auth_lenauth_google_enabled',          intval( $config->auth_lenauth_google_enabled ),                         'auth/lenauth');
+            set_config('auth_lenauth_google_client_id',        trim( format_string( $config->auth_lenauth_google_client_id ) ),        'auth/lenauth');
+            set_config('auth_lenauth_google_client_secret',    trim( format_string( $config->auth_lenauth_google_client_secret ) ),    'auth/lenauth');
+            set_config('auth_lenauth_google_project_id',       trim( format_string( $config->auth_lenauth_google_project_id ) ),       'auth/lenauth');
+            set_config('auth_lenauth_google_button_text',      trim( format_string( $config->auth_lenauth_google_button_text ) ),      'auth/lenauth');
             
-            set_config('yahoo_enabled',           intval( $config->yahoo_enabled ),                          'auth/lenauth');
-            set_config('yahoo_application_id',    trim( format_string( $config->yahoo_application_id ) ),    'auth/lenauth');
-            set_config('yahoo_consumer_key',      trim( format_string( $config->yahoo_consumer_key ) ),      'auth/lenauth');
-            set_config('yahoo_consumer_secret',   trim( format_string( $config->yahoo_consumer_secret ) ),   'auth/lenauth');
-            set_config('yahoo_button_text',       trim( format_string( $config->yahoo_button_text ) ),       'auth/lenauth');
+            set_config('auth_lenauth_yahoo_enabled',           intval( $config->auth_lenauth_yahoo_enabled ),                          'auth/lenauth');
+            set_config('auth_lenauth_yahoo_application_id',    trim( format_string( $config->auth_lenauth_yahoo_application_id ) ),    'auth/lenauth');
+            set_config('auth_lenauth_yahoo_consumer_key',      trim( format_string( $config->auth_lenauth_yahoo_consumer_key ) ),      'auth/lenauth');
+            set_config('auth_lenauth_yahoo_consumer_secret',   trim( format_string( $config->auth_lenauth_yahoo_consumer_secret ) ),   'auth/lenauth');
+            set_config('auth_lenauth_yahoo_button_text',       trim( format_string( $config->auth_lenauth_yahoo_button_text ) ),       'auth/lenauth');
 
-            set_config('twitter_enabled',         intval( $config->twitter_enabled ),                        'auth/lenauth');
-            set_config('twitter_application_id',  intval( $config->twitter_application_id ),                 'auth/lenauth');
-            set_config('twitter_consumer_key',    trim( format_string( $config->twitter_consumer_key ) ),    'auth/lenauth');
-            set_config('twitter_consumer_secret', trim( format_string( $config->twitter_consumer_secret ) ), 'auth/lenauth');
-            set_config('twitter_button_text',     trim( format_string( $config->twitter_button_text ) ),     'auth/lenauth');
+            set_config('auth_lenauth_twitter_enabled',         intval( $config->auth_lenauth_twitter_enabled ),                        'auth/lenauth');
+            set_config('auth_lenauth_twitter_application_id',  intval( $config->auth_lenauth_twitter_application_id ),                 'auth/lenauth');
+            set_config('auth_lenauth_twitter_consumer_key',    trim( format_string( $config->auth_lenauth_twitter_consumer_key ) ),    'auth/lenauth');
+            set_config('auth_lenauth_twitter_consumer_secret', trim( format_string( $config->auth_lenauth_twitter_consumer_secret ) ), 'auth/lenauth');
+            set_config('auth_lenauth_twitter_button_text',     trim( format_string( $config->auth_lenauth_twitter_button_text ) ),     'auth/lenauth');
             
-            set_config('vk_enabled',              intval( $config->vk_enabled ),                             'auth/lenauth');
-            set_config('vk_app_id',               trim( format_string( $config->vk_app_id ) ),               'auth/lenauth');
-            set_config('vk_app_secret',           trim( format_string( $config->vk_app_secret ) ),           'auth/lenauth');
-            set_config('vk_button_text',          trim( format_string( $config->vk_button_text ) ),          'auth/lenauth');
+            set_config('auth_lenauth_vk_enabled',              intval( $config->auth_lenauth_vk_enabled ),                             'auth/lenauth');
+            set_config('auth_lenauth_vk_app_id',               trim( format_string( $config->auth_lenauth_vk_app_id ) ),               'auth/lenauth');
+            set_config('auth_lenauth_vk_app_secret',           trim( format_string( $config->auth_lenauth_vk_app_secret ) ),           'auth/lenauth');
+            set_config('auth_lenauth_vk_button_text',          trim( format_string( $config->auth_lenauth_vk_button_text ) ),          'auth/lenauth');
             
-            set_config('yandex_enabled',          intval( $config->yandex_enabled ),                         'auth/lenauth');
-            set_config('yandex_app_id',           trim( format_string( $config->yandex_app_id ) ),           'auth/lenauth');
-            set_config('yandex_app_password',     trim( format_string( $config->yandex_app_password ) ),     'auth/lenauth');
-            set_config('yandex_button_text',      trim( format_string( $config->yandex_button_text ) ),      'auth/lenauth');
+            set_config('auth_lenauth_yandex_enabled',          intval( $config->auth_lenauth_yandex_enabled ),                         'auth/lenauth');
+            set_config('auth_lenauth_yandex_app_id',           trim( format_string( $config->auth_lenauth_yandex_app_id ) ),           'auth/lenauth');
+            set_config('auth_lenauth_yandex_app_password',     trim( format_string( $config->auth_lenauth_yandex_app_password ) ),     'auth/lenauth');
+            set_config('auth_lenauth_yandex_button_text',      trim( format_string( $config->auth_lenauth_yandex_button_text ) ),      'auth/lenauth');
 
-            set_config('mailru_enabled',          intval( $config->mailru_enabled ),                         'auth/lenauth');
-            set_config('mailru_site_id',          intval( $config->mailru_site_id ),                         'auth/lenauth');
-            set_config('mailru_client_private',   trim( format_string( $config->mailru_client_private ) ),   'auth/lenauth');
-            set_config('mailru_client_secret',    trim( format_string( $config->mailru_client_secret ) ),    'auth/lenauth');
-            set_config('mailru_button_text',      trim( format_string( $config->mailru_button_text ) ),      'auth/lenauth');
+            set_config('auth_lenauth_mailru_enabled',          intval( $config->auth_lenauth_mailru_enabled ),                         'auth/lenauth');
+            set_config('auth_lenauth_mailru_site_id',          intval( $config->auth_lenauth_mailru_site_id ),                         'auth/lenauth');
+            set_config('auth_lenauth_mailru_client_private',   trim( format_string( $config->auth_lenauth_mailru_client_private ) ),   'auth/lenauth');
+            set_config('auth_lenauth_mailru_client_secret',    trim( format_string( $config->auth_lenauth_mailru_client_secret ) ),    'auth/lenauth');
+            set_config('auth_lenauth_mailru_button_text',      trim( format_string( $config->auth_lenauth_mailru_button_text ) ),      'auth/lenauth');
 
             /*set_config('ok_enabled',              intval( $config->ok_enabled ),                             'auth/lenauth');
             set_config('ok_app_id',               trim( format_string( $config->ok_app_id ) ),               'auth/lenauth');
@@ -1454,26 +1468,26 @@ class auth_plugin_lenauth extends auth_plugin_base {
             set_config('ok_button_text',          trim( format_string( $config->ok_button_text ) ),          'auth/lenauth');
             set_config('ok_social_id_field',      trim( format_string( $config->ok_social_id_field ) ),      'auth/lenauth');*/
 
-            set_config('lenauthuserprefix',       trim( format_string( $config->lenauthuserprefix ) ),       'auth/lenauth');
-            set_config('default_country',         trim( format_string( $config->default_country ) ),         'auth/lenauth');
-            set_config('lenauth_locale',          trim( format_string( $config->lenauth_locale ) ),          'auth/lenauth');
-            //set_config('can_change_password',     intval( $config->can_change_password ),                    'auth/lenauth');
-            set_config('can_reset_password',      intval( $config->can_reset_password ),                     'auth/lenauth');
-            set_config('can_confirm',             intval( $config->can_confirm ),                            'auth/lenauth');
+            set_config('auth_lenauth_user_prefix',             trim( format_string( $config->auth_lenauth_user_prefix ) ),             'auth/lenauth');
+            set_config('auth_lenauth_default_country',         trim( format_string( $config->auth_lenauth_default_country ) ),         'auth/lenauth');
+            set_config('auth_lenauth_locale',                  trim( format_string( $config->auth_lenauth_locale ) ),                  'auth/lenauth');
+            //set_config('can_change_password',                  intval( $config->can_change_password ),                                 'auth/lenauth');
+            set_config('auth_lenauth_can_reset_password',      intval( $config->auth_lenauth_can_reset_password ),                     'auth/lenauth');
+            set_config('auth_lenauth_can_confirm',             intval( $config->auth_lenauth_can_confirm ),                            'auth/lenauth');
             
-            set_config('display_buttons',         trim( format_string( $config->display_buttons ) ),         'auth/lenauth');
-            set_config('button_width',            intval( $config->button_width ),                           'auth/lenauth');
-            set_config('button_margin_top',       intval( $config->button_margin_top ),                      'auth/lenauth');
-            set_config('button_margin_right',     intval( $config->button_margin_right ),                    'auth/lenauth');
-            set_config('button_margin_bottom',    intval( $config->button_margin_bottom ),                   'auth/lenauth');
-            set_config('button_margin_left',      intval( $config->button_margin_left ),                     'auth/lenauth');
+            set_config('auth_lenauth_display_buttons',         trim( format_string( $config->auth_lenauth_display_buttons ) ),         'auth/lenauth');
+            set_config('auth_lenauth_button_width',            intval( $config->auth_lenauth_button_width ),                           'auth/lenauth');
+            set_config('auth_lenauth_button_margin_top',       intval( $config->auth_lenauth_button_margin_top ),                      'auth/lenauth');
+            set_config('auth_lenauth_button_margin_right',     intval( $config->auth_lenauth_button_margin_right ),                    'auth/lenauth');
+            set_config('auth_lenauth_button_margin_bottom',    intval( $config->auth_lenauth_button_margin_bottom ),                   'auth/lenauth');
+            set_config('auth_lenauth_button_margin_left',      intval( $config->auth_lenauth_button_margin_left ),                     'auth/lenauth');
             
-            set_config('display_div',             trim( format_string( $config->display_div ) ),             'auth/lenauth');
-            set_config('div_width',               intval( $config->div_width ),                              'auth/lenauth');
-            set_config('div_margin_top',          intval( $config->div_margin_top ),                         'auth/lenauth');
-            set_config('div_margin_right',        intval( $config->div_margin_right ),                       'auth/lenauth');
-            set_config('div_margin_bottom',       intval( $config->div_margin_bottom ),                      'auth/lenauth');
-            set_config('div_margin_left',         intval( $config->div_margin_left ),                        'auth/lenauth');
+            set_config('auth_lenauth_display_div',             trim( format_string( $config->auth_lenauth_display_div ) ),             'auth/lenauth');
+            set_config('auth_lenauth_div_width',               intval( $config->auth_lenauth_div_width ),                              'auth/lenauth');
+            set_config('auth_lenauth_div_margin_top',          intval( $config->auth_lenauth_div_margin_top ),                         'auth/lenauth');
+            set_config('auth_lenauth_div_margin_right',        intval( $config->auth_lenauth_div_margin_right ),                       'auth/lenauth');
+            set_config('auth_lenauth_div_margin_bottom',       intval( $config->auth_lenauth_div_margin_bottom ),                      'auth/lenauth');
+            set_config('auth_lenauth_div_margin_left',         intval( $config->auth_lenauth_div_margin_left ),                        'auth/lenauth');
 
             return true;
         }
@@ -1516,9 +1530,9 @@ class auth_plugin_lenauth extends auth_plugin_base {
         return '';
     }
 
-    private function _yahoo_request_array( $signature ) {
+    private function _lenauth_yahoo_request_array( $signature ) {
         return array(
-            'oauth_consumer_key'     => $this->_oauth_config->yahoo_consumer_key,
+            'oauth_consumer_key'     => $this->_oauth_config->auth_lenauth_yahoo_consumer_key,
             'oauth_nonce'            => md5( microtime( true ) . $_SERVER['REMOTE_ADDR'] ),
             'oauth_signature_method' => 'PLAINTEXT',
             'oauth_timestamp'        => time(),
@@ -1536,7 +1550,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
      * @param type $oauth_token
      * @return type
      */
-    protected function _set_twitter_header($params, $oauth_token = false, $oauth_token_secret = false) {
+    protected function _lenauth_set_twitter_header($params, $oauth_token = false, $oauth_token_secret = false) {
         if ( $oauth_token ) {
             $params['oauth_token'] = $oauth_token;
         }
@@ -1553,7 +1567,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
         $params['oauth_signature'] = base64_encode(
                 hash_hmac( 'sha1', $signature, implode( '&', $this->urlEncodeRfc3986(
                         array(
-                            $this->_oauth_config->twitter_consumer_secret,
+                            $this->_oauth_config->auth_lenauth_twitter_consumer_secret,
                             $oauth_token_secret ? $oauth_token_secret : ''
                         )
                 ) ), 
@@ -1574,9 +1588,9 @@ class auth_plugin_lenauth extends auth_plugin_base {
         );
     }
 
-    private function _twitter_request_array() {
+    private function _lenauth_twitter_request_array() {
         return array(
-            'oauth_consumer_key'     => $this->_oauth_config->twitter_consumer_key,
+            'oauth_consumer_key'     => $this->_oauth_config->auth_lenauth_twitter_consumer_key,
             //'oauth_nonce'            => md5( microtime( true ) . $_SERVER['REMOTE_ADDR'] ),
             'oauth_nonce'            => md5( microtime( true ) ),
             'oauth_signature_method' => 'HMAC-SHA1',
@@ -1585,7 +1599,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
         );
     }
     
-    protected function _get_user_info_fields_array() {
+    protected function _lenauth_get_user_info_fields_array() {
         $ret_array = array();
         if ( !empty( $this->_user_info_fields ) && is_array( $this->_user_info_fields ) ) {
             foreach ($this->_user_info_fields as $item) {
@@ -1605,7 +1619,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
      *
      * @author Igor Sazonov
      */
-    protected function _get_fieldid() {
+    protected function _lenauth_get_fieldid() {
         global $DB;
         return ( $this->_field_shortname ) ? $DB->get_field( 'user_info_field', 'id', array( 'shortname' => $this->_field_shortname ) ) : false;
     }
@@ -1614,37 +1628,37 @@ class auth_plugin_lenauth extends auth_plugin_base {
      * Function to generate valid redirect URI to use it without problems
      * Param $authprovider checks service we use and makes URI. Used in code for much faster work.
      * 
-     * @global type $CFG
-     * @param type $authprovider
-     * @return type
+     * @global object $CFG
+     * @param string $authprovider current OAuth provider
+     * @return string
      */
-    protected function _redirect_uri($authprovider) {
+    protected function _lenauth_redirect_uri($authprovider) {
         global $CFG;
         
         return $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=' . $authprovider;
     }
 
-        /**
-     * 
-     * @global type $DB
-     * @global type $CFG
-     * @param type $social_uid
-     * @return type
+    /**
+     *
+     * This function returns an object
+     * @global object $DB
+     * @global object $CFG
+     * @param string $social_uid user internal ID of social webservice that comes from request
+     * @return object
      */
-    private function _get_userdata_by_social_id($social_uid) {
+    private function _lenauth_get_userdata_by_social_id($social_uid) {
         global $DB, $CFG;
         
         $ret = false;
         if ( !empty( $this->_field_shortname ) ) {
-            $ret = $DB->get_record_sql( "SELECT u.* FROM {user} u
-                                        LEFT JOIN {user_info_data} uid ON `u`.`id` = `uid`.`userid` 
-                                        LEFT JOIN {user_info_field} uif ON `uid`.`fieldid` = `uif`.`id` 
-                                        WHERE `uid`.`data` LIKE ? 
-                                            AND `uif`.`id` = ? 
-                                            AND `uif`.`shortname` LIKE ? 
-                                            AND `u`.`deleted` = ? 
-                                            AND `u`.`mnethostid` = ?", 
-                    array( $social_uid, $this->_field_id, $this->_field_shortname, 0, $CFG->mnet_localhost_id ) );
+            $ret = $DB->get_record_sql( 'SELECT u.* FROM {user} u
+                                                    LEFT JOIN {user_info_data} uid ON u.id = uid.userid
+                                                    LEFT JOIN {user_info_field} uif ON uid.fieldid = uif.id
+                                                    WHERE uid.data = ?
+                                                    AND uif.id = ?
+                                                    AND uif.shortname = ?
+                                                    AND u.deleted = ? AND u.mnethostid = ?'
+                    , array( $social_uid, $this->_field_id, $this->_field_shortname, 0, $CFG->mnet_localhost_id ) );
         }
         
         return $ret;

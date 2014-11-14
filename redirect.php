@@ -30,7 +30,7 @@ if ( !empty( $auth_service ) ) {
                 }
                 if ( empty( $error_inurl ) ) {
                     $error = true;
-                    $error_code = get_string( 'empty_code_param', 'auth_lenauth' );
+                    $error_code = get_string( 'auth_lenauth_empty_code_param', 'auth_lenauth' );
                 }
             }
 
@@ -48,7 +48,7 @@ if ( !empty( $auth_service ) ) {
                 }
                 if ( empty( $error_inurl ) ) {
                     $error = true;
-                    $error_code = get_string( 'empty_code_param', 'auth_lenauth' );
+                    $error_code = get_string( 'auth_lenauth_empty_code_param', 'auth_lenauth' );
                 }
             }
 
@@ -87,7 +87,7 @@ if ( !empty( $auth_service ) ) {
                 }
                 if ( empty( $error_inurl ) ) {
                     $error = true;
-                    $error_code = get_string( 'empty_code_param', 'auth_lenauth' );
+                    $error_code = get_string( 'auth_lenauth_empty_code_param', 'auth_lenauth' );
                 }
             }
 
@@ -103,7 +103,7 @@ if ( !empty( $auth_service ) ) {
                 }
                 if ( empty( $error_inurl ) ) {
                     $error = true;
-                    $error_code = get_string( 'empty_code_param', 'auth_lenauth' );
+                    $error_code = get_string( 'auth_lenauth_empty_code_param', 'auth_lenauth' );
                 }
             }
             break;
@@ -118,7 +118,7 @@ if ( !empty( $auth_service ) ) {
                 }
                 if ( empty( $error_inurl ) ) {
                     $error = true;
-                    $error_code = get_string( 'empty_code_param', 'auth_lenauth' );
+                    $error_code = get_string( 'auth_lenauth_empty_code_param', 'auth_lenauth' );
                 }
             }
             break;
