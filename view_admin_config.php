@@ -6,18 +6,18 @@ require_once('out.php');?>
         <td colspan="3"><h3><?php echo get_string( 'auth_lenauth_main_settings', 'auth_lenauth' ); ?></h3></td>
     </tr>
     <tr>
-        <td align="right" width="15%"><label for="lenauthuserprefix"><?php echo get_string( 'auth_lenauth_user_prefix_key', 'auth_lenauth' ); ?></label></td>
+        <td align="right" width="15%"><label for="auth_lenauth_user_prefix"><?php echo get_string( 'auth_lenauth_user_prefix_key', 'auth_lenauth' ); ?></label></td>
         <td width="35%"><?php echo html_writer::empty_tag( 'input',
                                         array( 'type' => 'text',
-                                            'id'      => 'lenauthuserprefix',
-                                            'name'    => 'lenauthuserprefix',
-                                            'class'   => 'lenauthuserprefix',
+                                            'id'      => 'auth_lenauth_user_prefix',
+                                            'name'    => 'auth_lenauth_user_prefix',
+                                            'class'   => 'auth_lenauth_user_prefix',
                                             'value'   => $config->auth_lenauth_user_prefix,
                                             'size'    => 50,
                                             'autocomplete' => 'off' )
                                         );
-        if ( isset( $err['lenauthuserprefix'] ) ) {
-            echo $OUTPUT->error_text( $err['lenauthuserprefix'] );
+        if ( isset( $err['auth_lenauth_user_prefix'] ) ) {
+            echo $OUTPUT->error_text( $err['auth_lenauth_user_prefix'] );
         } ?>
         </td>
         <td width="50%"><?php echo get_string( 'auth_lenauth_user_prefix_desc', 'auth_lenauth' ); ?></td>
@@ -1168,11 +1168,11 @@ require_once('out.php');?>
                     foreach ( $this->_styles_array as $style_item ) : ?>
                     <tr>
                         <td>
-                            <?php echo lenauth_out::getInstance()->output($style_item, true); ?>
+                            <?php echo auth_lenauth_out::getInstance()->lenauth_output($style_item, true); ?>
                             <br /><em><?php echo $style_item; ?></em>
                         </td>
                         <td>
-                            <code>&lt;?php include_once $CFG->dirroot . '/auth/lenauth/out.php';<br />echo lenauth_out::getInstance()->output('<?php echo $style_item; ?>'); ?&gt;</code>
+                            <code>&lt;?php if ( file_exists( $CFG->dirroot . '/auth/lenauth/out.php' ) ) :<br />include_once $CFG->dirroot . '/auth/lenauth/out.php';<br />echo auth_lenauth_out::getInstance()->lenauth_output('<?php echo $style_item; ?>');<br />endif; ?&gt;</code>
                             <br /><a href="<?php echo $CFG->wwwroot; ?>/auth/lenauth/htmlcode.php?style=<?php echo $style_item; ?>" target="_blank"><?php echo get_string( 'auth_lenauth_static_html', 'auth_lenauth' ); ?></a>
                         </td>
                     </tr>

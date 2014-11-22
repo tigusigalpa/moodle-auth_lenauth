@@ -10,7 +10,7 @@ if ( has_capability( 'moodle/user:update', context_system::instance() ) ) {
         
         global $CFG;
         include_once $CFG->dirroot . '/auth/lenauth/out.php';
-        echo 'Static inline HTML code:<br /><pre>' . htmlspecialchars( lenauth_out::getInstance()->output( $style, false, true ), ENT_QUOTES ) . '</pre>';
+        echo 'Static inline HTML code:<br /><pre>' . htmlspecialchars( auth_lenauth_out::getInstance()->lenauth_output( $style, false, true ), ENT_QUOTES ) . '</pre>';
         
     } else {
         throw new moodle_exception( 'style GET-parameter is not set', 'auth_lenauth' );

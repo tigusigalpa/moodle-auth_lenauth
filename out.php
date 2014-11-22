@@ -9,7 +9,7 @@ if ( get_called_class() != 'auth_plugin_lenauth' ) {
     require_once 'auth.php';
 }
 
-class lenauth_out extends auth_plugin_lenauth {
+class auth_lenauth_out extends auth_plugin_lenauth {
     
     /**
      * instance var for Singleton
@@ -26,7 +26,7 @@ class lenauth_out extends auth_plugin_lenauth {
      * @return object
      */
     public static function getInstance() {
-        if ( ! isset( self::$_instance ) && ! ( self::$_instance instanceof lenauth_out ) ) {
+        if ( ! isset( self::$_instance ) && ! ( self::$_instance instanceof auth_lenauth_out ) ) {
             self::$_instance = new self();
         }
         return self::$_instance;
@@ -44,7 +44,7 @@ class lenauth_out extends auth_plugin_lenauth {
      * 
      * @author Igor Sazonov
      */
-    public function output($style, $show_example = false, $show_html = false) {
+    public function lenauth_output($style, $show_example = false, $show_html = false) {
         $ret = '';
         
         if ( in_array( $style, $this->_styles_array ) ) {
@@ -66,17 +66,26 @@ class lenauth_out extends auth_plugin_lenauth {
                 if ( $this->_oauth_config->auth_lenauth_div_width > 0 ) {
                     $style_button_str .= 'width:' . $this->_oauth_config->auth_lenauth_div_width . 'px;';
                 }
-
+                
+                $facebook_class = '';
+                $google_class = '';
+                $yahoo_class = '';
+                $twitter_class = '';
+                $vk_class = '';
+                $yandex_class = '';
+                $mailru_class = '';
+                
                 $has_text = false;
                 $auto_width = true;
-                $yandex_bca = '';
-                $mailru_bca = '';
+                
                 $facebook_bca = '';
-                $vk_bca = '';
                 $google_bca = '';
-                //$ok_bca = '';
                 $yahoo_bca = '';
                 $twitter_bca = '';
+                $vk_bca = '';
+                $yandex_bca = '';
+                $mailru_bca = '';
+                //$ok_bca = '';
 
                 $facebook_link = ( !$show_example ) ? 'https://www.facebook.com/dialog/oauth?client_id=' . $this->_oauth_config->auth_lenauth_facebook_app_id . '&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri('facebook') ) . '&scope=email' : 'javascript:;';
 
@@ -731,7 +740,17 @@ class lenauth_out extends auth_plugin_lenauth {
                         break;
                 }
 
-                if ( !empty( $class_div_str ) ) {
+                if ( !empty( $class_div_str ) 
+                        && ( 
+                            $this->_oauth_config->auth_lenauth_facebook_enabled 
+                            || $this->_oauth_config->auth_lenauth_google_enabled 
+                            || $this->_oauth_config->auth_lenauth_yahoo_enabled 
+                            || $this->_oauth_config->auth_lenauth_twitter_enabled 
+                            || $this->_oauth_config->auth_lenauth_vk_enabled 
+                            || $this->_oauth_config->auth_lenauth_yandex_enabled 
+                            || $this->_oauth_config->auth_lenauth_mailru_enabled 
+                        ) 
+                ) {
 
                     if ( !$auto_width && $this->_oauth_config->auth_lenauth_button_width > 0 ) {
                         $style_button_str .= 'width:' . $this->_oauth_config->auth_lenauth_button_width . 'px;';

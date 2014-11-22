@@ -119,6 +119,22 @@ function xmldb_auth_lenauth_install() {
     set_config('auth_lenauth_display_buttons',      'inline-block', 'auth/lenauth');
     set_config('auth_lenauth_display_div',          'block',        'auth/lenauth');
     set_config('auth_lenauth_locale',               'en',           'auth/lenauth');
+    
+    set_config('auth_lenauth_div_width',            0,              'auth/lenauth');
+    set_config('auth_lenauth_button_width',         0,              'auth/lenauth');
+    
+    set_config('auth_lenauth_facebook_enabled',     0,              'auth/lenauth');
+    set_config('auth_lenauth_google_enabled',       0,              'auth/lenauth');
+    set_config('auth_lenauth_yahoo_enabled',        0,              'auth/lenauth');
+    set_config('auth_lenauth_twitter_enabled',      0,              'auth/lenauth');
+    set_config('auth_lenauth_vk_enabled',           0,              'auth/lenauth');
+    set_config('auth_lenauth_yandex_enabled',       0,              'auth/lenauth');
+    set_config('auth_lenauth_mailru_enabled',       0,              'auth/lenauth');
+    
+    set_config('auth_lenauth_div_margin_top',       0,              'auth/lenauth');
+    set_config('auth_lenauth_div_margin_right',     0,              'auth/lenauth');
+    set_config('auth_lenauth_div_margin_bottom',    0,              'auth/lenauth');
+    set_config('auth_lenauth_div_margin_left',      0,              'auth/lenauth');
 
     set_config('auth_lenauth_button_margin_top',    10,             'auth/lenauth');
     set_config('auth_lenauth_button_margin_right',  10,             'auth/lenauth');
