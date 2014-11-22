@@ -30,7 +30,7 @@ Its very-very simple. You have two methods: PHP-code or static HTML-code.
 
 **Sample PHP-code:**
 
-`<?php include_once $CFG->dirroot . '/auth/lenauth/out.php'; echo lenauth_out::getInstance()->output('style3-text'); ?>`
+`<?php if ( file_exists( $CFG->dirroot . '/auth/lenauth/out.php' ) ) : include_once $CFG->dirroot . '/auth/lenauth/out.php'; echo auth_lenauth_out::getInstance()->lenauth_output('style3-text'); endif; ?>`
 
 - **Static HTML-code**. Click **Static HTML-code** link under PHP-code. In new window you will see static HTML-code, so you can copy it and paste in your current theme. **BUT!** this is static code, so if you will change some settings in LenAuth you need to update this HTML-code!
 
@@ -38,9 +38,15 @@ Its very-very simple. You have two methods: PHP-code or static HTML-code.
 You're welcome for pull requests but against master branch. Thanks!
 
 ## Changelog
+#### Version 1.0.6 (2014112200)
+- Preset some plugin configs (Thanks to [David Mudrák](https://github.com/mudrd8mz))
+- Added check for file exists of out.php
+- Complete [Frankenstyle](https://docs.moodle.org/dev/Frankenstyle) class and functions names
+- Some very small fixes
+
 #### Version 1.0.4 (2014111300)
 - check permissions for file **view_admin_config.php**
-- edited config names and method names to [https://docs.moodle.org/dev/Frankenstyle](Frankenstyle)
+- edited config names and method names to [Frankenstyle](https://docs.moodle.org/dev/Frankenstyle)
 - fixed SQL request for function **_lenauth_get_userdata_by_social_id** to Postgresql compatibility
 - more documentation/metainfo for some functions
 - fix for Yandex button link for English locale
