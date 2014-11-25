@@ -38,6 +38,11 @@ Its very-very simple. You have two methods: PHP-code or static HTML-code.
 You're welcome for pull requests but against master branch. Thanks!
 
 ## Changelog
+#### Version 1.0.7 (2014112500)
+- Fix for output variable at [get_string](https://docs.moodle.org/dev/String_API#get_string.28.29) function
+- Predefine ALL of configs
+- Small fix to complete show buttons examples in admin screen
+
 #### Version 1.0.6 (2014112200)
 - Preset some plugin configs (Thanks to [David Mudrák](https://github.com/mudrd8mz))
 - Added check for file exists of out.php
