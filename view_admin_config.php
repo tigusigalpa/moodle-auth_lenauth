@@ -1,5 +1,6 @@
 <?php defined('MOODLE_INTERNAL') || die();
-require_once('out.php');?>
+require_once('out.php');
+global $CFG;?>
 
 <table cellspacing="0" cellpadding="5" border="0">
     <tr>
@@ -160,7 +161,7 @@ require_once('out.php');?>
                 echo $OUTPUT->error_text( $err['auth_lenauth_facebook_app_id'] );
             } ?>
         </td>
-        <td width="50%" rowspan="4" valign="top"><?php echo get_string( 'auth_lenauth_facebook_desc', 'auth_lenauth' ); ?></td>
+        <td width="50%" rowspan="4" valign="top"><?php echo get_string( 'auth_lenauth_facebook_desc', 'auth_lenauth', $CFG ); ?></td>
     </tr>
     <tr>
         <td align="right" width="15%"><label for="auth_lenauth_facebook_app_secret"><?php echo get_string( 'auth_lenauth_facebook_app_secret_key', 'auth_lenauth' ); ?></label></td>
@@ -251,7 +252,7 @@ require_once('out.php');?>
                 echo $OUTPUT->error_text( $err['auth_lenauth_google_client_id'] );
             } ?>
         </td>
-        <td width="50%" rowspan="5" valign="top"><?php echo get_string( 'auth_lenauth_google_desc', 'auth_lenauth' ); ?></td>
+        <td width="50%" rowspan="5" valign="top"><?php echo get_string( 'auth_lenauth_google_desc', 'auth_lenauth', $CFG ); ?></td>
     </tr>
     <tr>
         <td align="right" width="15%"><label for="auth_lenauth_google_client_secret"><?php echo get_string( 'auth_lenauth_google_client_secret_key', 'auth_lenauth' ); ?></label></td>
@@ -354,7 +355,7 @@ require_once('out.php');?>
                 echo $OUTPUT->error_text( $err['auth_lenauth_yahoo_application_id'] );
             } ?>
         </td>
-        <td width="50%" rowspan="5" valign="top"><?php echo get_string( 'auth_lenauth_yahoo_desc', 'auth_lenauth' ); ?></td>
+        <td width="50%" rowspan="5" valign="top"><?php echo get_string( 'auth_lenauth_yahoo_desc', 'auth_lenauth', $CFG ); ?></td>
     </tr>
     <tr>
         <td align="right" width="15%"><label for="auth_lenauth_yahoo_consumer_key"><?php echo get_string( 'auth_lenauth_yahoo_consumer_key', 'auth_lenauth' ); ?></label></td>
@@ -474,7 +475,7 @@ require_once('out.php');?>
                 echo $OUTPUT->error_text( $err['auth_lenauth_twitter_application_id'] );
             } ?>
         </td>
-        <td width="50%" rowspan="5" valign="top"><?php echo get_string( 'auth_lenauth_twitter_desc', 'auth_lenauth' ); ?></td>
+        <td width="50%" rowspan="5" valign="top"><?php echo get_string( 'auth_lenauth_twitter_desc', 'auth_lenauth', $CFG ); ?></td>
     </tr>
     <tr>
         <td align="right" width="15%"><label for="auth_lenauth_twitter_consumer_key"><?php echo get_string( 'auth_lenauth_twitter_consumer_key', 'auth_lenauth' ); ?></label></td>
@@ -582,7 +583,7 @@ require_once('out.php');?>
                 echo $OUTPUT->error_text( $err['auth_lenauth_vk_app_id'] );
             } ?>
         </td>
-        <td width="50%" rowspan="4" valign="top"><?php echo get_string( 'auth_lenauth_vk_desc', 'auth_lenauth' ); ?></td>
+        <td width="50%" rowspan="4" valign="top"><?php echo get_string( 'auth_lenauth_vk_desc', 'auth_lenauth', $CFG ); ?></td>
     </tr>
     <tr>
         <td align="right" width="15%"><label for="auth_lenauth_vk_app_secret"><?php echo get_string( 'auth_lenauth_vk_app_secret_key', 'auth_lenauth' ); ?></label></td>
@@ -675,7 +676,7 @@ require_once('out.php');?>
         }
         ?>
         </td>
-        <td width="50%" rowspan="4" valign="top"><?php echo get_string( 'auth_lenauth_yandex_desc', 'auth_lenauth' ); ?></td>
+        <td width="50%" rowspan="4" valign="top"><?php echo get_string( 'auth_lenauth_yandex_desc', 'auth_lenauth', $CFG ); ?></td>
     </tr>
     <tr>
         <td align="right" width="15%"><label for="auth_lenauth_yandex_app_password"><?php echo get_string( 'auth_lenauth_yandex_app_password_key', 'auth_lenauth' ); ?></label></td>

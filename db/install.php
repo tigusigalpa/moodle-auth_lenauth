@@ -119,6 +119,10 @@ function xmldb_auth_lenauth_install() {
     set_config('auth_lenauth_display_buttons',      'inline-block', 'auth/lenauth');
     set_config('auth_lenauth_display_div',          'block',        'auth/lenauth');
     set_config('auth_lenauth_locale',               'en',           'auth/lenauth');
+    set_config('auth_lenauth_default_country',      '',             'auth/lenauth');
+    set_config('auth_lenauth_user_prefix',          'lenauth_user_','auth/lenauth');
+    set_config('auth_lenauth_can_reset_password',   0,              'auth/lenauth');
+    set_config('auth_lenauth_can_confirm',          0,              'auth/lenauth');
     
     set_config('auth_lenauth_div_width',            0,              'auth/lenauth');
     set_config('auth_lenauth_button_width',         0,              'auth/lenauth');

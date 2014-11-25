@@ -77,9 +77,9 @@ $string['auth_lenauth_facebook_desc'] = '
         <li>У Вас должен быть зарегистрирован любой аккаунт на <a href="https://www.facebook.com/" target="_blank">Facebook</a></li>
         <li><a href="https://developers.facebook.com/apps/" target="_blank">Зарегистрируйтесь</a> как разработчик Facebook. <em>Процедура ни к чему не обязывает.</em></li>
         <li>В консоли разработчика необходимо создать приложение (кнопка <strong>+ Add a New App</strong>) с категорией <strong>WWW Веб-сайт</strong> и произвольным названием</li>
-        <li>Заполните в процессе настройки приложения <strong>Site URL</strong> как <strong>' . $CFG->wwwroot . '</strong>. Далее нажмите ссылку <strong><a href="https://developers.facebook.com/apps/" target="_blank">Skip to Developer Dashboard</a></strong></li>
+        <li>Заполните в процессе настройки приложения <strong>Site URL</strong> как <strong>{$a->wwwroot}</strong>. Далее нажмите ссылку <strong><a href="https://developers.facebook.com/apps/" target="_blank">Skip to Developer Dashboard</a></strong></li>
         <li>В результате Вам будут выданы <strong>App ID</strong> и <strong>App Secret</strong> (чтобы он стал виден нажмите <strong>Show</strong>). Скопируйте их сюда.</li>
-        <li><strong>ВАЖНО!</strong> в консоли приложения зайдите во вкладку <strong>Advanced</strong> и заполните поле <strong>Valid OAuth redirect URIs</strong>: впишите там <strong style="color:red">' . $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=facebook</strong></li>
+        <li><strong>ВАЖНО!</strong> в консоли приложения зайдите во вкладку <strong>Advanced</strong> и заполните поле <strong>Valid OAuth redirect URIs</strong>: впишите там <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=facebook</strong></li>
     </ol>';
 $string['auth_lenauth_facebook_app_secret'] = 'Секретный ключ приложения (App Secret)';
 $string['auth_lenauth_facebook_button_text_default'] = 'Фейсбук';
@@ -96,7 +96,7 @@ $string['auth_lenauth_google_desc'] = '
         <li>У Вас должен быть зарегистрирован любой аккаунт в <a href="https://accounts.google.com/SignUp" target="_blank">Google</a></li>
         <li><a href="https://console.developers.google.com/" target="_blank">Создайте приложение</a> (<strong>Create Project</strong>) в консоли разработчиков Google</li>
         <li>В консоли разработчика в разделе <strong>APIs &amp; auth &raquo; Credentials</strong> создайте <strong>OAuth Client ID</strong></li>
-        <li><strong>ВНИМАНИЕ!</strong> Приложение Google позволяет вводить несколько <strong>Redirect URI</strong>, Вам же необходимо ввести только один, а именно &mdash; <strong style="color:red">' . $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=google</strong></li>
+        <li><strong>ВНИМАНИЕ!</strong> Приложение Google позволяет вводить несколько <strong>Redirect URI</strong>, Вам же необходимо ввести только один, а именно &mdash; <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=google</strong></li>
         <li>В приложении в разделе <strong>APIs &amp; auth &raquo; Credentials</strong> скопируйте сюда <strong>CLIENT ID</strong> и <strong>CLIENT SECRET</strong></li>
         <li>Параметр <strong>Project ID</strong> не обязателен, его Вы можете скопировать из пункта меню <strong>Overview</strong> в консоли сверху страницы</li>
     </ol>';
@@ -119,9 +119,9 @@ $string['auth_lenauth_yahoo_desc'] = '
         <li>
             <ul><a href="https://developer.apps.yahoo.com/dashboard/createKey.html" target="_blank">Создайте приложение</a> (<strong>Create An App</strong>) в <a href="https://developer.apps.yahoo.com/projects" target="_blank">консоли разработчиков Yahoo (YDN)</a>
                 <li>Application Type: <strong>Web-based</strong></li>
-                <li>Home Page URL: <strong>' . $CFG->wwwroot . '</strong></li>
+                <li>Home Page URL: <strong>{$a->wwwroot}</strong></li>
                 <li>Access Scopes: <strong>This app requires access to private user data.</strong></li>
-                <li>Callback Domain: <strong style="color:red">' . $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=yahoo</strong></li>
+                <li>Callback Domain: <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=yahoo</strong></li>
                 <li>Select APIs for private user data access: отметьте галочку <strong>Social Directory (Profiles)</strong>, а под ней отметьте последний пункт <strong>Read/Write Public and Private</strong></li>
                 <li>Terms of Use: <em>отметьте галочку</em></li>
             </ul>
@@ -147,8 +147,8 @@ $string['auth_lenauth_twitter_desc'] = '
             <ul><a href="https://apps.twitter.com/app/new" target="_blank">Создайте приложение</a>
                 <li>Name: <strong>Назовите Ваше приложение</strong></li>
                 <li>Description: <strong>Опишите Ваше приложение</strong></li>
-                <li>Website: <strong>' . $CFG->wwwroot . '</strong></li>
-                <li>Callback URL: <strong style="color:red">' . $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=twitter</strong></li>
+                <li>Website: <strong>{$a->wwwroot}</strong></li>
+                <li>Callback URL: <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=twitter</strong></li>
                 <li>Developer Rules of the Road: отметьте галочку <strong>Yes, I agree</strong></li>
             </ul>
         </li>
@@ -171,8 +171,8 @@ $string['auth_lenauth_vk_desc'] = '
         <li>
             <ul><a href="http://vk.com/editapp?act=create" target="_blank">Создайте приложение</a>
                 <li>Тип: <strong>Веб-сайт</strong></li>
-                <li>Адрес сайта: <strong>' . $CFG->wwwroot . '</strong></li>
-                <li>Базовый домен: <strong>' . str_replace( array( 'http://', 'https://' ), '', $CFG->wwwroot ) . '</strong></li>
+                <li>Адрес сайта: <strong>{$a->wwwroot}</strong></li>
+                <li>Базовый домен: <strong>{$a->wwwroot}</strong> (<em style="color:red;font-weight:bold;">без префиксов <u>http://</u> или <u>https://</u></em>)</li>
             </ul>
         </li>
         <li>В консоли приложения во вкладке <strong>Настройки</strong> скопируйте сюда <strong>ID приложения</strong> и <strong>Защищенный ключ</strong></li>
@@ -193,7 +193,7 @@ $string['auth_lenauth_yandex_desc'] = '
             <ul><strong>Настройте приложение</strong>:
                 <li>Поля <strong>название</strong>, <strong>описание</strong>, </strong>ссылка на иконку</strong> и <strong>ссылка на приложение</strong> приложения на Ваше усмотрение</li>
                 <li>В поле <strong>Права</strong> выбираем <strong>Яндекс.Логин</strong> и выставляем все 2 опции (email, ФИО)</li>
-                <li>В поле <strong>Callback URI</strong> ставим ссылку <strong style="color:red">' . $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=yandex' . '</strong></li>
+                <li>В поле <strong>Callback URI</strong> ставим ссылку <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=yandex' . '</strong></li>
             </ul>
         </li>
         <li>Скопируйте сюда 2 параметра: <strong>ID</strong>, <strong>Пароль</strong></li>

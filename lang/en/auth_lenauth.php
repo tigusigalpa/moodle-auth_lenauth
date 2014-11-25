@@ -79,9 +79,9 @@ $string['auth_lenauth_facebook_desc'] = '
         <li>You need to have any social account at <a href="https://www.facebook.com/" target="_blank">Facebook</a></li>
         <li><a href="https://developers.facebook.com/apps/" target="_blank">Register</a> as Facebook developer</li>
         <li>At developers console you need to create an Application (<strong>+ Add a New App</strong> button) with category <strong>WWW Web-site</strong> and arbitary title</li>
-        <li>Fill in the application settings <strong>Site URL</strong> as <strong>' . $CFG->wwwroot . '</strong>. Next, click on the link <strong><a href="https://developers.facebook.com/apps/" target="_blank">Skip to Developer Dashboard</a></strong></li>
+        <li>Fill in the application settings <strong>Site URL</strong> as <strong>{$a->wwwroot}</strong>. Next, click on the link <strong><a href="https://developers.facebook.com/apps/" target="_blank">Skip to Developer Dashboard</a></strong></li>
         <li>As a result, you will be given <strong>App ID</strong> and <strong>App Secret</strong> (to become visible, click <strong>Show</strong>). Copy them here.</li>
-        <li><strong>IMPORTANT!</strong> at developers console go to tab <strong>Advanced</strong> and fill the field <strong>Valid OAuth redirect URIs</strong>: fill there <strong style="color:red">' . $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=facebook</strong></li>
+        <li><strong>IMPORTANT!</strong> at developers console go to tab <strong>Advanced</strong> and fill the field <strong>Valid OAuth redirect URIs</strong>: fill there <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=facebook</strong></li>
     </ol>';
 $string['auth_lenauth_facebook_app_secret_key'] = 'App secret';
 $string['auth_lenauth_facebook_button_text_default'] = 'Facebook';
@@ -98,7 +98,7 @@ $string['auth_lenauth_google_desc'] = '
         <li>You need to have any registered account at <a href="https://accounts.google.com/SignUp" target="_blank">Google</a></li>
         <li><a href="https://console.developers.google.com/" target="_blank">Create a Project</a> (<strong>Create Project</strong> button) at Google developers console</li>
         <li>At developers console in section <strong>APIs &amp; auth &raquo; Credentials</strong> create <strong>OAuth Client ID</strong></li>
-        <li><strong>ATTENTION!</strong> Google Project allows to enter several <strong>Redirect URI</strong>, but you need to fill just one, and this is &mdash; <strong style="color:red">' . $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=google</strong></li>
+        <li><strong>ATTENTION!</strong> Google Project allows to enter several <strong>Redirect URI</strong>, but you need to fill just one, and this is &mdash; <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=google</strong></li>
         <li>At the Project in section <strong>APIs &amp; auth &raquo; Credentials</strong> copy here <strong>CLIENT ID</strong> and <strong>CLIENT SECRET</strong></li>
         <li>Parameter <strong>Project ID</strong> is not required, you can copy it from menu section <strong>Overview</strong> at console at the top of page</li>
     </ol>';
@@ -121,9 +121,9 @@ $string['auth_lenauth_yahoo_desc'] = '
         <li>
             <ul><a href="https://developer.apps.yahoo.com/dashboard/createKey.html" target="_blank">Create an Application</a> (<strong>Create An App</strong>) at <a href="https://developer.apps.yahoo.com/projects" target="_blank">Yahoo Developer Network (YDN)</a>
                 <li>Application Type: <strong>Web-based</strong></li>
-                <li>Home Page URL: <strong>' . $CFG->wwwroot . '</strong></li>
+                <li>Home Page URL: <strong>{$a->wwwroot}</strong></li>
                 <li>Access Scopes: <strong>This app requires access to private user data.</strong></li>
-                <li>Callback Domain: <strong style="color:red">' . $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=yahoo</strong></li>
+                <li>Callback Domain: <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=yahoo</strong></li>
                 <li>Select APIs for private user data access: check the option <strong>Social Directory (Profiles)</strong>, and after check the last mark <strong>Read/Write Public and Private</strong></li>
                 <li>Terms of Use: <em>check the option</em></li>
             </ul>
@@ -152,8 +152,8 @@ $string['auth_lenauth_twitter_desc'] = '
             <ul><a href="https://apps.twitter.com/app/new" target="_blank">Create an application</a>
                 <li>Name: <strong>Title of your application</strong></li>
                 <li>Description: <strong>Describe your application</strong></li>
-                <li>Website: <strong>' . $CFG->wwwroot . '</strong></li>
-                <li>Callback URL: <strong style="color:red">' . $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=twitter</strong></li>
+                <li>Website: <strong>{$a->wwwroot}</strong></li>
+                <li>Callback URL: <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=twitter</strong></li>
                 <li>Developer Rules of the Road: check the option <strong>Yes, I agree</strong></li>
             </ul>
         </li>
@@ -176,8 +176,8 @@ $string['auth_lenauth_vk_desc'] = '
         <li>
             <ul><a href="http://vk.com/editapp?act=create" target="_blank">Create an Application</a>
                 <li>Category: <strong>Website</strong></li>
-                <li>Site address: <strong>' . $CFG->wwwroot . '</strong></li>
-                <li>Base domain: <strong>' . str_ireplace( array( 'http://', 'https://' ), '',  $CFG->wwwroot) . '</strong></li>
+                <li>Site address: <strong>{$a->wwwroot}</strong></li>
+                <li>Base domain: <strong>{$a->wwwroot}</strong> (<em style="color:red;font-weight:bold;">without <u>http://</u> or <u>https://</u> prefix</em>)</li>
             </ul>
         </li>
         <li>At <a href="http://vk.com/apps?act=manage" target="_blank">Manage apps dashboard</a> click on <strong>Manage</strong> link and in tab <strong>Settings</strong> of your Application manager copy here <strong>Application ID</strong> and <strong>Secure key</strong></li>
@@ -199,7 +199,7 @@ $string['auth_lenauth_yandex_desc'] = '
             <ul><strong>Configure the client</strong>:
                 <li>Fields <strong>Title</strong>, <strong>Description</strong>, </strong>Link to icon</strong> и <strong>Link to client site</strong> of client at your discretion</li>
                 <li>The field <strong>Scopes</strong> need to be <strong>Yandex.Username</strong> and check 2 options (Email address; User name, surname and gender)</li>
-                <li>The field <strong>Callback URL</strong> need to be as <strong style="color:red">' . $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=yandex' . '</strong></li>
+                <li>The field <strong>Callback URL</strong> need to be as <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=yandex' . '</strong></li>
             </ul>
         </li>
         <li>Copy here 2 parameters: <strong>ID</strong>, <strong>Password</strong></li>

@@ -749,7 +749,7 @@ class auth_lenauth_out extends auth_plugin_lenauth {
                             || $this->_oauth_config->auth_lenauth_vk_enabled 
                             || $this->_oauth_config->auth_lenauth_yandex_enabled 
                             || $this->_oauth_config->auth_lenauth_mailru_enabled 
-                        ) 
+                        ) || $show_example
                 ) {
 
                     if ( !$auto_width && $this->_oauth_config->auth_lenauth_button_width > 0 ) {
@@ -798,7 +798,7 @@ class auth_lenauth_out extends auth_plugin_lenauth {
                 }
             }
         } else {
-            $ret = get_string('auth_lenauth_style_not_defined', 'auth_lenauth');
+            $ret = get_string( 'auth_lenauth_style_not_defined', 'auth_lenauth' );
         }
 
         return $ret;
