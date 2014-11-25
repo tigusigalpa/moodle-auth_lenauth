@@ -17,6 +17,8 @@ This plugin allows easy auth method for your Moodle. You just need to register a
 
 [Russian plugin documentation](http://lmstech.ru/lenauth-plugin-oauth-moodle/)
 
+[Official Moodle plugin repository page](https://moodle.org/plugins/view.php?plugin=auth_lenauth)
+
 First of all, you need to have installed and fine working **[Moodle](https://github.com/moodle/moodle) 2.6.5+**
 - upload **lenauth** folder to **/auth** folder, so files need to be inside **/auth/lenauth/**
 - update Moodle DataBase. Just in admin panel click Home, and Moodle will suggest for LenAuth update
