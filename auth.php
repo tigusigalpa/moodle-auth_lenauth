@@ -4,7 +4,7 @@
  * @author Igor Sazonov ( @tigusigalpa )
  * @link http://lms-service.org/lenauth-plugin-oauth-moodle/
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @version 1.0
+ * @version 1.0.8
  * @uses auth_plugin_base core class
  *
  * Authentication Plugin: LenAuth Authentication
@@ -860,7 +860,11 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         $curl_final_data            = json_decode( $curl_response, true );
 
                         $social_uid                 = $curl_final_data['id'];
-                        $user_email                 = $curl_final_data['emails'][0];//or $curl_final_data['default_email']
+                        /**
+                         * fix @since 24.12.2014. Thanks for Yandex Tech team guys!!
+                         * @link https://tech.yandex.ru/passport/
+                         */
+                        $user_email                 = $curl_final_data['default_email']; //was $curl_final_data['emails'][0]; - wrong!
                         $first_name                 = $curl_final_data['first_name'];
                         $last_name                  = $curl_final_data['last_name'];
                         $nickname                   = $curl_final_data['display_name']; //for future
@@ -939,6 +943,11 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         throw new moodle_exception( 'Empty Social UID', 'auth_lenauth' );
                     }
                 } else {
+                    /**
+                     * addon @since 24.12.2014
+                     * I forgot about clear $_COOKIE, thanks again for Yandex Tech Team guys!!!
+                     */
+                    @setcookie( $authprovider, null, time() - 3600 );
                     throw new moodle_exception( 'Final request returns nothing', 'auth_lenauth' );
                 }
                 $last_user_number = intval( $this->_oauth_config->auth_lenauth_last_user_number );
