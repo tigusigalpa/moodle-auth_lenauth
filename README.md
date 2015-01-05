@@ -40,6 +40,12 @@ Its very-very simple. You have two methods: PHP-code or static HTML-code.
 You're welcome for pull requests but against master branch. Thanks!
 
 ## Changelog
+#### Version 1.1.0 (2015010500)
+- Copyrights about code parts from [auth_googleoauth2 Moodle plugin](https://moodle.org/plugins/view.php?plugin=auth_googleoauth2). Much thanks to [Jérôme Mouneyrac](https://github.com/mouneyrac)!
+- Added retrieve avatars from social profiles (new checkbox option)
+- Fix about Twitter works
+- Update VK.com API version to 5.27
+
 #### Version 1.0.8 (2014122400). Much thanks to Yandex Tech Team!
 - Added cookie clear if final data fails
 - Fix from Yandex Tech team: get default email instead of first
