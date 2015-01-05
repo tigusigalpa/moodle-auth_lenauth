@@ -18,6 +18,8 @@
 /**
  * LenAuth authentication plugin version specification.
  *
+ * NOTE: Some parts of the plugin are taken from auth_googleoauth2 Moodle plugin. {@author} Jérôme Mouneyrac (jerome@mouneyrac.com) twitter: mouneyrac
+ *
  * @package    auth
  * @subpackage lenauth
  * @copyright  2014 Igor Sazonov ( @tigusigalpa )
@@ -26,7 +28,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2014122400;
+$plugin->version  = 2015010500;
 $plugin->requires = 2013111805;   // Requires Moodle 2.6.5 or later
-$plugin->release = '1.0.8 (Build: 2014122400)';
+$plugin->release = '1.1.0 (Build: 2015010500)';
 $plugin->maturity = MATURITY_BETA;             // this version's maturity level

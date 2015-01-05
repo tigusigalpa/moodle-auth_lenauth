@@ -1,6 +1,8 @@
-<?php defined('MOODLE_INTERNAL') || die();
+<?php
+defined('MOODLE_INTERNAL') || die();
 require_once('out.php');
-global $CFG;?>
+global $CFG;
+?>
 
 <table cellspacing="0" cellpadding="5" border="0">
     <tr>
@@ -125,6 +127,19 @@ global $CFG;?>
             } ?>
         </td>
         <td width="50%"><?php echo get_string( 'auth_lenauth_can_confirm_desc', 'auth_lenauth' ); ?></td>
+    </tr>
+    <tr>
+        <td width="50%" colspan="2"><?php
+            echo html_writer::checkbox(
+                'auth_lenauth_retrieve_avatar', 1,
+                isset( $config->auth_lenauth_retrieve_avatar ) ? $config->auth_lenauth_retrieve_avatar : 0,
+                get_string( 'auth_lenauth_retrieve_avatar_key', 'auth_lenauth' ), array( 'id' => 'auth_lenauth_retrieve_avatar' )
+            );
+            if ( isset( $err['auth_lenauth_retrieve_avatar'] ) ) {
+                echo $OUTPUT->error_text( $err['auth_lenauth_retrieve_avatar'] );
+            } ?>
+        </td>
+        <td width="50%"><?php echo get_string( 'auth_lenauth_retrieve_avatar_desc', 'auth_lenauth' ); ?></td>
     </tr>
     
     <!----------FACEBOOK---------->

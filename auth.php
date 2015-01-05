@@ -4,13 +4,20 @@
  * @author Igor Sazonov ( @tigusigalpa )
  * @link http://lms-service.org/lenauth-plugin-oauth-moodle/
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @version 1.0.8
+ * @version 1.1.0
  * @uses auth_plugin_base core class
  *
  * Authentication Plugin: LenAuth Authentication
  * If the email doesn't exist, then the auth plugin creates the user.
  * If the email exist (and the user has for auth plugin this current one),
  * then the plugin login the user related to this email.
+ *
+ * This plugin uses some code parts from the Moodle plugin auth_googleoauth2
+ * @link https://moodle.org/plugins/view.php?plugin=auth_googleoauth2
+ * @link http://mouneyrac.github.io/moodle-auth_googleoauth2/
+ * @author Jérôme Mouneyrac (jerome@mouneyrac.com) twitter: mouneyrac
+ * auth_googleoauth2 was developed @since 2011 and supported now with a lot of updates and fixes at GitHub
+ * Thanks to Jérôme about critical issues for security
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -149,7 +156,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
     
     /**
      * List of available styles
-     * @var type 
+     * @var array
      */
     protected $_styles_array = array( 'default', 'style1', 
         'style1-dark-white', 'style1-light-black', 'style1-text', 
@@ -182,7 +189,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
      * VK API version
      * @var string
      */
-    public static $vk_api_version = '5.25';
+    public static $vk_api_version = '5.27';
     
     /**
      * Yahoo API version
@@ -195,8 +202,12 @@ class auth_plugin_lenauth extends auth_plugin_base {
      * @var string
      */
     public static $twitter_oauth_version = '1.0';
-    
-    protected static $_auth_lenauth_default_country = 'RU';
+
+    protected static $_allowed_icons_types = array(
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/gif'  => 'gif'
+    );
 
 
     /**
@@ -244,10 +255,12 @@ class auth_plugin_lenauth extends auth_plugin_base {
      *
      * Check authentication method
      *
-     * @param string $username of user
-     * @param string $password of user
+     * @param  string $username of user
+     * @param  string $password of user
      * @return boolean
      * @access public
+     *
+     * @author Jerome Mouneyrac ( @mouneyrac )
      */
     function user_login( $username, $password ) {
         global $DB, $CFG;
@@ -258,8 +271,8 @@ class auth_plugin_lenauth extends auth_plugin_base {
 
         //check for user (username) exist and authentication method
         if ( !empty( $user ) && ( $user->auth == 'lenauth' ) ) {
-            $code = optional_param( 'code', false, PARAM_TEXT );
-            if ( $code === false ) {
+            $code = optional_param( 'code', '', PARAM_TEXT );
+            if ( empty( $code ) ) {
                 return false;
             }
             return true;
@@ -362,7 +375,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
         if ( !empty( $authorizationcode ) ) {
             
             $authprovider = required_param( 'authprovider', PARAM_TEXT ); // get authorization provider (webservice name)
-            $config_field_str = $authprovider . '_social_id_field';
+            $config_field_str = 'auth_lenauth_' . $authprovider . '_social_id_field';
             $this->_field_shortname = $this->_oauth_config->$config_field_str;
             $this->_field_id = $this->_lenauth_get_fieldid();
 
@@ -702,6 +715,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                 
                 //some services check accounts for verifier, so we will check it too. No unverified accounts, only verified! only hardCORE!
                 $is_verified = true;
+                $image_url   = '';
 
                 switch ( $authprovider ) {
                     case 'facebook':
@@ -714,6 +728,9 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         $first_name                  = $curl_final_data['first_name'];
                         $last_name                   = $curl_final_data['last_name'];
                         $is_verified                 = $curl_final_data['verified'];
+                        if ( $this->_oauth_config->auth_lenauth_retrieve_avatar ) {
+                            $image_url = 'http://graph.facebook.com/' . $social_uid . '/picture';
+                        }
                         break;
                     
                     /**
@@ -738,6 +755,9 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         $user_email                  = $curl_final_data['emails'][0]['value'];
                         $first_name                  = $curl_final_data['name']['givenName'];
                         $last_name                   = $curl_final_data['name']['familyName'];
+                        if ( $this->_oauth_config->auth_lenauth_retrieve_avatar ) {
+                            $image_url               = isset( $curl_final_data['image']['url'] ) ? $curl_final_data['image']['url'] : '';
+                        }
                         break;
                     
                     case 'yahoo':
@@ -803,6 +823,9 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         }
                         $first_name      = $curl_final_data['query']['results']['profile']['givenName'];
                         $last_name       = $curl_final_data['query']['results']['profile']['familyName'];
+                        if ( $this->_oauth_config->auth_lenauth_retrieve_avatar ) {
+                            $image_url = isset( $curl_final_data['query']['results']['profile']['image']['imageUrl'] ) ? $curl_final_data['query']['results']['profile']['image']['imageUrl'] : '';
+                        }
                         break;
                         
                     case 'twitter':
@@ -827,6 +850,11 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         }
                         parse_str($curl_final_data_pre, $curl_final_data);
                         $social_uid = $curl_final_data['user_id'];
+                        if ( $this->_oauth_config->auth_lenauth_retrieve_avatar ) {
+                            $image_url_pre = 'https://twitter.com/' . $curl_final_data['screen_name'] . '/profile_image?size=original';
+                            $image_header = get_headers( $image_url_pre, 1 );
+                            $image_url = $image_header['location'];
+                        }
                         break;
                     
                     case 'vk':
@@ -847,6 +875,16 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         $user_email                  = isset( $user_email ) ? $user_email : false; //hack, because VK has bugs sometimes
                         $first_name                  = $curl_final_data['response'][0]['first_name'];
                         $last_name                   = $curl_final_data['response'][0]['last_name'];
+
+                        /**
+                         * @link http://vk.com/dev/users.get
+                         */
+                        $fields_array                = array( 'avatar' => 'photo_200' );
+                        $additional_fields_pre       = $curl->get( 'http://api.vk.com/method/users.get?user_ids=' . $social_uid . '&fields=' . join( ',', $fields_array ) );
+                        $additional_fields           = json_decode( $additional_fields_pre, true );
+                        if ( $this->_oauth_config->auth_lenauth_retrieve_avatar ) {
+                            $image_url               = isset($additional_fields['response'][0][$fields_array['avatar']]) ? $additional_fields['response'][0][$fields_array['avatar']] : '';
+                        }
                         break;
                     
                     /**
@@ -868,6 +906,16 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         $first_name                 = $curl_final_data['first_name'];
                         $last_name                  = $curl_final_data['last_name'];
                         $nickname                   = $curl_final_data['display_name']; //for future
+
+                        if ( $this->_oauth_config->auth_lenauth_retrieve_avatar ) {
+                            /**
+                             * @link https://tech.yandex.ru/passport/doc/dg/reference/response-docpage/#norights_5
+                             */
+                            $yandex_avatar_size     = 'islands-200';
+                            if ( isset( $curl_final_data['default_avatar_id'] ) ) {
+                                $image_url          = 'https://avatars.yandex.net/get-yapic/' . $curl_final_data['default_avatar_id'] . '/' . $yandex_avatar_size;
+                            }
+                        }
                         break;
 
                     case 'mailru':
@@ -900,6 +948,9 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         $last_name       = $curl_final_data[0]['last_name'];
                         $is_verified     = $curl_final_data[0]['is_verified'];
                         $birthday        = $curl_final_data[0]['birthday']; //dd.mm.YYYY
+                        if ( $this->_oauth_config->auth_lenauth_retrieve_avatar ) {
+                            $image_url = isset($curl_final_data[0]['pic_big']) ? $curl_final_data[0]['pic_big'] : '';
+                        }
                         break;
 
                     /*case 'ok':
@@ -1021,8 +1072,61 @@ class auth_plugin_lenauth extends auth_plugin_base {
                     // update user record
                     if ( !empty( $newuser ) ) {
                         $newuser->id = $user_lenauth->id;
+                            /*require_once( $CFG->libdir . '/gdlib.php' );
+
+                            $fs = get_file_storage();
+                            $file_obj = $fs->create_file_from_url( array(
+                                'contextid' => context_user::instance( $newuser->id, MUST_EXIST )->id,
+                                'component' => 'user',
+                                'filearea'  => 'icon',
+                                'itemid'    => 0,
+                                'filepath'  => '/',
+                                'source'    => '',
+                                'filename'  => 'f' . $newuser->id . '.' . $ext
+                            ), $image_url );
+                            //$newuser->picture = $file_obj->get_id();*/
+
                         $user_lenauth = (object) array_merge( (array) $user_lenauth, (array) $newuser );
                         $DB->update_record( 'user', $user_lenauth );
+
+                        if ( $this->_oauth_config->auth_lenauth_retrieve_avatar ) {
+                            //processing user avatar from social webservice
+                            if ( !empty( $image_url ) && intval( $user_lenauth->picture ) === 0) {
+                                $image_header = get_headers( $image_url, 1 );
+
+                                if ( isset( $image_header['Content-Type'] )
+                                    && is_string( $image_header['Content-Type'] )
+                                    && in_array( $image_header['Content-Type'], array_keys( self::$_allowed_icons_types ) ) ) {
+                                    $mime = $image_header['Content-Type'];
+                                } else {
+                                    if ( isset( $image_header['Content-Type'][0] )
+                                        && is_string( $image_header['Content-Type'][0] )
+                                        && in_array( $image_header['Content-Type'][0], array_keys( self::$_allowed_icons_types ) ) ) {
+                                        $mime = $image_header['Content-Type'][0];
+                                    }
+                                }
+                                $ext = $this->_lenauth_get_image_extension_from_mime( $mime );
+                                if ( $ext ) {
+                                    //create temp file
+                                    $tempfilename = substr( microtime(), 0, 10 ) . '.tmp';
+                                    $templfolder = $CFG->tempdir . '/filestorage';
+                                    if ( !file_exists( $templfolder ) ) {
+                                        mkdir( $templfolder, $CFG->directorypermissions );
+                                    }
+                                    @chmod( $templfolder, 0777 );
+                                    $tempfile = $templfolder . '/' . $tempfilename;
+                                    if ( copy( $image_url, $tempfile ) ) {
+                                        require_once( $CFG->libdir . '/gdlib.php' );
+                                        $usericonid = process_new_icon( context_user::instance( $newuser->id, MUST_EXIST ), 'user', 'icon', 0, $tempfile );
+                                        if ( $usericonid ) {
+                                            $DB->set_field( 'user', 'picture', $usericonid, array( 'id' => $newuser->id ) );
+                                        }
+                                        unset( $tempfile );
+                                    }
+                                    @chmod( $templfolder, $CFG->directorypermissions );
+                                }
+                            }
+                        }
                     }
 
                     complete_user_login( $user_lenauth ); // complete user login
@@ -1051,8 +1155,8 @@ class auth_plugin_lenauth extends auth_plugin_base {
      * Prints a form for configuring this authentication plugin.
      * It's called from admin/auth.php, and outputs a full page with a form for configuring this plugin.
      *
-     * @param object $config An object of Moodle global config.
-     * @param array $err An array of current form errors
+     * @param  object $config An object of Moodle global config.
+     * @param  array $err An array of current form errors
      * @return void. Just output form template
      *
      * @author Igor Sazonov
@@ -1083,6 +1187,11 @@ class auth_plugin_lenauth extends auth_plugin_base {
             $config->auth_lenauth_can_confirm = 0;
         } else {
             $config->auth_lenauth_can_confirm = 1;
+        }
+        if ( empty( $config->auth_lenauth_retrieve_avatar ) ) {
+            $config->auth_lenauth_retrieve_avatar = 0;
+        } else {
+            $config->auth_lenauth_retrieve_avatar = 1;
         }
         
         if ( !isset( $config->auth_lenauth_display_buttons ) ) {
@@ -1251,10 +1360,8 @@ class auth_plugin_lenauth extends auth_plugin_base {
      * @link http://docs.moodle.org/dev/Authentication_plugins#process_config.28.24config.29
      * Processes and stores configuration data for this authentication plugin.
      *
-     * @param object $config
-     *
+     * @param  object $config
      * @access public
-     *
      * @author Igor Sazonov
      */
     function process_config( $config ) {
@@ -1284,7 +1391,12 @@ class auth_plugin_lenauth extends auth_plugin_base {
                 $config->auth_lenauth_can_confirm = 0;
             } else {
                 $config->auth_lenauth_can_confirm = 1;
-            }            
+            }
+            if ( empty( $config->auth_lenauth_retrieve_avatar ) ) {
+                $config->auth_lenauth_retrieve_avatar = 0;
+            } else {
+                $config->auth_lenauth_retrieve_avatar = 1;
+            }
             
             if ( !isset( $config->auth_lenauth_display_buttons ) ) {
                 $config->auth_lenauth_display_buttons = 'inline-block';
@@ -1431,72 +1543,73 @@ class auth_plugin_lenauth extends auth_plugin_base {
             }*/
 
             // save settings
-            set_config('auth_lenauth_facebook_enabled',        intval( $config->auth_lenauth_facebook_enabled ),                       'auth/lenauth');
-            set_config('auth_lenauth_facebook_app_id',         trim( format_string( $config->auth_lenauth_facebook_app_id ) ),         'auth/lenauth');
-            set_config('auth_lenauth_facebook_app_secret',     trim( format_string( $config->auth_lenauth_facebook_app_secret ) ),     'auth/lenauth');
-            set_config('auth_lenauth_facebook_button_text',    trim( format_string( $config->auth_lenauth_facebook_button_text ) ),    'auth/lenauth');
+            set_config('auth_lenauth_facebook_enabled',        intval( $config->auth_lenauth_facebook_enabled ),      'auth/lenauth');
+            set_config('auth_lenauth_facebook_app_id',         trim( $config->auth_lenauth_facebook_app_id ),         'auth/lenauth');
+            set_config('auth_lenauth_facebook_app_secret',     trim( $config->auth_lenauth_facebook_app_secret ),     'auth/lenauth');
+            set_config('auth_lenauth_facebook_button_text',    trim( $config->auth_lenauth_facebook_button_text ),    'auth/lenauth');
             
-            set_config('auth_lenauth_google_enabled',          intval( $config->auth_lenauth_google_enabled ),                         'auth/lenauth');
-            set_config('auth_lenauth_google_client_id',        trim( format_string( $config->auth_lenauth_google_client_id ) ),        'auth/lenauth');
-            set_config('auth_lenauth_google_client_secret',    trim( format_string( $config->auth_lenauth_google_client_secret ) ),    'auth/lenauth');
-            set_config('auth_lenauth_google_project_id',       trim( format_string( $config->auth_lenauth_google_project_id ) ),       'auth/lenauth');
-            set_config('auth_lenauth_google_button_text',      trim( format_string( $config->auth_lenauth_google_button_text ) ),      'auth/lenauth');
+            set_config('auth_lenauth_google_enabled',          intval( $config->auth_lenauth_google_enabled ),        'auth/lenauth');
+            set_config('auth_lenauth_google_client_id',        trim( $config->auth_lenauth_google_client_id ),        'auth/lenauth');
+            set_config('auth_lenauth_google_client_secret',    trim( $config->auth_lenauth_google_client_secret ),    'auth/lenauth');
+            set_config('auth_lenauth_google_project_id',       trim( $config->auth_lenauth_google_project_id ),       'auth/lenauth');
+            set_config('auth_lenauth_google_button_text',      trim( $config->auth_lenauth_google_button_text ),      'auth/lenauth');
             
-            set_config('auth_lenauth_yahoo_enabled',           intval( $config->auth_lenauth_yahoo_enabled ),                          'auth/lenauth');
-            set_config('auth_lenauth_yahoo_application_id',    trim( format_string( $config->auth_lenauth_yahoo_application_id ) ),    'auth/lenauth');
-            set_config('auth_lenauth_yahoo_consumer_key',      trim( format_string( $config->auth_lenauth_yahoo_consumer_key ) ),      'auth/lenauth');
-            set_config('auth_lenauth_yahoo_consumer_secret',   trim( format_string( $config->auth_lenauth_yahoo_consumer_secret ) ),   'auth/lenauth');
-            set_config('auth_lenauth_yahoo_button_text',       trim( format_string( $config->auth_lenauth_yahoo_button_text ) ),       'auth/lenauth');
+            set_config('auth_lenauth_yahoo_enabled',           intval( $config->auth_lenauth_yahoo_enabled ),         'auth/lenauth');
+            set_config('auth_lenauth_yahoo_application_id',    trim( $config->auth_lenauth_yahoo_application_id ),    'auth/lenauth');
+            set_config('auth_lenauth_yahoo_consumer_key',      trim( $config->auth_lenauth_yahoo_consumer_key ),      'auth/lenauth');
+            set_config('auth_lenauth_yahoo_consumer_secret',   trim( $config->auth_lenauth_yahoo_consumer_secret ),   'auth/lenauth');
+            set_config('auth_lenauth_yahoo_button_text',       trim( $config->auth_lenauth_yahoo_button_text ),       'auth/lenauth');
 
-            set_config('auth_lenauth_twitter_enabled',         intval( $config->auth_lenauth_twitter_enabled ),                        'auth/lenauth');
-            set_config('auth_lenauth_twitter_application_id',  intval( $config->auth_lenauth_twitter_application_id ),                 'auth/lenauth');
-            set_config('auth_lenauth_twitter_consumer_key',    trim( format_string( $config->auth_lenauth_twitter_consumer_key ) ),    'auth/lenauth');
-            set_config('auth_lenauth_twitter_consumer_secret', trim( format_string( $config->auth_lenauth_twitter_consumer_secret ) ), 'auth/lenauth');
-            set_config('auth_lenauth_twitter_button_text',     trim( format_string( $config->auth_lenauth_twitter_button_text ) ),     'auth/lenauth');
+            set_config('auth_lenauth_twitter_enabled',         intval( $config->auth_lenauth_twitter_enabled ),       'auth/lenauth');
+            set_config('auth_lenauth_twitter_application_id',  intval( $config->auth_lenauth_twitter_application_id ),'auth/lenauth');
+            set_config('auth_lenauth_twitter_consumer_key',    trim( $config->auth_lenauth_twitter_consumer_key ),    'auth/lenauth');
+            set_config('auth_lenauth_twitter_consumer_secret', trim( $config->auth_lenauth_twitter_consumer_secret ), 'auth/lenauth');
+            set_config('auth_lenauth_twitter_button_text',     trim( $config->auth_lenauth_twitter_button_text ),     'auth/lenauth');
             
-            set_config('auth_lenauth_vk_enabled',              intval( $config->auth_lenauth_vk_enabled ),                             'auth/lenauth');
-            set_config('auth_lenauth_vk_app_id',               trim( format_string( $config->auth_lenauth_vk_app_id ) ),               'auth/lenauth');
-            set_config('auth_lenauth_vk_app_secret',           trim( format_string( $config->auth_lenauth_vk_app_secret ) ),           'auth/lenauth');
-            set_config('auth_lenauth_vk_button_text',          trim( format_string( $config->auth_lenauth_vk_button_text ) ),          'auth/lenauth');
+            set_config('auth_lenauth_vk_enabled',              intval( $config->auth_lenauth_vk_enabled ),            'auth/lenauth');
+            set_config('auth_lenauth_vk_app_id',               trim( $config->auth_lenauth_vk_app_id ),               'auth/lenauth');
+            set_config('auth_lenauth_vk_app_secret',           trim( $config->auth_lenauth_vk_app_secret ),           'auth/lenauth');
+            set_config('auth_lenauth_vk_button_text',          trim( $config->auth_lenauth_vk_button_text ),          'auth/lenauth');
             
-            set_config('auth_lenauth_yandex_enabled',          intval( $config->auth_lenauth_yandex_enabled ),                         'auth/lenauth');
-            set_config('auth_lenauth_yandex_app_id',           trim( format_string( $config->auth_lenauth_yandex_app_id ) ),           'auth/lenauth');
-            set_config('auth_lenauth_yandex_app_password',     trim( format_string( $config->auth_lenauth_yandex_app_password ) ),     'auth/lenauth');
-            set_config('auth_lenauth_yandex_button_text',      trim( format_string( $config->auth_lenauth_yandex_button_text ) ),      'auth/lenauth');
+            set_config('auth_lenauth_yandex_enabled',          intval( $config->auth_lenauth_yandex_enabled ),        'auth/lenauth');
+            set_config('auth_lenauth_yandex_app_id',           trim( $config->auth_lenauth_yandex_app_id ),           'auth/lenauth');
+            set_config('auth_lenauth_yandex_app_password',     trim( $config->auth_lenauth_yandex_app_password ),     'auth/lenauth');
+            set_config('auth_lenauth_yandex_button_text',      trim( $config->auth_lenauth_yandex_button_text ),      'auth/lenauth');
 
-            set_config('auth_lenauth_mailru_enabled',          intval( $config->auth_lenauth_mailru_enabled ),                         'auth/lenauth');
-            set_config('auth_lenauth_mailru_site_id',          intval( $config->auth_lenauth_mailru_site_id ),                         'auth/lenauth');
-            set_config('auth_lenauth_mailru_client_private',   trim( format_string( $config->auth_lenauth_mailru_client_private ) ),   'auth/lenauth');
-            set_config('auth_lenauth_mailru_client_secret',    trim( format_string( $config->auth_lenauth_mailru_client_secret ) ),    'auth/lenauth');
-            set_config('auth_lenauth_mailru_button_text',      trim( format_string( $config->auth_lenauth_mailru_button_text ) ),      'auth/lenauth');
+            set_config('auth_lenauth_mailru_enabled',          intval( $config->auth_lenauth_mailru_enabled ),        'auth/lenauth');
+            set_config('auth_lenauth_mailru_site_id',          intval( $config->auth_lenauth_mailru_site_id ),        'auth/lenauth');
+            set_config('auth_lenauth_mailru_client_private',   trim( $config->auth_lenauth_mailru_client_private ),   'auth/lenauth');
+            set_config('auth_lenauth_mailru_client_secret',    trim( $config->auth_lenauth_mailru_client_secret ),    'auth/lenauth');
+            set_config('auth_lenauth_mailru_button_text',      trim( $config->auth_lenauth_mailru_button_text ),      'auth/lenauth');
 
             /*set_config('ok_enabled',              intval( $config->ok_enabled ),                             'auth/lenauth');
-            set_config('ok_app_id',               trim( format_string( $config->ok_app_id ) ),               'auth/lenauth');
-            set_config('ok_public_key',           trim( format_string( $config->ok_public_key ) ),           'auth/lenauth');
-            set_config('ok_secret_key',           trim( format_string( $config->ok_secret_key ) ),           'auth/lenauth');
-            set_config('ok_button_text',          trim( format_string( $config->ok_button_text ) ),          'auth/lenauth');
-            set_config('ok_social_id_field',      trim( format_string( $config->ok_social_id_field ) ),      'auth/lenauth');*/
+            set_config('ok_app_id',               trim( $config->ok_app_id ),               'auth/lenauth');
+            set_config('ok_public_key',           trim( $config->ok_public_key ),           'auth/lenauth');
+            set_config('ok_secret_key',           trim( $config->ok_secret_key ),           'auth/lenauth');
+            set_config('ok_button_text',          trim( $config->ok_button_text ),          'auth/lenauth');
+            set_config('ok_social_id_field',      trim( $config->ok_social_id_field ),      'auth/lenauth');*/
 
-            set_config('auth_lenauth_user_prefix',             trim( format_string( $config->auth_lenauth_user_prefix ) ),             'auth/lenauth');
-            set_config('auth_lenauth_default_country',         trim( format_string( $config->auth_lenauth_default_country ) ),         'auth/lenauth');
-            set_config('auth_lenauth_locale',                  trim( format_string( $config->auth_lenauth_locale ) ),                  'auth/lenauth');
-            //set_config('can_change_password',                  intval( $config->can_change_password ),                                 'auth/lenauth');
-            set_config('auth_lenauth_can_reset_password',      intval( $config->auth_lenauth_can_reset_password ),                     'auth/lenauth');
-            set_config('auth_lenauth_can_confirm',             intval( $config->auth_lenauth_can_confirm ),                            'auth/lenauth');
+            set_config('auth_lenauth_user_prefix',             trim( $config->auth_lenauth_user_prefix ),             'auth/lenauth');
+            set_config('auth_lenauth_default_country',         trim( $config->auth_lenauth_default_country ),         'auth/lenauth');
+            set_config('auth_lenauth_locale',                  trim( $config->auth_lenauth_locale ),                  'auth/lenauth');
+            //set_config('can_change_password',                  intval( $config->can_change_password ),              'auth/lenauth');
+            set_config('auth_lenauth_can_reset_password',      intval( $config->auth_lenauth_can_reset_password ),    'auth/lenauth');
+            set_config('auth_lenauth_can_confirm',             intval( $config->auth_lenauth_can_confirm ),           'auth/lenauth');
+            set_config('auth_lenauth_retrieve_avatar',         intval( $config->auth_lenauth_retrieve_avatar ),       'auth/lenauth');
             
-            set_config('auth_lenauth_display_buttons',         trim( format_string( $config->auth_lenauth_display_buttons ) ),         'auth/lenauth');
-            set_config('auth_lenauth_button_width',            intval( $config->auth_lenauth_button_width ),                           'auth/lenauth');
-            set_config('auth_lenauth_button_margin_top',       intval( $config->auth_lenauth_button_margin_top ),                      'auth/lenauth');
-            set_config('auth_lenauth_button_margin_right',     intval( $config->auth_lenauth_button_margin_right ),                    'auth/lenauth');
-            set_config('auth_lenauth_button_margin_bottom',    intval( $config->auth_lenauth_button_margin_bottom ),                   'auth/lenauth');
-            set_config('auth_lenauth_button_margin_left',      intval( $config->auth_lenauth_button_margin_left ),                     'auth/lenauth');
+            set_config('auth_lenauth_display_buttons',         trim( $config->auth_lenauth_display_buttons ),         'auth/lenauth');
+            set_config('auth_lenauth_button_width',            intval( $config->auth_lenauth_button_width ),          'auth/lenauth');
+            set_config('auth_lenauth_button_margin_top',       intval( $config->auth_lenauth_button_margin_top ),     'auth/lenauth');
+            set_config('auth_lenauth_button_margin_right',     intval( $config->auth_lenauth_button_margin_right ),   'auth/lenauth');
+            set_config('auth_lenauth_button_margin_bottom',    intval( $config->auth_lenauth_button_margin_bottom ),  'auth/lenauth');
+            set_config('auth_lenauth_button_margin_left',      intval( $config->auth_lenauth_button_margin_left ),    'auth/lenauth');
             
-            set_config('auth_lenauth_display_div',             trim( format_string( $config->auth_lenauth_display_div ) ),             'auth/lenauth');
-            set_config('auth_lenauth_div_width',               intval( $config->auth_lenauth_div_width ),                              'auth/lenauth');
-            set_config('auth_lenauth_div_margin_top',          intval( $config->auth_lenauth_div_margin_top ),                         'auth/lenauth');
-            set_config('auth_lenauth_div_margin_right',        intval( $config->auth_lenauth_div_margin_right ),                       'auth/lenauth');
-            set_config('auth_lenauth_div_margin_bottom',       intval( $config->auth_lenauth_div_margin_bottom ),                      'auth/lenauth');
-            set_config('auth_lenauth_div_margin_left',         intval( $config->auth_lenauth_div_margin_left ),                        'auth/lenauth');
+            set_config('auth_lenauth_display_div',             trim( $config->auth_lenauth_display_div ),             'auth/lenauth');
+            set_config('auth_lenauth_div_width',               intval( $config->auth_lenauth_div_width ),             'auth/lenauth');
+            set_config('auth_lenauth_div_margin_top',          intval( $config->auth_lenauth_div_margin_top ),        'auth/lenauth');
+            set_config('auth_lenauth_div_margin_right',        intval( $config->auth_lenauth_div_margin_right ),      'auth/lenauth');
+            set_config('auth_lenauth_div_margin_bottom',       intval( $config->auth_lenauth_div_margin_bottom ),     'auth/lenauth');
+            set_config('auth_lenauth_div_margin_left',         intval( $config->auth_lenauth_div_margin_left ),       'auth/lenauth');
 
             return true;
         }
@@ -1510,13 +1623,12 @@ class auth_plugin_lenauth extends auth_plugin_base {
      *
      * If email updated we store it to global $USER object
      *
-     * @param object $olduser before user update
-     * @param object $newuser new user data
-     * @uses $USER core global object
+     * @param  object $olduser before user update
+     * @param  object $newuser new user data
+     * @uses   $USER core global object
      * @return boolean
      *
      * @access public
-     *
      * @author Igor Sazonov
      *
      */
@@ -1529,7 +1641,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
         return true;
     }
 
-    public function urlEncodeRfc3986($input) {
+    public function urlEncodeRfc3986( $input ) {
         if ( is_array( $input ) ) {
             return array_map( array( $this, 'urlEncodeRfc3986' ), $input );
         }
@@ -1539,6 +1651,10 @@ class auth_plugin_lenauth extends auth_plugin_base {
         return '';
     }
 
+    /**
+     * @param  $signature Signature atring
+     * @return array
+     */
     private function _lenauth_yahoo_request_array( $signature ) {
         return array(
             'oauth_consumer_key'     => $this->_oauth_config->auth_lenauth_yahoo_consumer_key,
@@ -1552,14 +1668,17 @@ class auth_plugin_lenauth extends auth_plugin_base {
     
     
     /**
-     * 
-     * @global type $SESSION
-     * @param type $params
-     * @param type $send_oauth_request
-     * @param type $oauth_token
-     * @return type
+     *
+     * This function generates array with Twitter request header
+     * @param  array $params Array with parameters to be send with request header
+     * @param  bool $send_oauth_request Boolean param about send OAuth request or not
+     * @param  string $oauth_token OAuth token
+     * @return array
+     *
+     * @access  protected
+     * @author Igor Sazonov
      */
-    protected function _lenauth_set_twitter_header($params, $oauth_token = false, $oauth_token_secret = false) {
+    protected function _lenauth_set_twitter_header( $params, $oauth_token = false, $oauth_token_secret = false ) {
         if ( $oauth_token ) {
             $params['oauth_token'] = $oauth_token;
         }
@@ -1622,15 +1741,15 @@ class auth_plugin_lenauth extends auth_plugin_base {
     /**
      * The function gets additional field ID of specified webservice shortname from user_info_field table
      *
-     * @param string $shortname a shortname of webservice defined here
+     * @param  string $shortname a shortname of webservice defined here
      * @return int
-     * @access protected
      *
-     * @author Igor Sazonov
+     * @access protected
+     * @author Igor Sazonov (@tigusigalpa)
      */
     protected function _lenauth_get_fieldid() {
         global $DB;
-        return ( $this->_field_shortname ) ? $DB->get_field( 'user_info_field', 'id', array( 'shortname' => $this->_field_shortname ) ) : false;
+        return $this->_field_shortname ? $DB->get_field( 'user_info_field', 'id', array( 'shortname' => $this->_field_shortname ) ) : false;
     }
     
     /**
@@ -1638,10 +1757,13 @@ class auth_plugin_lenauth extends auth_plugin_base {
      * Param $authprovider checks service we use and makes URI. Used in code for much faster work.
      * 
      * @global object $CFG
-     * @param string $authprovider current OAuth provider
+     * @param  string $authprovider current OAuth provider
      * @return string
+     *
+     * @access protected
+     * @author Igor Sazonov (@tigusigalpa)
      */
-    protected function _lenauth_redirect_uri($authprovider) {
+    protected function _lenauth_redirect_uri( $authprovider ) {
         global $CFG;
         
         return $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=' . $authprovider;
@@ -1649,15 +1771,21 @@ class auth_plugin_lenauth extends auth_plugin_base {
 
     /**
      *
-     * This function returns an object
+     * This function returns user object from Moodle database with given $social_uid param,
+     * if user with this social_uid exists, function will return this user object,
+     * if not - false
+     *
      * @global object $DB
      * @global object $CFG
-     * @param string $social_uid user internal ID of social webservice that comes from request
-     * @return object
+     * @param  string $social_uid user internal ID of social webservice that comes from request
+     * @return object|bool
+     *
+     * @access private
+     * @author Igor Sazonov (@tigusigalpa)
      */
-    private function _lenauth_get_userdata_by_social_id($social_uid) {
+    private function _lenauth_get_userdata_by_social_id( $social_uid ) {
         global $DB, $CFG;
-        
+
         $ret = false;
         if ( !empty( $this->_field_shortname ) ) {
             $ret = $DB->get_record_sql( 'SELECT u.* FROM {user} u
@@ -1671,6 +1799,16 @@ class auth_plugin_lenauth extends auth_plugin_base {
         }
         
         return $ret;
+    }
+
+    /**
+     * This function returns extension of web image mime type
+     *
+     * @param  $mime Mime type
+     * @return string If needle $mime type exists returns extension, if not - empty string
+     */
+    private function _lenauth_get_image_extension_from_mime( $mime ) {
+        return isset( self::$_allowed_icons_types[$mime] ) ? self::$_allowed_icons_types[$mime] : '';
     }
 
 }

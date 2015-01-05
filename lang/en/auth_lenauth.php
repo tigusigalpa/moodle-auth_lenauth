@@ -49,6 +49,8 @@ $string['auth_lenauth_can_reset_password_desc'] = 'If the option enabled, user c
 //$string['password_expire_desc'] = 'Период жизни пароля, необходимо будет создать новый через определенное Вами количество дней. 0 &mdash; значит пароль можно оставить навсегда.';
 $string['auth_lenauth_can_confirm_key'] = 'Moderate new users';
 $string['auth_lenauth_can_confirm_desc'] = 'New users, registered via LenAuth needs to be moderated by Moodle administrator';
+$string['auth_lenauth_retrieve_avatar_key'] = 'Retrieve avatar';
+$string['auth_lenauth_retrieve_avatar_desc'] = 'If option checked and if user is newbie or exists without Moodle-based avatar, it will be uploaded automatically if it exists at social profile';
 
 $string['auth_lenauth_empty_code_param'] = 'Someting wrong, code GET-param is empty. Check your App settings in LenAuth';
 
