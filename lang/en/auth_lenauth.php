@@ -64,6 +64,8 @@ $string['auth_lenauth_margin_top_key'] = 'Margin top (px)';
 $string['auth_lenauth_margin_right_key'] = 'Margin right (px)';
 $string['auth_lenauth_margin_bottom_key'] = 'Margin bottom (px)';
 $string['auth_lenauth_margin_left_key'] = 'Margin left (px)';
+$string['auth_lenauth_order'] = 'Order';
+
 
 $string['auth_lenauth_div_settings'] = 'Buttons area settings';
 $string['auth_lenauth_div_location'] = 'Area location';
@@ -113,6 +115,8 @@ $string['auth_lenauth_google_binding'] = 'Google Social ID';
  * Yahoo English locale
  */
 $string['auth_lenauth_yahoo_settings'] = 'Yahoo Settings';
+$string['auth_lenauth_yahoo_oauth_1_note'] = 'if you already have Yahoo OAuth account';
+$string['auth_lenauth_yahoo_oauth_2_note'] = 'recommended for new apps';
 $string['auth_lenauth_yahoo_application_id'] = 'Application ID';
 $string['auth_lenauth_yahoo_consumer_key'] = 'Consumer Key';
 $string['auth_lenauth_yahoo_consumer_secret'] = 'Consumer Secret';
@@ -125,7 +129,7 @@ $string['auth_lenauth_yahoo_desc'] = '
                 <li>Application Type: <strong>Web-based</strong></li>
                 <li>Home Page URL: <strong>{$a->wwwroot}</strong></li>
                 <li>Access Scopes: <strong>This app requires access to private user data.</strong></li>
-                <li>Callback Domain: <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=yahoo</strong></li>
+                <li>Callback Domain: <strong style="color:red">{$a->wwwroot}</strong></li>
                 <li>Select APIs for private user data access: check the option <strong>Social Directory (Profiles)</strong>, and after check the last mark <strong>Read/Write Public and Private</strong></li>
                 <li>Terms of Use: <em>check the option</em></li>
             </ul>

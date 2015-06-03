@@ -3,6 +3,7 @@
 require( '../../config.php' );
 
 $code = '';
+$state = '';
 $error = false;
 $error_code = '';
 $oauth_token = false;
@@ -54,12 +55,17 @@ if ( !empty( $auth_service ) ) {
 
             break;
             
-        case 'yahoo':
+        case 'yahoo1':
             $code = $auth_service;
             $oauth_token = false;
             if ( isset( $_REQUEST['oauth_token'] ) ) $oauth_token = optional_param( 'oauth_token', '', PARAM_TEXT );
             $oauth_verifier = false;
             if ( isset( $_REQUEST['oauth_verifier'] ) ) $oauth_verifier = optional_param( 'oauth_verifier', '', PARAM_TEXT );
+            break;
+            
+        case 'yahoo2':
+            $code = optional_param( 'code', '', PARAM_TEXT );
+            $state = optional_param( 'state', '', PARAM_TEXT );
             break;
             
         case 'twitter':
@@ -145,6 +151,7 @@ if ( empty( $error ) ) {
      * @see auth.php#loginpage_hook()
      */
     $moodle_url_params = array( 'oauthcode' => $code, 'authprovider' => $auth_service );
+    if ( !empty( $state ) ) $moodle_url_params['state'] = $state;
     if ( $oauth_token ) $moodle_url_params['oauth_token'] = $oauth_token;
     if ( $oauth_verifier ) $moodle_url_params['oauth_verifier'] = $oauth_verifier;
     $url = new moodle_url( $loginurl, $moodle_url_params );

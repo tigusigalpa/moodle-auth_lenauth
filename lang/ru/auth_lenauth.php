@@ -62,6 +62,7 @@ $string['auth_lenauth_margin_top_key'] = 'Отступ сверху (px)';
 $string['auth_lenauth_margin_right_key'] = 'Отступ справа (px)';
 $string['auth_lenauth_margin_bottom_key'] = 'Отступ снизу (px)';
 $string['auth_lenauth_margin_left_key'] = 'Отступ слева (px)';
+$string['auth_lenauth_order'] = 'Порядок';
 
 $string['auth_lenauth_div_settings'] = 'Настройки области кнопок';
 $string['auth_lenauth_div_location'] = 'Расположение области';
@@ -111,6 +112,8 @@ $string['auth_lenauth_google_binding'] = 'ID Гугл';
  * Yahoo Russian locale
  */
 $string['auth_lenauth_yahoo_settings'] = 'Настройки Yahoo';
+$string['auth_lenauth_yahoo_oauth_1_note'] = 'если у Вас уже есть приложение Yahoo';
+$string['auth_lenauth_yahoo_oauth_2_note'] = 'рекомендуется для создания новых приложений';
 $string['auth_lenauth_yahoo_application_id'] = 'Application ID';
 $string['auth_lenauth_yahoo_consumer_key'] = 'Consumer Key';
 $string['auth_lenauth_yahoo_consumer_secret'] = 'Consumer Secret';
@@ -123,7 +126,7 @@ $string['auth_lenauth_yahoo_desc'] = '
                 <li>Application Type: <strong>Web-based</strong></li>
                 <li>Home Page URL: <strong>{$a->wwwroot}</strong></li>
                 <li>Access Scopes: <strong>This app requires access to private user data.</strong></li>
-                <li>Callback Domain: <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=yahoo</strong></li>
+                <li>Callback Domain: <strong style="color:red">{$a->wwwroot}</strong></li>
                 <li>Select APIs for private user data access: отметьте галочку <strong>Social Directory (Profiles)</strong>, а под ней отметьте последний пункт <strong>Read/Write Public and Private</strong></li>
                 <li>Terms of Use: <em>отметьте галочку</em></li>
             </ul>

@@ -228,7 +228,22 @@ global $CFG;
             echo $OUTPUT->error_text( $err['auth_lenauth_facebook_social_id_field'] );
         }
         ?>
-            <!--input type="hidden" name="auth_lenauth_facebook_social_id_field" value="<?php echo $config->auth_lenauth_facebook_social_id_field; ?>" /-->
+        </td>
+    </tr>
+    <tr>
+        <td align="right" width="15%"><label for="auth_lenauth_facebook_order"><?php echo get_string( 'auth_lenauth_order', 'auth_lenauth' ); ?></label></td>
+        <td width="35%"><?php echo html_writer::empty_tag( 'input',
+                array( 'type' => 'number',
+                    'id'      => 'auth_lenauth_facebook_order',
+                    'name'    => 'auth_lenauth_order[facebook]',
+                    'class'   => 'auth_lenauth_facebook_order',
+                    'value'   => array_search( 'facebook', $order_array ),
+                    'size'    => 10,
+                    'min'     => 1,
+                    'max'     => 7,
+                    'maxlength' => 1,
+                    'autocomplete' => 'off' )
+            ); ?>
         </td>
     </tr>
     
@@ -267,7 +282,7 @@ global $CFG;
                 echo $OUTPUT->error_text( $err['auth_lenauth_google_client_id'] );
             } ?>
         </td>
-        <td width="50%" rowspan="5" valign="top"><?php echo get_string( 'auth_lenauth_google_desc', 'auth_lenauth', $CFG ); ?></td>
+        <td width="50%" rowspan="6" valign="top"><?php echo get_string( 'auth_lenauth_google_desc', 'auth_lenauth', $CFG ); ?></td>
     </tr>
     <tr>
         <td align="right" width="15%"><label for="auth_lenauth_google_client_secret"><?php echo get_string( 'auth_lenauth_google_client_secret_key', 'auth_lenauth' ); ?></label></td>
@@ -335,16 +350,35 @@ global $CFG;
             echo $OUTPUT->error_text( $err['auth_lenauth_google_social_id_field'] );
         }
         ?>
-            <!--input type="hidden" name="auth_lenauth_google_social_id_field" value="<?php echo $config->auth_lenauth_google_social_id_field; ?>" /-->
+        </td>
+    </tr>
+    <tr>
+        <td align="right" width="15%"><label for="auth_lenauth_google_order"><?php echo get_string( 'auth_lenauth_order', 'auth_lenauth' ); ?></label></td>
+        <td width="35%"><?php echo html_writer::empty_tag( 'input',
+                array( 'type' => 'number',
+                    'id'      => 'auth_lenauth_google_order',
+                    'name'    => 'auth_lenauth_order[google]',
+                    'class'   => 'auth_lenauth_google_order',
+                    'value'   => array_search( 'google', $order_array ),
+                    'size'    => 10,
+                    'min'     => 1,
+                    'max'     => 7,
+                    'maxlength' => 1,
+                    'autocomplete' => 'off' )
+            ); ?>
         </td>
     </tr>
     
     <!----------YAHOO---------->
     <tr>
-        <td colspan="3"><h3><?php echo get_string( 'auth_lenauth_yahoo_settings', 'auth_lenauth' ); ?></h3></td>
+        <td colspan="3"><h3><?php echo get_string( 'auth_lenauth_yahoo_settings', 'auth_lenauth' );
+            if ( !empty( $config->auth_lenauth_yahoo_application_id ) ) {
+                echo ' ( <strong><a href="https://developer.apps.yahoo.com/projects/' . $config->auth_lenauth_yahoo_application_id . '" target="_blank">' . get_string( 'auth_lenauth_google_dashboard', 'auth_lenauth' ) . '</a></strong> )';
+            }
+        ?></h3></td>
     </tr>
     <tr>
-        <td colspan="3">
+        <td>
             <?php echo html_writer::checkbox( 'auth_lenauth_yahoo_enabled', 1,
                                     $config->auth_lenauth_yahoo_enabled,
                                     get_string( 'auth_lenauth_enabled_key', 'auth_lenauth' ) );
@@ -352,6 +386,33 @@ global $CFG;
             echo $OUTPUT->error_text( $err['auth_lenauth_yahoo_enabled'] );
         } ?>
         </td>
+        <td>
+            <table border="0" width="100%">
+                <tr>
+                    <td width="7%">
+                        <input type="radio" name="auth_lenauth_yahoo_oauth_version" id="auth_lenauth_yahoo_oauth_version_1" class="auth_lenauth_yahoo_oauth_version" value="1"<?php echo ( empty( $config->auth_lenauth_yahoo_oauth_version ) || ( !empty( $config->auth_lenauth_yahoo_oauth_version ) && $config->auth_lenauth_yahoo_oauth_version == 1 ) ) ? ' checked="checked"' : ''; ?> />
+                        <?php
+                        if ( isset( $err['auth_lenauth_yahoo_oauth_version'] ) ) {
+                            echo $OUTPUT->error_text( $err['auth_lenauth_yahoo_oauth_version'] );
+                        } ?>
+                    </td>
+                    <td width="43%">
+                        <label for="auth_lenauth_yahoo_oauth_version_1"><strong>OAuth 1.0</strong><br />(<em><?php echo get_string( 'auth_lenauth_yahoo_oauth_1_note', 'auth_lenauth' ); ?></em>)</label>
+                    </td>
+                    <td width="7%">
+                        <input type="radio" name="auth_lenauth_yahoo_oauth_version" id="auth_lenauth_yahoo_oauth_version_2" class="auth_lenauth_yahoo_oauth_version" value="2"<?php echo ( !empty( $config->auth_lenauth_yahoo_oauth_version ) && $config->auth_lenauth_yahoo_oauth_version == 2 ) ? ' checked="checked"' : ''; ?> />
+                        <?php
+                        if ( isset( $err['auth_lenauth_yahoo_oauth_version'] ) ) {
+                            echo $OUTPUT->error_text( $err['auth_lenauth_yahoo_oauth_version'] );
+                        } ?>
+                    </td>
+                    <td width="43%">
+                        <label for="auth_lenauth_yahoo_oauth_version_2"><strong>OAuth 2.0</strong><br />(<em><?php echo get_string( 'auth_lenauth_yahoo_oauth_2_note', 'auth_lenauth' ); ?></em>)</label>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td></td>
     </tr>
                 
     <tr>
@@ -370,7 +431,7 @@ global $CFG;
                 echo $OUTPUT->error_text( $err['auth_lenauth_yahoo_application_id'] );
             } ?>
         </td>
-        <td width="50%" rowspan="5" valign="top"><?php echo get_string( 'auth_lenauth_yahoo_desc', 'auth_lenauth', $CFG ); ?></td>
+        <td width="50%" rowspan="6" valign="top"><?php echo get_string( 'auth_lenauth_yahoo_desc', 'auth_lenauth', $CFG ); ?></td>
     </tr>
     <tr>
         <td align="right" width="15%"><label for="auth_lenauth_yahoo_consumer_key"><?php echo get_string( 'auth_lenauth_yahoo_consumer_key', 'auth_lenauth' ); ?></label></td>
@@ -441,6 +502,22 @@ global $CFG;
             <!--input type="hidden" name="auth_lenauth_yahoo_social_id_field" value="<?php echo $config->auth_lenauth_yahoo_social_id_field; ?>" /-->
         </td>
     </tr>
+    <tr>
+        <td align="right" width="15%"><label for="auth_lenauth_google_order"><?php echo get_string( 'auth_lenauth_order', 'auth_lenauth' ); ?></label></td>
+        <td width="35%"><?php echo html_writer::empty_tag( 'input',
+                array( 'type' => 'number',
+                    'id'      => 'auth_lenauth_google_order',
+                    'name'    => 'auth_lenauth_order[yahoo]',
+                    'class'   => 'auth_lenauth_google_order',
+                    'value'   => array_search( 'yahoo', $order_array ),
+                    'size'    => 10,
+                    'min'     => 1,
+                    'max'     => 7,
+                    'maxlength' => 1,
+                    'autocomplete' => 'off' )
+            ); ?>
+        </td>
+    </tr>
     
     <!----------TWITTER---------->
     <tr>
@@ -490,7 +567,7 @@ global $CFG;
                 echo $OUTPUT->error_text( $err['auth_lenauth_twitter_application_id'] );
             } ?>
         </td>
-        <td width="50%" rowspan="5" valign="top"><?php echo get_string( 'auth_lenauth_twitter_desc', 'auth_lenauth', $CFG ); ?></td>
+        <td width="50%" rowspan="6" valign="top"><?php echo get_string( 'auth_lenauth_twitter_desc', 'auth_lenauth', $CFG ); ?></td>
     </tr>
     <tr>
         <td align="right" width="15%"><label for="auth_lenauth_twitter_consumer_key"><?php echo get_string( 'auth_lenauth_twitter_consumer_key', 'auth_lenauth' ); ?></label></td>
@@ -561,6 +638,22 @@ global $CFG;
             <!--input type="hidden" name="auth_lenauth_twitter_social_id_field" value="<?php echo $config->auth_lenauth_twitter_social_id_field; ?>" /-->
         </td>
     </tr>
+    <tr>
+        <td align="right" width="15%"><label for="auth_lenauth_google_order"><?php echo get_string( 'auth_lenauth_order', 'auth_lenauth' ); ?></label></td>
+        <td width="35%"><?php echo html_writer::empty_tag( 'input',
+                array( 'type' => 'number',
+                    'id'      => 'auth_lenauth_google_order',
+                    'name'    => 'auth_lenauth_order[twitter]',
+                    'class'   => 'auth_lenauth_google_order',
+                    'value'   => array_search( 'twitter', $order_array ),
+                    'size'    => 10,
+                    'min'     => 1,
+                    'max'     => 7,
+                    'maxlength' => 1,
+                    'autocomplete' => 'off' )
+            ); ?>
+        </td>
+    </tr>
     
     <!----------VK.COM---------->
     <tr>
@@ -598,7 +691,7 @@ global $CFG;
                 echo $OUTPUT->error_text( $err['auth_lenauth_vk_app_id'] );
             } ?>
         </td>
-        <td width="50%" rowspan="4" valign="top"><?php echo get_string( 'auth_lenauth_vk_desc', 'auth_lenauth', $CFG ); ?></td>
+        <td width="50%" rowspan="5" valign="top"><?php echo get_string( 'auth_lenauth_vk_desc', 'auth_lenauth', $CFG ); ?></td>
     </tr>
     <tr>
         <td align="right" width="15%"><label for="auth_lenauth_vk_app_secret"><?php echo get_string( 'auth_lenauth_vk_app_secret_key', 'auth_lenauth' ); ?></label></td>
@@ -653,6 +746,22 @@ global $CFG;
             <!--input type="hidden" name="auth_lenauth_vk_social_id_field" value="<?php echo $config->auth_lenauth_vk_social_id_field; ?>" /-->
         </td>
     </tr>
+    <tr>
+        <td align="right" width="15%"><label for="auth_lenauth_google_order"><?php echo get_string( 'auth_lenauth_order', 'auth_lenauth' ); ?></label></td>
+        <td width="35%"><?php echo html_writer::empty_tag( 'input',
+                array( 'type' => 'number',
+                    'id'      => 'auth_lenauth_google_order',
+                    'name'    => 'auth_lenauth_order[vk]',
+                    'class'   => 'auth_lenauth_google_order',
+                    'value'   => array_search( 'vk', $order_array ),
+                    'size'    => 10,
+                    'min'     => 1,
+                    'max'     => 7,
+                    'maxlength' => 1,
+                    'autocomplete' => 'off' )
+            ); ?>
+        </td>
+    </tr>
     
     <!----------YANDEX.RU---------->
     <tr>
@@ -691,7 +800,7 @@ global $CFG;
         }
         ?>
         </td>
-        <td width="50%" rowspan="4" valign="top"><?php echo get_string( 'auth_lenauth_yandex_desc', 'auth_lenauth', $CFG ); ?></td>
+        <td width="50%" rowspan="5" valign="top"><?php echo get_string( 'auth_lenauth_yandex_desc', 'auth_lenauth', $CFG ); ?></td>
     </tr>
     <tr>
         <td align="right" width="15%"><label for="auth_lenauth_yandex_app_password"><?php echo get_string( 'auth_lenauth_yandex_app_password_key', 'auth_lenauth' ); ?></label></td>
@@ -748,6 +857,22 @@ global $CFG;
             <!--input type="hidden" name="auth_lenauth_yandex_social_id_field" value="<?php echo $config->auth_lenauth_yandex_social_id_field; ?>" /-->
         </td>
     </tr>
+    <tr>
+        <td align="right" width="15%"><label for="auth_lenauth_google_order"><?php echo get_string( 'auth_lenauth_order', 'auth_lenauth' ); ?></label></td>
+        <td width="35%"><?php echo html_writer::empty_tag( 'input',
+                array( 'type' => 'number',
+                    'id'      => 'auth_lenauth_google_order',
+                    'name'    => 'auth_lenauth_order[yandex]',
+                    'class'   => 'auth_lenauth_google_order',
+                    'value'   => array_search( 'yandex', $order_array ),
+                    'size'    => 10,
+                    'min'     => 1,
+                    'max'     => 7,
+                    'maxlength' => 1,
+                    'autocomplete' => 'off' )
+            ); ?>
+        </td>
+    </tr>
 
 
     <!----------MAIL.RU---------->
@@ -784,7 +909,7 @@ global $CFG;
             echo $OUTPUT->error_text( $err['auth_lenauth_mailru_site_id'] );
         } ?>
         </td>
-        <td width="50%" rowspan="5" valign="top"><?php echo get_string( 'auth_lenauth_mailru_desc', 'auth_lenauth' ); ?></td>
+        <td width="50%" rowspan="6" valign="top"><?php echo get_string( 'auth_lenauth_mailru_desc', 'auth_lenauth' ); ?></td>
     </tr>
     <tr>
         <td align="right" width="15%"><label for="auth_lenauth_mailru_client_private"><?php echo get_string('auth_lenauth_mailru_client_private_key', 'auth_lenauth'); ?></label></td>
@@ -853,6 +978,22 @@ global $CFG;
         }
         ?>
             <!--input type="hidden" name="auth_lenauth_mailru_social_id_field" value="<?php echo $config->auth_lenauth_mailru_social_id_field; ?>" /-->
+        </td>
+    </tr>
+    <tr>
+        <td align="right" width="15%"><label for="auth_lenauth_google_order"><?php echo get_string( 'auth_lenauth_order', 'auth_lenauth' ); ?></label></td>
+        <td width="35%"><?php echo html_writer::empty_tag( 'input',
+                array( 'type' => 'number',
+                    'id'      => 'auth_lenauth_google_order',
+                    'name'    => 'auth_lenauth_order[mailru]',
+                    'class'   => 'auth_lenauth_google_order',
+                    'value'   => array_search( 'mailru', $order_array ),
+                    'size'    => 10,
+                    'min'     => 1,
+                    'max'     => 7,
+                    'maxlength' => 1,
+                    'autocomplete' => 'off' )
+            ); ?>
         </td>
     </tr>
 

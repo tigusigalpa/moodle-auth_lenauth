@@ -4,7 +4,7 @@
  * @author Igor Sazonov ( @tigusigalpa )
  * @link http://lms-service.org/lenauth-plugin-oauth-moodle/
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @version 1.1.0
+ * @version 1.2.0
  * @uses auth_plugin_base core class
  *
  * Authentication Plugin: LenAuth Authentication
@@ -68,14 +68,28 @@ class auth_plugin_lenauth extends auth_plugin_base {
         ),
 
         /**
-         * Yahoo settings
+         * Yahoo OAuth1 settings
          * @link https://developer.yahoo.com/oauth/
          * @link https://developer.yahoo.com/oauth/guide/
          * @link https://developer.yahoo.com/oauth/guide/oauth-userauth.html
          */
-        'yahoo' => array(
+        'yahoo1' => array(
             'request_token_url' => 'https://api.login.yahoo.com/oauth/v2/get_request_token',
             'request_api_url'   => 'https://api.login.yahoo.com/oauth/v2/get_token',
+            'yql_url'           => 'https://query.yahooapis.com/v1/yql'
+        ),
+        
+        /**
+         * Yahoo OAuth2 settings
+         * @link https://developer.yahoo.com/oauth2/
+         * @link https://developer.yahoo.com/oauth2/guide/
+         * @link https://developer.yahoo.com/oauth2/guide/flows_authcode/
+         * @link https://developer.yahoo.com/oauth2/guide/apirequests/
+         */
+        'yahoo2' => array(
+            'request_token_url' => 'https://api.login.yahoo.com/oauth2/get_token',
+            'request_api_url'   => 'https://api.login.yahoo.com/oauth2/get_token',
+            'grant_type'        => 'authorization_code',
             'yql_url'           => 'https://query.yahooapis.com/v1/yql'
         ),
 
@@ -138,6 +152,11 @@ class auth_plugin_lenauth extends auth_plugin_base {
         ),*/
     );
     
+    protected $_default_order = array( 
+        1 => 'facebook', 2 => 'google', 3 => 'yahoo', 4 => 'twitter', 
+        5 => 'vk', 6 => 'yandex', 7 => 'mailru' 
+    );
+
     protected $_send_oauth_request = true;
 
     protected $_set_password = true;
@@ -189,7 +208,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
      * VK API version
      * @var string
      */
-    public static $vk_api_version = '5.27';
+    public static $vk_api_version = '5.33';
     
     /**
      * Yahoo API version
@@ -217,6 +236,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
         global $DB;
 
         $this->_oauth_config = get_config( 'auth/lenauth' ); // get plugin config object
+        
         $this->_user_info_fields = $DB->get_records('user_info_field');
         $this->authtype = 'lenauth'; // define name of our authentication method
         $this->roleauth = 'auth_lenauth';
@@ -375,22 +395,23 @@ class auth_plugin_lenauth extends auth_plugin_base {
         if ( !empty( $authorizationcode ) ) {
             
             $authprovider = required_param( 'authprovider', PARAM_TEXT ); // get authorization provider (webservice name)
-            $config_field_str = 'auth_lenauth_' . $authprovider . '_social_id_field';
+            $hack_authprovider = ( $authprovider == 'yahoo1' || $authprovider == 'yahoo2' ) ? 'yahoo' : $authprovider;
+            $config_field_str = 'auth_lenauth_' . $hack_authprovider . '_social_id_field';
             $this->_field_shortname = $this->_oauth_config->$config_field_str;
             $this->_field_id = $this->_lenauth_get_fieldid();
 
-            $params = array(); // params to generate data for token request
+            $params        = array(); // params to generate data for token request
             $encode_params = true;
-            $code = true;
-            $redirect_uri = true;
-            $curl_header = false;
-            $curl_options = array();
+            $code          = true;
+            $redirect_uri  = true;
+            $curl_header   = false;
+            $curl_options  = array();
             
             //if we have access_token in $_COOKIE, so do not need to make request fot the one
             $this->_send_oauth_request = !isset( $_COOKIE[$authprovider]['access_token'] ) ? true : false;
             
             //if service is not enabled, why should we make request? hack protect. maybe
-            $enabled_str = 'auth_lenauth_' . $authprovider . '_enabled';
+            $enabled_str = 'auth_lenauth_' . $hack_authprovider . '_enabled';
             if ( empty( $this->_oauth_config->$enabled_str ) ) {
                 throw new moodle_exception( 'Service not enabled in your LenAuth Settings', 'auth_lenauth' );
             }
@@ -413,7 +434,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                     $params['grant_type']    = $this->_settings[$authprovider]['grant_type'];
                     break;
                 
-                case 'yahoo':
+                case 'yahoo1':
                     if ( !isset( $_COOKIE[$authprovider]['access_token'] ) && !isset( $_COOKIE[$authprovider]['oauth_verifier'] ) ) {
                         $params = array_merge(
                             $this->_lenauth_yahoo_request_array( $this->_oauth_config->auth_lenauth_yahoo_consumer_secret . '&' )
@@ -440,6 +461,13 @@ class auth_plugin_lenauth extends auth_plugin_base {
                     }
                     break;
                     
+                case 'yahoo2':
+                    $params['grant_type']    = $this->_settings[$authprovider]['grant_type'];
+                    $curl_options = array(
+                        'USERPWD' => $this->_oauth_config->auth_lenauth_yahoo_consumer_key . ':' . $this->_oauth_config->auth_lenauth_yahoo_consumer_secret
+                    );
+                    break;
+                    
                 case 'twitter':
                     if ( !empty( $this->_oauth_config->auth_lenauth_twitter_enabled ) ) {
                         if ( !isset( $_COOKIE[$authprovider]['access_token'] ) ) {
@@ -456,9 +484,9 @@ class auth_plugin_lenauth extends auth_plugin_base {
                             
                             if ( !$this->_send_oauth_request && isset( $_COOKIE[$authprovider]['oauth_token_secret'] ) ) {
                                 $access_token = $SESSION->twitter_access_token = optional_param( 'oauth_token', '', PARAM_TEXT );
-                                setcookie( $authprovider . '[access_token]', $access_token, time() + $this->_settings[$authprovider]['expire'] );
+                                setcookie( $authprovider . '[access_token]', $access_token, time() + $this->_settings[$authprovider]['expire'], '/' );
                                 $oauth_verifier = $SESSION->twitter_oauth_verifier = optional_param( 'oauth_verifier', '', PARAM_TEXT );
-                                setcookie( $authprovider . '[oauth_verifier]', $oauth_verifier, time() + $this->_settings[$authprovider]['expire'] );
+                                setcookie( $authprovider . '[oauth_verifier]', $oauth_verifier, time() + $this->_settings[$authprovider]['expire'], '/' );
                             } else {
                                 $curl_header = $this->_lenauth_set_twitter_header( $params );
                             }
@@ -508,7 +536,6 @@ class auth_plugin_lenauth extends auth_plugin_base {
 
                 default: // if authorization provider is wrong
                     throw new moodle_exception( 'Unknown OAuth Provider', 'auth_lenauth' );
-                    break;
             }
 
             // url for catch token value
@@ -519,7 +546,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
             //require cURL from Moodle core
             require_once( $CFG->libdir . '/filelib.php' ); // requires library with cURL class
             $curl = new curl();
-            //hack for twitter
+            //hack for twitter and Yahoo
             if ( !empty( $curl_options ) && is_array( $curl_options ) ) {
                 $curl->setopt( $curl_options );
             }
@@ -546,7 +573,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                     );
                 }
             }
-
+            
             // check for token response
             if ( !empty( $curl_tokens_values ) || !$this->_send_oauth_request ) {
                 $token_values  = array();
@@ -559,7 +586,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                             $expires       = $token_values['expires']; //5183999 = 2 months
                             $access_token  = $token_values['access_token'];
                             if ( !empty( $expires ) && !empty( $access_token ) ) {
-                                setcookie( $authprovider . '[access_token]', $access_token, time() + $expires );
+                                setcookie( $authprovider . '[access_token]', $access_token, time() + $expires, '/' );
                             } else {
                                 throw new moodle_exception( 'Can not get access for "access_token" or/and "expires" params after request', 'auth_lenauth' );
                             }
@@ -577,7 +604,9 @@ class auth_plugin_lenauth extends auth_plugin_base {
                             $expires       = $token_values['expires_in']; //3600 = 1 hour
                             $access_token  = $token_values['access_token'];
                             if ( !empty( $access_token ) && !empty( $expires ) ) {
-                                setcookie( $authprovider . '[access_token]', $access_token, time() + $expires );
+                                setcookie( $authprovider . '[access_token]', $access_token, time() + $expires, '/' );
+                            } else {
+                                throw new moodle_exception( 'Can not get access for "access_token" or/and "expires" params after request', 'auth_lenauth' );
                             }
                         } else {
                             if ( isset( $_COOKIE[$authprovider]['access_token'] ) ) {
@@ -587,7 +616,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                             }
                         }
                         break;
-                    case 'yahoo':
+                    case 'yahoo1':
                         if ( $this->_send_oauth_request || !isset( $_COOKIE[$authprovider]['oauth_token_secret'] ) ) {
                             parse_str( $curl_tokens_values, $token_values );
                             $expires       = $SESSION->yahoo_expires = $token_values['oauth_expires_in']; //3600 = 1 hour
@@ -603,11 +632,35 @@ class auth_plugin_lenauth extends auth_plugin_base {
                             }
                         }
                         break;
+                    case 'yahoo2':
+                        if ( $this->_send_oauth_request || !isset( $_COOKIE[$authprovider]['access_token'] ) ) {
+                            $token_values  = json_decode( $curl_tokens_values, true );
+                            $expires       = $token_values['expires_in']; //3600 = 1 hour
+                            $access_token  = $token_values['access_token'];
+                            $refresh_token = $token_values['refresh_token'];
+                            $user_id       = $token_values['xoauth_yahoo_guid'];
+                            if ( !empty( $expires ) && !empty( $access_token ) ) {
+                                setcookie( $authprovider . '[access_token]', $access_token, time() + $expires, '/' );
+                                if ( !empty( $user_id ) ) {
+                                    setcookie( $authprovider . '[user_id]', $user_id, time() + $expires, '/' );
+                                }
+                            } else {
+                                throw new moodle_exception( 'Can not get access for "access_token" or/and "expires" params after request', 'auth_lenauth' );
+                            }
+                        } else {
+                            if ( isset( $_COOKIE[$authprovider]['access_token'], $_COOKIE[$authprovider]['user_id'] ) ) {
+                                $access_token = $_COOKIE[$authprovider]['access_token'];
+                                $user_id = $_COOKIE[$authprovider]['user_id'];
+                            } else {
+                                throw new moodle_exception( 'Someting wrong, maybe expires', 'auth_lenauth' );
+                            }
+                        }
+                        break;
                     case 'twitter':
                         if ( $this->_send_oauth_request || !isset( $_COOKIE[$authprovider]['oauth_token_secret'] ) ) {
                             parse_str( $curl_tokens_values, $token_values );
                             $access_token = $SESSION->twitter_access_token = $token_values['oauth_token'];
-                            setcookie( $authprovider . '[oauth_token_secret]', $token_values['oauth_token_secret'], time() + $this->_settings[$authprovider]['expire'] );
+                            setcookie( $authprovider . '[oauth_token_secret]', $token_values['oauth_token_secret'], time() + $this->_settings[$authprovider]['expire'], '/' );
                         } else {
                             if ( isset( $_COOKIE[$authprovider]['access_token'], $_COOKIE[$authprovider]['oauth_token_secret'] ) || isset( $SESSION->twitter_access_token, $SESSION->twitter_oauth_verifier ) ) {
                                 $access_token = isset( $_COOKIE[$authprovider]['access_token'] ) ? $_COOKIE[$authprovider]['access_token'] : $SESSION->twitter_access_token;
@@ -626,19 +679,19 @@ class auth_plugin_lenauth extends auth_plugin_base {
                             $expires       = $token_values['expires_in']; //86400 = 24 hours
                             $access_token  = $token_values['access_token'];
                             if ( !empty( $access_token ) && !empty( $expires ) ) {
-                                setcookie( $authprovider . '[access_token]', $access_token, time() + $expires );
+                                setcookie( $authprovider . '[access_token]', $access_token, time() + $expires, '/' );
                             }
                             
                             $user_id       = $token_values['user_id'];
                             if ( !empty( $user_id ) ) {
-                                setcookie( $authprovider . '[user_id]', $user_id, time() + $expires );
+                                setcookie( $authprovider . '[user_id]', $user_id, time() + $expires, '/' );
                             }
                             /**
                              * VK user may do not enter email, soooo =((
                              */
                             $user_email    = ( isset( $token_values['email'] ) ) ? $token_values['email'] : false; // WOW!!! So early???))) Awesome!
                             if ( !empty( $user_email ) ) {
-                                setcookie( $authprovider . '[user_email]', $user_email, time() + $expires );
+                                setcookie( $authprovider . '[user_email]', $user_email, time() + $expires, '/' );
                             }
                         } else {
                             if ( isset( $_COOKIE[$authprovider]['access_token'], $_COOKIE[$authprovider]['user_id'] ) ) {
@@ -658,7 +711,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                             $expires       = $token_values['expires_in']; //31536000 = 1 year
                             $access_token  = $token_values['access_token'];
                             if ( !empty( $expires ) && !empty( $access_token ) ) {
-                                setcookie( $authprovider . '[access_token]', $access_token, time() + $expires );
+                                setcookie( $authprovider . '[access_token]', $access_token, time() + $expires, '/' );
                             } else {
                                 throw new moodle_exception( 'Can not get access for "access_token" or/and "expires" params after request', 'auth_lenauth' );
                             }
@@ -676,7 +729,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                             $expires       = $token_values['expires_in']; //86400 = 24 hours
                             $access_token  = $token_values['access_token'];
                             if ( !empty( $expires ) && !empty( $access_token ) ) {
-                                setcookie( $authprovider . '[access_token]', $access_token, time() + $expires );
+                                setcookie( $authprovider . '[access_token]', $access_token, time() + $expires, '/' );
                             } else {
                                 //check native errors if exists
                                 if ( isset( $token_values['error'] ) ) {
@@ -705,7 +758,6 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         break;*/
                     default:
                         throw new moodle_exception( 'Unknown OAuth Provider', 'auth_lenauth' );
-                        break;
                 }
             }
 
@@ -760,7 +812,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         }
                         break;
                     
-                    case 'yahoo':
+                    case 'yahoo1':
                         if ( !$oauth_verifier ) {
                             header( 'Location: ' . $xoauth_request_auth_url ); // yahoo =))
                             die;
@@ -825,6 +877,34 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         $last_name       = $curl_final_data['query']['results']['profile']['familyName'];
                         if ( $this->_oauth_config->auth_lenauth_retrieve_avatar ) {
                             $image_url = isset( $curl_final_data['query']['results']['profile']['image']['imageUrl'] ) ? $curl_final_data['query']['results']['profile']['image']['imageUrl'] : '';
+                        }
+                        break;
+                        
+                    case 'yahoo2':
+                        $request_api_url             = 'https://social.yahooapis.com/v1/user/' . $user_id . '/profile?format=json';
+                        $queryparams['access_token'] = $access_token;
+                        $now_header = array(
+                            'Authorization: Bearer '. $access_token
+                            ,'Accept: application/json'
+                            ,'Content-Type: application/json'
+                        );
+                        $curl->resetHeader();
+                        $curl->setHeader( $now_header );
+                        $curl_response  = $curl->get( $request_api_url, $queryparams );
+                        $curl->resetHeader();
+                        $curl_final_data = json_decode($curl_response, true);
+                        $social_uid      = $curl_final_data['profile']['guid'];
+                        $emails          = $curl_final_data['profile']['emails'];
+                        if ( !empty( $emails ) && is_array( $emails ) ) {
+                            foreach( $emails as $email_array ) {
+                                $user_email = $email_array['handle'];
+                                if ( isset( $email_array['primary'] ) ) break;
+                            }
+                        }
+                        $first_name      = $curl_final_data['profile']['givenName'];
+                        $last_name       = $curl_final_data['profile']['familyName'];
+                        if ( $this->_oauth_config->auth_lenauth_retrieve_avatar ) {
+                            $image_url = isset( $curl_final_data['profile']['image']['imageUrl'] ) ? $curl_final_data['profile']['image']['imageUrl'] : '';
                         }
                         break;
                         
@@ -1232,6 +1312,12 @@ class auth_plugin_lenauth extends auth_plugin_base {
             $config->auth_lenauth_div_margin_left = 0;
         }
         
+        if ( !isset( $config->auth_lenauth_order ) ) {
+            $order_array = $this->_default_order;
+        } else {
+            $order_array = json_decode( $config->auth_lenauth_order, true );
+        }
+        
         if ( !isset( $config->auth_lenauth_facebook_enabled ) ) {
             $config->auth_lenauth_facebook_enabled = 0;
         }
@@ -1263,6 +1349,9 @@ class auth_plugin_lenauth extends auth_plugin_base {
         
         if ( !isset( $config->auth_lenauth_yahoo_enabled ) ) {
             $config->auth_lenauth_yahoo_enabled = 0;
+        }
+        if ( !isset( $config->auth_lenauth_yahoo_oauth_version ) ) {
+            $config->auth_lenauth_yahoo_oauth_version = 1;
         }
         if ( !isset( $config->auth_lenauth_yahoo_application_id ) ) {
             $config->auth_lenauth_yahoo_application_id = '';
@@ -1436,6 +1525,10 @@ class auth_plugin_lenauth extends auth_plugin_base {
                 $config->auth_lenauth_div_margin_left = 0;
             }
             
+            if ( !isset( $config->auth_lenauth_order ) ) {
+                $config->auth_lenauth_order = json_encode( $this->_default_order );
+            }
+            
             $config->auth_lenauth_facebook_enabled = ( !empty( $config->auth_lenauth_facebook_enabled ) ) ? 1 : 0;
             if ( !isset( $config->auth_lenauth_facebook_app_id ) ) {
                 $config->auth_lenauth_facebook_app_id = '';
@@ -1462,6 +1555,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
             }
             
             $config->auth_lenauth_yahoo_enabled = ( !empty( $config->auth_lenauth_yahoo_enabled ) ) ? 1 : 0;
+            $config->auth_lenauth_yahoo_oauth_version = ( !empty( $config->auth_lenauth_yahoo_oauth_version ) ) ? intval( $config->auth_lenauth_yahoo_oauth_version ) : 1;
             if ( !isset( $config->auth_lenauth_yahoo_application_id ) ) {
                 $config->auth_lenauth_yahoo_application_id = '';
             }
@@ -1555,6 +1649,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
             set_config('auth_lenauth_google_button_text',      trim( $config->auth_lenauth_google_button_text ),      'auth/lenauth');
             
             set_config('auth_lenauth_yahoo_enabled',           intval( $config->auth_lenauth_yahoo_enabled ),         'auth/lenauth');
+            set_config('auth_lenauth_yahoo_oauth_version',     intval( $config->auth_lenauth_yahoo_oauth_version ),   'auth/lenauth');
             set_config('auth_lenauth_yahoo_application_id',    trim( $config->auth_lenauth_yahoo_application_id ),    'auth/lenauth');
             set_config('auth_lenauth_yahoo_consumer_key',      trim( $config->auth_lenauth_yahoo_consumer_key ),      'auth/lenauth');
             set_config('auth_lenauth_yahoo_consumer_secret',   trim( $config->auth_lenauth_yahoo_consumer_secret ),   'auth/lenauth');
@@ -1610,11 +1705,41 @@ class auth_plugin_lenauth extends auth_plugin_base {
             set_config('auth_lenauth_div_margin_right',        intval( $config->auth_lenauth_div_margin_right ),      'auth/lenauth');
             set_config('auth_lenauth_div_margin_bottom',       intval( $config->auth_lenauth_div_margin_bottom ),     'auth/lenauth');
             set_config('auth_lenauth_div_margin_left',         intval( $config->auth_lenauth_div_margin_left ),       'auth/lenauth');
+            
+            $order_array = $this->_make_order( $config->auth_lenauth_order );
+            set_config('auth_lenauth_order',                   json_encode( $order_array ),                           'auth/lenauth');
 
             return true;
         }
 
         throw new moodle_exception('You do not have permissions', 'auth_lenauth');
+    }
+    
+    /**
+     * This function generate pretty (key-number=>name) array of socials order
+     * 
+     * @param  array $order_array Orders array from $_POST config: user input for orders
+     * @access private
+     * @return array
+     */
+    private function _make_order( array $order_array ) {
+        $ret_array = array();
+        foreach ( $order_array as $service => $order ) {
+            $order = intval( $order );
+            while ( isset( $ret_array[$order] ) ) {
+                $order+=1;
+            }
+            $ret_array[$order] = $service;
+        }
+        ksort( $ret_array );
+        $i = 1;
+        $ret_array_2 = array();
+        foreach ( $ret_array as $service ) {
+            $ret_array_2[$i] = $service;
+            $i++;
+        }
+        
+        return $ret_array_2;
     }
 
     /**
@@ -1758,6 +1883,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
      * 
      * @global object $CFG
      * @param  string $authprovider current OAuth provider
+     * @param  int    provider OAuth version (ie for Yahoo)
      * @return string
      *
      * @access protected
@@ -1766,7 +1892,8 @@ class auth_plugin_lenauth extends auth_plugin_base {
     protected function _lenauth_redirect_uri( $authprovider ) {
         global $CFG;
         
-        return $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=' . $authprovider;
+        $return = $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=' . $authprovider;
+        return $return;
     }
 
     /**

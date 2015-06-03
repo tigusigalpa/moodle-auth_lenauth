@@ -131,6 +131,7 @@ function xmldb_auth_lenauth_install() {
     set_config('auth_lenauth_facebook_enabled',     0,              'auth/lenauth');
     set_config('auth_lenauth_google_enabled',       0,              'auth/lenauth');
     set_config('auth_lenauth_yahoo_enabled',        0,              'auth/lenauth');
+    set_config('auth_lenauth_yahoo_oauth_version',  1,              'auth/lenauth');
     set_config('auth_lenauth_twitter_enabled',      0,              'auth/lenauth');
     set_config('auth_lenauth_vk_enabled',           0,              'auth/lenauth');
     set_config('auth_lenauth_yandex_enabled',       0,              'auth/lenauth');
@@ -145,5 +146,11 @@ function xmldb_auth_lenauth_install() {
     set_config('auth_lenauth_button_margin_right',  10,             'auth/lenauth');
     set_config('auth_lenauth_button_margin_bottom', 10,             'auth/lenauth');
     set_config('auth_lenauth_button_margin_left',   10,             'auth/lenauth');
+    
+    $default_order = array( 
+        1 => 'facebook', 2 => 'google', 3 => 'yahoo', 4 => 'twitter', 
+        5 => 'vk', 6 => 'yandex', 7 => 'mailru' 
+    );
+    set_config('auth_lenauth_order', json_encode( $default_order ), 'auth/lenauth');
     
 }

@@ -49,7 +49,7 @@ class auth_lenauth_out extends auth_plugin_lenauth {
         
         if ( in_array( $style, $this->_styles_array ) ) {
             
-            if ( !isloggedin() || $show_example || $show_html ) {
+            if ( !isloggedin() || isguestuser() || $show_example || $show_html ) {
                 global $CFG;
 
                 //$li_class = '';
@@ -90,8 +90,18 @@ class auth_lenauth_out extends auth_plugin_lenauth {
                 $facebook_link = ( !$show_example ) ? 'https://www.facebook.com/dialog/oauth?client_id=' . $this->_oauth_config->auth_lenauth_facebook_app_id . '&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri('facebook') ) . '&scope=email' : 'javascript:;';
 
                 $google_link = ( !$show_example ) ? 'https://accounts.google.com/o/oauth2/auth?client_id=' . $this->_oauth_config->auth_lenauth_google_client_id . '&response_type=code&scope=openid%20profile%20email&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'google' ) ) : 'javascript:;';
-
-                $yahoo_link = ( !$show_example ) ? $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=yahoo' : 'javascript:;';
+                
+                if ( !$show_example ) {
+                    switch ( $this->_oauth_config->auth_lenauth_yahoo_oauth_version ) {
+                        case 2:
+                            $yahoo_link = 'https://api.login.yahoo.com/oauth2/request_auth?client_id=' . $this->_oauth_config->auth_lenauth_yahoo_consumer_key . '&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'yahoo2' ) ) . '&response_type=code';
+                            break;
+                        default:
+                            $yahoo_link = $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=yahoo1';
+                    }
+                } else {
+                    $yahoo_link = 'javascript:;';
+                }
 
                 $twitter_link = ( !$show_example ) ? $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=twitter' : 'javascript:;';
 
@@ -760,38 +770,56 @@ class auth_lenauth_out extends auth_plugin_lenauth {
                     $style_button_str .= '"';
 
                     $ret .= '<div class="lenauth-buttons' . ( !empty( $class_div_str ) ? ' ' . $class_div_str : '' ) .'"' . $style_div_str . '><ul>';
-
-                    if ( ( $this->_oauth_config->auth_lenauth_facebook_enabled && !empty( $this->_oauth_config->auth_lenauth_facebook_app_id ) && !empty( $this->_oauth_config->auth_lenauth_facebook_app_secret ) && !$show_example ) || $show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $facebook_class . '" href="' . $facebook_link . '">' . $facebook_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_facebook_button_text : ( '' ) ) . '</a></li>';
-                    }
-
-                    if ( $this->_oauth_config->auth_lenauth_google_enabled && !empty( $this->_oauth_config->auth_lenauth_google_client_id ) && !empty( $this->_oauth_config->auth_lenauth_google_client_secret ) && !$show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $google_class . '" href="' . $google_link . '">' . $google_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_google_button_text : ( '' ) ) . '</a></li>';
-                    }
-
-                    if ( $this->_oauth_config->auth_lenauth_yahoo_enabled && !empty( $this->_oauth_config->auth_lenauth_yahoo_consumer_key ) && !empty( $this->_oauth_config->auth_lenauth_yahoo_consumer_secret ) && !$show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $yahoo_class . '" href="' . $yahoo_link . '">' . $yahoo_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_yahoo_button_text : ( '' ) ) . '</a></li>';
-                    }
-
-                    if ( ( $this->_oauth_config->auth_lenauth_twitter_enabled && !empty( $this->_oauth_config->auth_lenauth_twitter_consumer_key ) && !empty( $this->_oauth_config->auth_lenauth_twitter_consumer_secret ) && !$show_example ) || $show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $twitter_class . '" href="' . $twitter_link . '">' . $twitter_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_twitter_button_text : ( '' ) ) . '</a></li>';
-                    }
-
-                    if ( $this->_oauth_config->auth_lenauth_vk_enabled && !empty( $this->_oauth_config->auth_lenauth_vk_app_id ) && !empty( $this->_oauth_config->auth_lenauth_vk_app_secret ) || $show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $vk_class . '" href="' . $vk_link . '">' . $vk_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_vk_button_text : ( '' ) ) . '</a></li>';
-                    }
-
-                    if ( $this->_oauth_config->auth_lenauth_yandex_enabled && !empty( $this->_oauth_config->auth_lenauth_yandex_app_id ) && !empty( $this->_oauth_config->auth_lenauth_yandex_app_password ) && !$show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $yandex_class . '" href="' . $yandex_link . '">' . $yandex_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_yandex_button_text : ( '' ) ) . '</a></li>';
-                    }
-
-                    if ( $this->_oauth_config->auth_lenauth_mailru_enabled && !empty( $this->_oauth_config->auth_lenauth_mailru_site_id ) && !empty( $this->_oauth_config->auth_lenauth_mailru_client_private ) && !empty( $this->_oauth_config->auth_lenauth_mailru_client_secret ) && !$show_example ) {
-                        $ret .= '<li' . $style_button_str . '><a class="' . $mailru_class . '" href="' . $mailru_link . '">' . $mailru_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_mailru_button_text : ( '' ) ) . '</a></li>';
-                    }
-
-                    /*if ( $this->_oauth_config->ok_enabled && !empty( $this->_oauth_config->ok_app_id ) && !empty( $this->_oauth_config->ok_public_key ) && !empty( $this->_oauth_config->ok_secret_key ) && !$show_example ) {
-                        $ret .= '<a class="' . $style_class . ' ' . $ok_class . '" href="' . $ok_link . '"' . $style_button_str . '>' . $ok_bca . ( ( $has_text ) ? $this->_oauth_config->ok_button_text : ( '' ) ) . '</a>';
-                    }*/
+                    
+                    $order_array = isset( $this->_oauth_config->auth_lenauth_order ) ? json_decode( $this->_oauth_config->auth_lenauth_order, true ) : $this->_default_order;
+                    
+                    foreach ( $order_array as $service_name ) :
+                        
+                        switch ( $service_name ) {
+                            case 'facebook':
+                                if ( ( $this->_oauth_config->auth_lenauth_facebook_enabled && !empty( $this->_oauth_config->auth_lenauth_facebook_app_id ) && !empty( $this->_oauth_config->auth_lenauth_facebook_app_secret ) && !$show_example ) || $show_example ) {
+                                    $ret .= '<li' . $style_button_str . '><a class="' . $facebook_class . '" href="' . $facebook_link . '">' . $facebook_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_facebook_button_text : ( '' ) ) . '</a></li>';
+                                }
+                                break;
+                                
+                            case 'google':
+                                if ( $this->_oauth_config->auth_lenauth_google_enabled && !empty( $this->_oauth_config->auth_lenauth_google_client_id ) && !empty( $this->_oauth_config->auth_lenauth_google_client_secret ) && !$show_example ) {
+                                    $ret .= '<li' . $style_button_str . '><a class="' . $google_class . '" href="' . $google_link . '">' . $google_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_google_button_text : ( '' ) ) . '</a></li>';
+                                }
+                                break;
+                                
+                            case 'yahoo':
+                                if ( $this->_oauth_config->auth_lenauth_yahoo_enabled && !empty( $this->_oauth_config->auth_lenauth_yahoo_consumer_key ) && !empty( $this->_oauth_config->auth_lenauth_yahoo_consumer_secret ) && !$show_example ) {
+                                    $ret .= '<li' . $style_button_str . '><a class="' . $yahoo_class . '" href="' . $yahoo_link . '">' . $yahoo_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_yahoo_button_text : ( '' ) ) . '</a></li>';
+                                }
+                                break;
+                                
+                            case 'twitter':
+                                if ( ( $this->_oauth_config->auth_lenauth_twitter_enabled && !empty( $this->_oauth_config->auth_lenauth_twitter_consumer_key ) && !empty( $this->_oauth_config->auth_lenauth_twitter_consumer_secret ) && !$show_example ) || $show_example ) {
+                                    $ret .= '<li' . $style_button_str . '><a class="' . $twitter_class . '" href="' . $twitter_link . '">' . $twitter_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_twitter_button_text : ( '' ) ) . '</a></li>';
+                                }
+                                break;
+                                
+                            case 'vk':
+                                if ( $this->_oauth_config->auth_lenauth_vk_enabled && !empty( $this->_oauth_config->auth_lenauth_vk_app_id ) && !empty( $this->_oauth_config->auth_lenauth_vk_app_secret ) || $show_example ) {
+                                    $ret .= '<li' . $style_button_str . '><a class="' . $vk_class . '" href="' . $vk_link . '">' . $vk_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_vk_button_text : ( '' ) ) . '</a></li>';
+                                }
+                                break;
+                                
+                            case 'yandex':
+                                if ( $this->_oauth_config->auth_lenauth_yandex_enabled && !empty( $this->_oauth_config->auth_lenauth_yandex_app_id ) && !empty( $this->_oauth_config->auth_lenauth_yandex_app_password ) && !$show_example ) {
+                                    $ret .= '<li' . $style_button_str . '><a class="' . $yandex_class . '" href="' . $yandex_link . '">' . $yandex_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_yandex_button_text : ( '' ) ) . '</a></li>';
+                                }
+                                break;
+                                
+                            case 'mailru':
+                                if ( $this->_oauth_config->auth_lenauth_mailru_enabled && !empty( $this->_oauth_config->auth_lenauth_mailru_site_id ) && !empty( $this->_oauth_config->auth_lenauth_mailru_client_private ) && !empty( $this->_oauth_config->auth_lenauth_mailru_client_secret ) && !$show_example ) {
+                                    $ret .= '<li' . $style_button_str . '><a class="' . $mailru_class . '" href="' . $mailru_link . '">' . $mailru_bca . ( ( $has_text ) ? $this->_oauth_config->auth_lenauth_mailru_button_text : ( '' ) ) . '</a></li>';
+                                }
+                                break;
+                        }
+                        
+                    endforeach;
 
                     $ret .= '</ul></div>';
 
