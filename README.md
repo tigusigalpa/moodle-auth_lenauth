@@ -40,6 +40,12 @@ Its very-very simple. You have two methods: PHP-code or static HTML-code.
 You're welcome for pull requests but against master branch. Thanks!
 
 ## Changelog
+#### Version 1.2.0 (2015060300)
+- **New feature**: custom order of links/buttons output
+- **Yahoo OAuth2 protocol full integration**, old OAuth1 also supports. Now you can select Yahoo OAuth protocol version.
+- Improvement from [Mark Samberg](https://github.com/mjsamberg) to allow display buttons for guest users
+- VK API version updated to version 5.33
+
 #### Version 1.1.0 (2015010500)
 - Copyrights about code parts from [auth_googleoauth2 Moodle plugin](https://moodle.org/plugins/view.php?plugin=auth_googleoauth2). Much thanks to [Jérôme Mouneyrac](https://github.com/mouneyrac)!
 - Added retrieve avatars from social profiles (new checkbox option)
