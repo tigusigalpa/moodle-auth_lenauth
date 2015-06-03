@@ -11,6 +11,7 @@ This plugin allows easy auth method for your Moodle. You just need to register a
 - own buttons text (some skins)
 - enable/disable services
 - international/russian logos in settings
+- own buttons order
 
 ## Download Installation
 [English plugin documentation](http://lms-service.org/lenauth-plugin-oauth-moodle/)
