@@ -42,7 +42,7 @@ You're welcome for pull requests but against master branch. Thanks!
 
 ## Changelog
 #### Version 1.2.2 (2015071100)
-- Improvement from [Mark Samberg](https://github.com/mjsamberg) about Bootstrap + FontAwesome buttons styles. **NOTE** your current Moodle theme requires Bootstrap and Font Awesome to correct output. Yandex and Mail.Ru logos are out of Font Awesome..
+- Improvement from [Mark Samberg](https://github.com/mjsamberg) about Bootstrap + FontAwesome buttons styles. **NOTE** your current Moodle theme requires Bootstrap and Font Awesome to correct output this buttons skin. Yandex and Mail.Ru logos are out of Font Awesome..
 - Double email correct check
 
 #### Version 1.2.0 (2015060300)
