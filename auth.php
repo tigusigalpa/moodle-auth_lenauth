@@ -4,7 +4,7 @@
  * @author Igor Sazonov ( @tigusigalpa )
  * @link http://lms-service.org/lenauth-plugin-oauth-moodle/
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @version 1.2.0
+ * @version 1.2.2
  * @uses auth_plugin_base core class
  *
  * Authentication Plugin: LenAuth Authentication
@@ -191,7 +191,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
         'smooth-w64-classic-square', 'smooth-w64-classic-rounded', 
         'smooth-w64-classic-circle', 'simple-3d', 'simple-3d-small', 
         '3d-circle', '3d-circle-small', 'simple-flat', 'simple-flat-small', 
-        'simple-flat-circle', 'simple-flat-circle-small'
+        'simple-flat-circle', 'simple-flat-circle-small', 'bootstrap-font-awesome'
     );
 
     /**
@@ -1050,7 +1050,6 @@ class auth_plugin_lenauth extends auth_plugin_base {
                         throw new moodle_exception( 'Unknown OAuth Provider', 'auth_lenauth' );
                 }
 
-
                 /**
                  * Check for email returned by webservice. If exist - check for user with this email in Moodle Database
                  */
@@ -1058,6 +1057,9 @@ class auth_plugin_lenauth extends auth_plugin_base {
                     if ( !empty( $social_uid ) ) {
                         if ( $is_verified ) {
                             if ( !empty( $user_email ) ) {
+                                if ( $err = email_is_not_allowed( $user_email ) ) {
+                                    throw new moodle_exception( $err, 'auth_lenauth' );
+                                }
                                 $user_lenauth = $DB->get_record('user', array('email' => $user_email, 'deleted' => 0, 'mnethostid' => $CFG->mnet_localhost_id));
                             } else {
                                 if ( empty( $user_lenauth ) ) {

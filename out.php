@@ -748,6 +748,31 @@ class auth_lenauth_out extends auth_plugin_lenauth {
                         }
                         $mailru_class = 'lenauth-style5-mailru';
                         break;
+                    case 'bootstrap-font-awesome':
+                        $has_text = true;
+                        $class_div_str = 'lenauth-bootstrap';
+                        $facebook_bca = "<i class='fa fa-facebook-square'></i>&nbsp;";
+                        $google_bca = "<i class='fa fa-google-plus-square'></i>&nbsp;";
+                        $yahoo_bca = "<i class='fa fa-yahoo'></i>&nbsp;";
+                        $twitter_bca = "<i class='fa fa-twitter-square'></i>&nbsp;";
+                        $vk_bca = "<i class='fa fa-vk'></i>&nbsp;";
+                        $yandex_bca = "<i class='fa fa-yandex'></i>&nbsp;";
+                        $mailru_bca = "<i class='fa fa-mailru'></i>&nbsp;";
+                        $facebook_class = 'btn btn-default lenauth-bootstrap-facebook';
+                        $google_class = 'btn btn-default lenauth-bootstrap-google';
+                        $yahoo_class = 'btn btn-default lenauth-bootstrap-yahoo';
+                        $twitter_class = 'btn btn-default lenauth-bootstrap-twitter';
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
+                            case 'en':
+                                $vk_class = 'btn btn-default lenauth-bootstrap-vk-en';
+                                $yandex_class = 'btn btn-default lenauth-bootstrap-yandex-en';
+                                break;
+                            case 'ru':
+                                $vk_class = 'btn btn-default lenauth-bootstrap-vk-ru';
+                                $yandex_class = 'btn btn-default lenauth-bootstrap-yandex-ru';
+                        }
+                        $mailru_class = 'btn btn-default lenauth-bootstrap-mailru';
+                        break;
                 }
 
                 if ( !empty( $class_div_str ) 

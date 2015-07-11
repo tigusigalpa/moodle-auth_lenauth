@@ -1327,6 +1327,13 @@ global $CFG;
                         <td>
                             <?php echo auth_lenauth_out::getInstance()->lenauth_output($style_item, true); ?>
                             <br /><em><?php echo $style_item; ?></em>
+                            <?php
+                            switch ( $style_item ) {
+                                case 'bootstrap-font-awesome':
+                                    echo '<br /><small style="color:red">' . get_string( 'auth_lenauth_bootstrap_fontawesome_needle', 'auth_lenauth' ) . '</small>';
+                                    break;
+                            }
+                            ?>
                         </td>
                         <td>
                             <code>&lt;?php if ( file_exists( $CFG->dirroot . '/auth/lenauth/out.php' ) ) :<br />include_once $CFG->dirroot . '/auth/lenauth/out.php';<br />echo auth_lenauth_out::getInstance()->lenauth_output('<?php echo $style_item; ?>');<br />endif; ?&gt;</code>

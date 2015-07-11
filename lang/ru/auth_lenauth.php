@@ -67,7 +67,7 @@ $string['auth_lenauth_order'] = 'Порядок';
 $string['auth_lenauth_div_settings'] = 'Настройки области кнопок';
 $string['auth_lenauth_div_location'] = 'Расположение области';
 $string['auth_lenauth_output_style_key'] = 'Стиль как на сайте';
-$string['auth_lenauth_output_php_code_key'] = 'PHP-код для шаблона';
+$string['auth_lenauth_bootstrap_fontawesome_needle'] = 'Для корректного вывода кнопок в шаблоне необходимо подключение CSS-фреймворка Bootstrap и шрифтов семейства Font-Awesome!';
 
 /**
  * Facebook Russian locale

@@ -70,6 +70,7 @@ $string['auth_lenauth_order'] = 'Order';
 $string['auth_lenauth_div_settings'] = 'Buttons area settings';
 $string['auth_lenauth_div_location'] = 'Area location';
 $string['auth_lenauth_output_style_key'] = 'Live style';
+$string['auth_lenauth_bootstrap_fontawesome_needle'] = 'To make a correct output your theme is required CSS-framework Bootstrap and fonts Font-Awesome!';
 $string['auth_lenauth_output_php_code_key'] = 'Theme PHP-code';
 
 /**

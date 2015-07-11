@@ -466,3 +466,69 @@
 .lenauth-style-5 .lenauth-style5-mailru{background:#168de2}
 .lenauth-style-5 .lenauth-style5-mailru:hover{background-color:#168de2}
 .lenauth-style-5 .lenauth-style5-mailru span{background-position:-227px -98px}
+
+a.btn.btn-default.lenauth-bootstrap-facebook{
+    background: #3b5998;
+    color: white;
+    border: 1px solid #3b5998;
+}
+a.btn.btn-default.lenauth-bootstrap-facebook:hover, a.btn.btn-default.lenauth-bootstrap-facebook:focus{
+    background: white;
+    border-color: #3b5998;
+    color: #3b5998;
+}
+
+a.btn.btn-default.lenauth-bootstrap-google{
+    background: #db4437;
+    color: white;
+    border: 1px solid #db4437;
+}
+a.btn.btn-default.lenauth-bootstrap-google:hover, a.btn.btn-default.lenauth-bootstrap-google:focus{
+    background: white;
+    border-color: #db4437;
+    color: #db4437;
+}
+
+a.btn.btn-default.lenauth-bootstrap-yahoo{
+    background: #400191;
+    color: white;
+    border: 1px solid #400191;
+}
+a.btn.btn-default.lenauth-bootstrap-yahoo:hover, a.btn.btn-default.lenauth-bootstrap-yahoo:focus{
+    background: white;
+    border-color: #400191;
+    color: #400191;
+}
+
+a.btn.btn-default.lenauth-bootstrap-twitter{
+    background: #55acee;
+    color: white;
+    border: 1px solid #55acee;
+}
+a.btn.btn-default.lenauth-bootstrap-twitter:hover, a.btn.btn-default.lenauth-bootstrap-twitter:focus{
+    background: white;
+    border-color: #55acee;
+    color: #55acee;
+}
+
+a.btn.btn-default.lenauth-bootstrap-yandex{
+    background: #ffcc00;
+    color: black;
+    border: 1px solid #ffcc00;
+}
+a.btn.btn-default.lenauth-bootstrap-yandex:hover, a.btn.btn-default.lenauth-bootstrap-yandex:focus{
+    background: white;
+    border-color: #ffcc00;
+    color: black;
+}
+
+a.btn.btn-default.lenauth-bootstrap-vk{
+    background: #45668e;
+    color: white;
+    border: 1px solid #45668e;
+}
+a.btn.btn-default.lenauth-bootstrap-vk:hover, a.btn.btn-default.lenauth-bootstrap-vk:focus{
+    background: white;
+    border-color: #ffcc00;
+    color: #45668e;
+}
