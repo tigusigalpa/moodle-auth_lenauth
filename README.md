@@ -42,13 +42,13 @@ You're welcome for pull requests but against master branch. Thanks!
 
 ## Changelog
 #### Version 1.2.2 (2015071100)
-- Improvement from [Mark Samberg](https://github.com/mjsamberg) about [Bootstrap](http://getbootstrap.com/) + [Font Awesome](http://fortawesome.github.io/Font-Awesome/) buttons styles. **NOTE** your current Moodle theme requires Bootstrap and Font Awesome to correct output this buttons skin. Yandex and Mail.Ru logos are out of Font Awesome for now...
+- Improvement from [Mark Samberg](https://github.com/mjsamberg) ([pull request #3](https://github.com/tigusigalpa/moodle-auth_lenauth/pull/3)) about [Bootstrap](http://getbootstrap.com/) + [Font Awesome](http://fortawesome.github.io/Font-Awesome/) buttons styles. **NOTE** your current Moodle theme requires Bootstrap and Font Awesome to correct output this buttons skin. Yandex and Mail.Ru logos are out of Font Awesome for now...
 - Double email correct check
 
 #### Version 1.2.0 (2015060300)
 - **New feature**: custom order of links/buttons output
 - **Yahoo OAuth2 protocol full integration**, old OAuth1 also supports. Now you can select Yahoo OAuth protocol version.
-- Improvement from [Mark Samberg](https://github.com/mjsamberg) to allow display buttons for guest users
+- Improvement from [Mark Samberg](https://github.com/mjsamberg) ([pull request #2](https://github.com/tigusigalpa/moodle-auth_lenauth/pull/2)) to allow display buttons for guest users
 - VK API version updated to version 5.33
 
 #### Version 1.1.0 (2015010500)
