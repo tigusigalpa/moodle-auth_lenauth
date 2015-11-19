@@ -141,6 +141,23 @@ global $CFG;
         </td>
         <td width="50%"><?php echo get_string( 'auth_lenauth_retrieve_avatar_desc', 'auth_lenauth' ); ?></td>
     </tr>
+    <?php if ( $CFG->debugdeveloper == 1 ) : ?>
+    <tr>
+        <td width="50%" colspan="2"><?php
+            echo html_writer::checkbox(
+                'auth_lenauth_dev_mode', 1,
+                isset( $config->auth_lenauth_dev_mode ) ? $config->auth_lenauth_dev_mode : 0,
+                get_string( 'auth_lenauth_dev_mode_key', 'auth_lenauth' ), array( 'id' => 'auth_lenauth_dev_mode' )
+            );
+            if ( isset( $err['auth_lenauth_dev_mode'] ) ) {
+                echo $OUTPUT->error_text( $err['auth_lenauth_dev_mode'] );
+            } ?>
+        </td>
+        <td width="50%"><?php echo get_string( 'auth_lenauth_dev_mode_desc', 'auth_lenauth' ); ?></td>
+    </tr>
+    <?php else : ?>
+    
+    <?php endif; ?>
     
     <!----------FACEBOOK---------->
     <tr>

@@ -51,6 +51,8 @@ $string['auth_lenauth_can_confirm_key'] = 'Moderate new users';
 $string['auth_lenauth_can_confirm_desc'] = 'New users, registered via LenAuth needs to be moderated by Moodle administrator';
 $string['auth_lenauth_retrieve_avatar_key'] = 'Retrieve avatar';
 $string['auth_lenauth_retrieve_avatar_desc'] = 'If option checked and if user is newbie or exists without Moodle-based avatar, it will be uploaded automatically if it exists at social profile';
+$string['auth_lenauth_dev_mode_key'] = 'Development mode';
+$string['auth_lenauth_dev_mode_desc'] = 'If you are developer and you need to check OAuth webservices response, just set this option on.<br /><strong style="color:red">Moodle native DEVELOPER mode is required</strong>';
 
 $string['auth_lenauth_empty_code_param'] = 'Someting wrong, code GET-param is empty. Check your App settings in LenAuth';
 
