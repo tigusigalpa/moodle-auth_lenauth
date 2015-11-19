@@ -4,7 +4,11 @@
  * @author Igor Sazonov ( @tigusigalpa )
  * @link http://lms-service.org/lenauth-plugin-oauth-moodle/
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+<<<<<<< HEAD
  * @version 1.2.3
+=======
+ * @version 1.2.2
+>>>>>>> 787cb594d4691234018f697c00368eb005f156d9
  * @uses auth_plugin_base core class
  *
  * Authentication Plugin: LenAuth Authentication
@@ -1279,11 +1283,14 @@ class auth_plugin_lenauth extends auth_plugin_base {
         } else {
             $config->auth_lenauth_retrieve_avatar = 1;
         }
+<<<<<<< HEAD
         if ( empty( $config->auth_lenauth_dev_mode ) ) {
             $config->auth_lenauth_dev_mode = 0;
         } else {
             $config->auth_lenauth_dev_mode = 1;
         }
+=======
+>>>>>>> 787cb594d4691234018f697c00368eb005f156d9
         
         if ( !isset( $config->auth_lenauth_display_buttons ) ) {
             $config->auth_lenauth_display_buttons = 'inline-block';
@@ -1497,11 +1504,14 @@ class auth_plugin_lenauth extends auth_plugin_base {
             } else {
                 $config->auth_lenauth_retrieve_avatar = 1;
             }
+<<<<<<< HEAD
             if ( empty( $config->auth_lenauth_dev_mode ) ) {
                 $config->auth_lenauth_dev_mode = 0;
             } else {
                 $config->auth_lenauth_dev_mode = 1;
             }
+=======
+>>>>>>> 787cb594d4691234018f697c00368eb005f156d9
             
             if ( !isset( $config->auth_lenauth_display_buttons ) ) {
                 $config->auth_lenauth_display_buttons = 'inline-block';
@@ -1707,7 +1717,10 @@ class auth_plugin_lenauth extends auth_plugin_base {
             set_config('auth_lenauth_can_reset_password',      intval( $config->auth_lenauth_can_reset_password ),    'auth/lenauth');
             set_config('auth_lenauth_can_confirm',             intval( $config->auth_lenauth_can_confirm ),           'auth/lenauth');
             set_config('auth_lenauth_retrieve_avatar',         intval( $config->auth_lenauth_retrieve_avatar ),       'auth/lenauth');
+<<<<<<< HEAD
             set_config('auth_lenauth_dev_mode',                intval( $config->auth_lenauth_dev_mode ),              'auth/lenauth');
+=======
+>>>>>>> 787cb594d4691234018f697c00368eb005f156d9
             
             set_config('auth_lenauth_display_buttons',         trim( $config->auth_lenauth_display_buttons ),         'auth/lenauth');
             set_config('auth_lenauth_button_width',            intval( $config->auth_lenauth_button_width ),          'auth/lenauth');
