@@ -1,0 +1,534 @@
+@charset "utf-8";
+
+.lenauth-buttons ul{list-style-type:none;margin:0;padding:0}
+.lenauth-buttons a{text-decoration:none}
+.lenauth-buttons a:hover,.lenauth-buttons a:active,.lenauth-buttons a:focus{text-decoration:none}
+
+/**----------------------------
+******LENAUTH SMOOTH STYLE******
+-------------------------------*/
+.lenauth-smooth li{display:inline-block}
+.lenauth-smooth a, .lenauth-smooth .img_act, .lenauth-smooth .img_nact, .lenauth-smooth .link_act{display:block}
+.lenauth-smooth.lenauth-smooth-button li a:active .link_act{box-shadow:inset 0 0 10px rgba(0,0,0, .5)}
+.lenauth-smooth.lenauth-smooth-button li a:active .img_act{border:none}
+.lenauth-smooth-button li{
+    background-color:#eee;
+    background-image:-webkit-gradient(linear, left top, left bottom, from(#eee), to(#ccc));
+    background-image:-webkit-linear-gradient(top, #eee, #ccc);
+    background-image:-moz-linear-gradient(top, #eee, #ccc); 
+    background-image:-ms-linear-gradient(top, #eee, #ccc); 
+    background-image:-o-linear-gradient(top, #eee, #ccc);
+    background-image:linear-gradient(top, #eee, #ccc);
+    box-shadow:0 1px 1px rgba(0, 0, 0, .5);
+}
+
+.lenauth-smooth-classic li{
+    background-color:#555;
+    transition:background .5s ease-in-out;
+    -moz-transition:background .5s ease-in-out;
+    -webkit-transition:background .5s ease-in-out;
+}
+
+.lenauth-smooth-classic li:hover{background-color:rgba(214,214,214,.5)}
+.lenauth-smooth-button .link_act{border:none;opacity:0;box-shadow:0 .4px 1px rgba(0, 0, 0, .5);transition:opacity .4s ease-in-out;-moz-transition:opacity .4s ease-in-out;-webkit-transition:opacity .4s ease-in-out}
+.lenauth-smooth-classic .link_act{border:none;opacity:0;box-shadow:0 .5px 1px rgba(0, 0, 0, .5);transition:opacity .5s ease-in-out;-moz-transition:opacity .5s ease-in-out;-webkit-transition:opacity .5s ease-in-out}
+.lenauth-smooth-classic a:hover .link_act{opacity:1}
+.lenauth-smooth-button a:hover .link_act{opacity:1}
+.lenauth-smooth-button li .img_act{border-top:1px solid rgba(255,255,255,.5)}
+.lenauth-smooth-square li, .lenauth-smooth-square .img_act, .lenauth-smooth-square .img_nact, .lenauth-smooth-square .link_act{border-radius:0}
+.lenauth-smooth-rounded li, .lenauth-smooth-rounded .img_act, .lenauth-smooth-rounded .img_nact, .lenauth-smooth-rounded .link_act{border-radius:5px}
+.lenauth-smooth-circle li, .lenauth-smooth-circle .img_act, .lenauth-smooth-circle .img_nact, .lenauth-smooth-circle .link_act{border-radius:50%}
+.w64 li, .w64 a, .w64 .img_act, .w64 .img_nact, .w64 .link_act{width:64px;height:64px}
+.w48 li, .w48 a, .w48 .img_act, .w48 .img_nact, .w48 .link_act{width:48px;height:48px}
+.w32 li, .w32 a, .w32 .img_act, .w32 .img_nact, .w32 .link_act{width:32px;height:32px}
+.img_act{cursor:pointer}
+
+/*******FACEBOOK*******/
+.lenauth-smooth-button .lenauth-smooth-button-facebook .link_act{
+    background-color:#3C5A99;
+    background-image:-webkit-gradient(linear, left top, left bottom, from(#4476BA), to(#3C5A99));
+    background-image:-webkit-linear-gradient(top, #4476BA, #3C5A99);
+    background-image:-moz-linear-gradient(top, #4476BA, #3C5A99); 
+    background-image:-ms-linear-gradient(top, #4476BA, #3C5A99); 
+    background-image:-o-linear-gradient(top, #4476BA, #3C5A99);
+    background-image:linear-gradient(top, #4476BA, #3C5A99);
+}
+
+.lenauth-smooth-button.w64 .lenauth-smooth-button-facebook .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -320px -65px no-repeat}
+.lenauth-smooth-button.w64 .lenauth-smooth-button-facebook{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -320px -128px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-facebook .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -240px -49px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-facebook{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -240px -96px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-facebook .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -160px -33px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-facebook{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -160px -64px no-repeat}
+.lenauth-smooth-classic .lenauth-smooth-button-facebook .link_act{background-color:#3C5A99}
+.lenauth-smooth-classic.w64 .lenauth-smooth-button-facebook, .lenauth-smooth-classic.w64 .lenauth-smooth-button-facebook .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -320px 0 no-repeat}
+.lenauth-smooth-classic.w48 .lenauth-smooth-button-facebook, .lenauth-smooth-classic.w48 .lenauth-smooth-button-facebook .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -240px 0 no-repeat}
+.lenauth-smooth-classic.w32 .lenauth-smooth-button-facebook, .lenauth-smooth-classic.w32 .lenauth-smooth-button-facebook .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -160px 0 no-repeat}
+
+/*******GOOGLE*******/
+.lenauth-smooth-button .lenauth-smooth-button-googleplus .link_act{
+    background-color:#D33321;
+    background-image:-webkit-gradient(linear, left top, left bottom, from(#D33321), to(#A6281A));
+    background-image:-webkit-linear-gradient(top, #D33321, #A6281A);
+    background-image:-moz-linear-gradient(top, #D33321, #A6281A);
+    background-image:-ms-linear-gradient(top, #D33321, #A6281A);
+    background-image:-o-linear-gradient(top, #D33321, #A6281A);
+    background-image:linear-gradient(top, #D33321, #A6281A);
+}
+
+.lenauth-smooth-button.w64 .lenauth-smooth-button-googleplus .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -576px -641px no-repeat}
+.lenauth-smooth-button.w64 .lenauth-smooth-button-googleplus{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -576px -704px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-googleplus .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -432px -481px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-googleplus{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -432px -528px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-googleplus .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -288px -321px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-googleplus{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -288px -352px no-repeat}
+.lenauth-smooth-classic .lenauth-smooth-button-googleplus .link_act{background-color:#a6281a}
+.lenauth-smooth-classic.w64 .lenauth-smooth-button-googleplus, .lenauth-smooth-classic.w64 .lenauth-smooth-button-googleplus .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -576px -576px no-repeat}
+.lenauth-smooth-classic.w48 .lenauth-smooth-button-googleplus, .lenauth-smooth-classic.w48 .lenauth-smooth-button-googleplus .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -432px -432px no-repeat}
+.lenauth-smooth-classic.w32 .lenauth-smooth-button-googleplus, .lenauth-smooth-classic.w32 .lenauth-smooth-button-googleplus .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -288px -288px no-repeat}
+
+/*******YAHOO*******/
+.lenauth-smooth-button .lenauth-smooth-button-yahoo .link_act{
+    background-color:#a500ce;
+    background-image:-webkit-gradient(linear, left top, left bottom, from(#a500ce), to(#7B0099));
+    background-image:-webkit-linear-gradient(top, #a500ce, #7B0099);
+    background-image:-moz-linear-gradient(top, #a500ce, #7B0099);
+    background-image:-ms-linear-gradient(top, #a500ce, #7B0099);
+    background-image:-o-linear-gradient(top, #a500ce, #7B0099);
+    background-image:linear-gradient(top, #a500ce, #7B0099);
+}
+
+.lenauth-smooth-button.w64 .lenauth-smooth-button-yahoo .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -192px -257px no-repeat}
+.lenauth-smooth-button.w64 .lenauth-smooth-button-yahoo{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -192px -320px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-yahoo .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -144px -193px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-yahoo{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -144px -240px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-yahoo .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -96px -129px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-yahoo{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -96px -160px no-repeat}
+.lenauth-smooth-classic .lenauth-smooth-button-yahoo .link_act{background-color:#7b0099}
+.lenauth-smooth-classic.w64 .lenauth-smooth-button-yahoo, .lenauth-smooth-classic.w64 .lenauth-smooth-button-yahoo .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -192px -192px no-repeat}
+.lenauth-smooth-classic.w48 .lenauth-smooth-button-yahoo, .lenauth-smooth-classic.w48 .lenauth-smooth-button-yahoo .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -144px -144px no-repeat}
+.lenauth-smooth-classic.w32 .lenauth-smooth-button-yahoo, .lenauth-smooth-classic.w32 .lenauth-smooth-button-yahoo .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -96px -96px no-repeat}
+
+/*******TWITTER*******/
+.lenauth-smooth-button .lenauth-smooth-button-twitter-1 .link_act{
+    background-color:#20C1FF;
+    background-image:-webkit-gradient(linear, left top, left bottom, from(#20C1FF), to(#00AAEA));
+    background-image:-webkit-linear-gradient(top, #20C1FF, #00AAEA);
+    background-image:-moz-linear-gradient(top, #20C1FF, #00AAEA);
+    background-image:-ms-linear-gradient(top, #20C1FF, #00AAEA);
+    background-image:-o-linear-gradient(top, #20C1FF, #00AAEA);
+    background-image:linear-gradient(top, #20C1FF, #00AAEA);
+}
+
+.lenauth-smooth-button.w64 .lenauth-smooth-button-twitter-1 .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -128px -65px no-repeat}
+.lenauth-smooth-button.w64 .lenauth-smooth-button-twitter-1{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -128px -128px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-twitter-1 .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -96px -49px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-twitter-1{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -96px -96px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-twitter-1 .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -64px -33px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-twitter-1{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -64px -64px no-repeat}
+.lenauth-smooth-classic .lenauth-smooth-button-twitter-1 .link_act{background-color:#00aaea}
+.lenauth-smooth-classic .lenauth-smooth-button-twitter-1, .lenauth-smooth-classic .lenauth-smooth-button-twitter-1 .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -128px 0 no-repeat}
+.lenauth-smooth-classic.w48 .lenauth-smooth-button-twitter-1, .lenauth-smooth-classic.w48 .lenauth-smooth-button-twitter-1 .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -96px 0 no-repeat}
+.lenauth-smooth-classic.w32 .lenauth-smooth-button-twitter-1, .lenauth-smooth-classic.w32 .lenauth-smooth-button-twitter-1 .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -64px 0 no-repeat}
+
+/*******TWITTER2*******/
+.lenauth-smooth-button .lenauth-smooth-button-twitter-2 .link_act{
+    background-color:#20c1ff;
+    background-image:-webkit-gradient(linear, left top, left bottom, from(#20c1ff), to(#00aaea));
+    background-image:-webkit-linear-gradient(top, #20c1ff, #00aaea);
+    background-image:-moz-linear-gradient(top, #20c1ff, #00aaea);
+    background-image:-ms-linear-gradient(top, #20c1ff, #00aaea);
+    background-image:-o-linear-gradient(top, #20c1ff, #00aaea);
+    background-image:linear-gradient(top, #20c1ff, #00aaea);
+}
+
+.lenauth-smooth-button.w64 .lenauth-smooth-button-twitter-2 .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -256px -65px no-repeat}
+.lenauth-smooth-button.w64 .lenauth-smooth-button-twitter-2{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -256px -128px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-twitter-2 .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -192px -49px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-twitter-2{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -192px -96px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-twitter-2 .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -128px -33px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-twitter-2{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -128px -64px no-repeat}
+.lenauth-smooth-classic .lenauth-smooth-button-twitter-2 .link_act{background-color:#00aaea}
+.lenauth-smooth-classic .lenauth-smooth-button-twitter-2, .lenauth-smooth-classic .lenauth-smooth-button-twitter-2 .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -256px 0 no-repeat}
+.lenauth-smooth-classic.w48 .lenauth-smooth-button-twitter-2, .lenauth-smooth-classic.w48 .lenauth-smooth-button-twitter-2 .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -192px 0 no-repeat}
+.lenauth-smooth-classic.w32 .lenauth-smooth-button-twitter-2, .lenauth-smooth-classic.w32 .lenauth-smooth-button-twitter-2 .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -128px 0 no-repeat}
+
+/*******VK*******/
+.lenauth-smooth-button .lenauth-smooth-button-vk-en .link_act,.lenauth-smooth-button .lenauth-smooth-button-vk-ru .link_act{
+    background-color:#4f7094;
+    background-image:-webkit-gradient(linear, left top, left bottom, from(#4f7094), to(#597ca0));
+    background-image:-webkit-linear-gradient(top, #4f7094, #597ca0);
+    background-image:-moz-linear-gradient(top, #4f7094, #597ca0);
+    background-image:-ms-linear-gradient(top, #4f7094, #597ca0);
+    background-image:-o-linear-gradient(top, #4f7094, #597ca0);
+    background-image:linear-gradient(top, #4f7094, #597ca0);
+}
+
+.lenauth-smooth-button.w64 .lenauth-smooth-button-vk-en .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) 0 -768px no-repeat}
+.lenauth-smooth-button.w64 .lenauth-smooth-button-vk-en{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) 0 -896px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-vk-en .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) 0 -576px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-vk-en{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) 0 -670px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-vk-en .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) 0 -384px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-vk-en{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) 0 -447px no-repeat}
+.lenauth-smooth-button.w64 .lenauth-smooth-button-vk-ru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -256px -768px no-repeat}
+.lenauth-smooth-button.w64 .lenauth-smooth-button-vk-ru{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -256px -896px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-vk-ru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -192px -576px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-vk-ru{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -192px -670px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-vk-ru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -128px -384px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-vk-ru{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -128px -447px no-repeat}
+
+.lenauth-smooth-classic .lenauth-smooth-button-vk-en .link_act,.lenauth-smooth-classic .lenauth-smooth-button-vk-ru .link_act{background-color:#4f7094}
+.lenauth-smooth-classic.w64 .lenauth-smooth-button-vk-en, .lenauth-smooth-classic.w64 .lenauth-smooth-button-vk-en .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) 0 -832px no-repeat}
+.lenauth-smooth-classic.w48 .lenauth-smooth-button-vk-en, .lenauth-smooth-classic.w48 .lenauth-smooth-button-vk-en .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) 0 -622px no-repeat}
+.lenauth-smooth-classic.w32 .lenauth-smooth-button-vk-en, .lenauth-smooth-classic.w32 .lenauth-smooth-button-vk-en .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) 0 -416px no-repeat}
+.lenauth-smooth-classic.w64 .lenauth-smooth-button-vk-ru, .lenauth-smooth-classic.w64 .lenauth-smooth-button-vk-ru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -256px -832px no-repeat}
+.lenauth-smooth-classic.w48 .lenauth-smooth-button-vk-ru, .lenauth-smooth-classic.w48 .lenauth-smooth-button-vk-ru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -192px -622px no-repeat}
+.lenauth-smooth-classic.w32 .lenauth-smooth-button-vk-ru, .lenauth-smooth-classic.w32 .lenauth-smooth-button-vk-ru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -128px -416px no-repeat}
+
+/*******YANDEX*******/
+.lenauth-smooth-button .lenauth-smooth-button-yandex-ru .link_act,.lenauth-smooth-button .lenauth-smooth-button-yandex-en .link_act{
+    background-color:#ff3333;
+    background-image:-webkit-gradient(linear, left top, left bottom, from(#ff3333), to(#ff0000));
+    background-image:-webkit-linear-gradient(top, #ff3333, #ff0000);
+    background-image:-moz-linear-gradient(top, #ff3333, #ff0000);
+    background-image:-ms-linear-gradient(top, #ff3333, #ff0000);
+    background-image:-o-linear-gradient(top, #ff3333, #ff0000);
+    background-image:linear-gradient(top, #ff3333, #ff0000);
+}
+
+.lenauth-smooth-button.w64 .lenauth-smooth-button-yandex-ru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -129px -769px no-repeat}
+.lenauth-smooth-button.w64 .lenauth-smooth-button-yandex-ru{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -129px -896px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-yandex-ru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -97px -577px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-yandex-ru{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -97px -670px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-yandex-ru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -64px -385px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-yandex-ru{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -64px -447px no-repeat}
+.lenauth-smooth-button.w64 .lenauth-smooth-button-yandex-en .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -193px -769px no-repeat}
+.lenauth-smooth-button.w64 .lenauth-smooth-button-yandex-en{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -193px -896px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-yandex-en .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -145px -577px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-yandex-en{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -145px -670px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-yandex-en .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -96px -385px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-yandex-en{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -96px -447px no-repeat}
+.lenauth-smooth-classic .lenauth-smooth-button-yandex-en .link_act,.lenauth-smooth-classic .lenauth-smooth-button-yandex-ru .link_act{background-color:#ff3333}
+.lenauth-smooth-classic.w64 .lenauth-smooth-button-yandex-ru, .lenauth-smooth-classic.w64 .lenauth-smooth-button-yandex-ru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -129px -832px no-repeat}
+.lenauth-smooth-classic.w48 .lenauth-smooth-button-yandex-ru, .lenauth-smooth-classic.w48 .lenauth-smooth-button-yandex-ru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -97px -622px no-repeat}
+.lenauth-smooth-classic.w32 .lenauth-smooth-button-yandex-ru, .lenauth-smooth-classic.w32 .lenauth-smooth-button-yandex-ru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -64px -417px no-repeat}
+.lenauth-smooth-classic.w64 .lenauth-smooth-button-yandex-en, .lenauth-smooth-classic.w64 .lenauth-smooth-button-yandex-en .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -193px -832px no-repeat}
+.lenauth-smooth-classic.w48 .lenauth-smooth-button-yandex-en, .lenauth-smooth-classic.w48 .lenauth-smooth-button-yandex-en .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -145px -622px no-repeat}
+.lenauth-smooth-classic.w32 .lenauth-smooth-button-yandex-en, .lenauth-smooth-classic.w32 .lenauth-smooth-button-yandex-en .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -96px -417px no-repeat}
+
+/*******MAIL.RU*******/
+.lenauth-smooth-button .lenauth-smooth-button-mailru .link_act{
+    background-color:#168de2;
+    background-image:-webkit-gradient(linear, left top, left bottom, from(#4f7094), to(#168de2));
+    background-image:-webkit-linear-gradient(top, #4f7094, #168de2);
+    background-image:-moz-linear-gradient(top, #4f7094, #168de2);
+    background-image:-ms-linear-gradient(top, #4f7094, #168de2);
+    background-image:-o-linear-gradient(top, #4f7094, #168de2);
+    background-image:linear-gradient(top, #4f7094, #168de2);
+}
+
+.lenauth-smooth-button.w64 .lenauth-smooth-button-mailru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -64px -769px no-repeat}
+.lenauth-smooth-button.w64 .lenauth-smooth-button-mailru{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -64px -896px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-mailru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -49px -575px no-repeat}
+.lenauth-smooth-button.w48 .lenauth-smooth-button-mailru{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -49px -670px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-mailru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -32px -385px no-repeat}
+.lenauth-smooth-button.w32 .lenauth-smooth-button-mailru{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -32px -447px no-repeat}
+.lenauth-smooth-classic .lenauth-smooth-button-mailru .link_act{background-color:#168de2}
+.lenauth-smooth-classic.w64 .lenauth-smooth-button-mailru, .lenauth-smooth-classic.w64 .lenauth-smooth-button-mailru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_64px]]) -64px -767px no-repeat}
+.lenauth-smooth-classic.w48 .lenauth-smooth-button-mailru, .lenauth-smooth-classic.w48 .lenauth-smooth-button-mailru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_48px]]) -49px -573px no-repeat}
+.lenauth-smooth-classic.w32 .lenauth-smooth-button-mailru, .lenauth-smooth-classic.w32 .lenauth-smooth-button-mailru .img_act{background:url([[pix:auth_lenauth|social_media_icon_sets_32px]]) -32px -383px no-repeat}
+
+/* STYLE1 - STYLE4 */
+
+.lenauth-style-1-4 li{font-weight:300;font-size:13px;margin:10px;text-align:center}
+.lenauth-style-1-4 a{display:block}
+.lenauth-style-1-4 a,.lenauth-style-1-4 a:hover,.lenauth-style-1-4 a:active,.lenauth-style-1-4 a:focus{text-decoration:none;color:#fff}
+.lenauth-icon a{width:50px;height:50px}
+.lenauth-icon-text a{padding:15px 20px 15px 45px}
+.lenauth-style-1-4.style1 a{
+    border-radius:25px;
+    -webkit-border-radius:25px;
+    -moz-border-radius:25px;
+    -o-border-radius:25px;
+    -khtml-border-radius:25px;
+    box-shadow:0px 1px 4px rgba(0, 0, 0, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px -5px 0px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow:0px 1px 4px rgba(0, 0, 0, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px -5px 0px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow:0px 1px 4px rgba(0, 0, 0, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px -5px 0px rgba(0, 0, 0, 0.2);
+}
+
+.lenauth-style-1-4.style1 a:active{
+    box-shadow:inset 0px 1px 24px rgba(0, 0, 0, 0.4), inset 0px -2px 0px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow:inset 0px 1px 24px rgba(0, 0, 0, 0.4), inset 0px -2px 0px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow:inset 0px 1px 24px rgba(0, 0, 0, 0.4), inset 0px -2px 0px rgba(0, 0, 0, 0.2);
+}
+
+.lenauth-style-1-4.style2 a{
+    border-radius:6px;
+    -webkit-border-radius:6px;
+    -moz-border-radius:6px;
+    -o-border-radius:6px;
+    -khtml-border-radius:6px;
+    box-shadow:0px 1px 4px rgba(0, 0, 0, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px -5px 0px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow:0px 1px 4px rgba(0, 0, 0, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px -5px 0px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow:0px 1px 4px rgba(0, 0, 0, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px -5px 0px rgba(0, 0, 0, 0.2);
+}
+
+.lenauth-style-1-4.style2 a:active{
+    box-shadow:inset 0px -1px 24px rgba(0, 0, 0, 0.4), inset 0px 3px 0px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow:inset 0px -1px 24px rgba(0, 0, 0, 0.4), inset 0px 3px 0px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow:inset 0px -1px 24px rgba(0, 0, 0, 0.4), inset 0px 3px 0px rgba(0, 0, 0, 0.2);
+}
+
+.lenauth-style-1-4.style3.lenauth-icon-text a{padding:15px 20px 15px 70px}
+
+.lenauth-style-1-4.style3 a{
+    box-shadow:0px 1px 4px rgba(0, 0, 0, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px -5px 0px rgba(0, 0, 0, 0.2), inset 50px 0px 0px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow:0px 1px 4px rgba(0, 0, 0, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px -5px 0px rgba(0, 0, 0, 0.2), inset 50px 0px 0px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow:0px 1px 4px rgba(0, 0, 0, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px -5px 0px rgba(0, 0, 0, 0.2), inset 50px 0px 0px rgba(0, 0, 0, 0.1);
+}
+
+.lenauth-style-1-4.style3 a:active{
+    box-shadow:inset 0px 1px 24px rgba(0, 0, 0, 0.4), inset 0px 0px 5px rgba(0, 0, 0, 0.4), inset 50px 0px 0px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow:inset 0px 1px 24px rgba(0, 0, 0, 0.4), inset 0px 0px 5px rgba(0, 0, 0, 0.4), inset 50px 0px 0px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow:inset 0px 1px 24px rgba(0, 0, 0, 0.4), inset 0px 0px 5px rgba(0, 0, 0, 0.4), inset 50px 0px 0px rgba(0, 0, 0, 0.2);
+}
+
+.lenauth-style-1-4.style4.lenauth-icon-text a{padding:15px 20px 15px 70px}
+
+.lenauth-style-1-4.style4 a{
+    border-radius:6px;
+    -webkit-border-radius:6px;
+    -moz-border-radius:6px;
+    -o-border-radius:6px;
+    -khtml-border-radius:6px;
+    box-shadow:0px 1px 4px rgba(0, 0, 0, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 3px 0px rgba(255, 255, 255, 0.2), inset 0px -3px 0px rgba(255, 255, 255, 0.2), inset 50px 0px 0px rgba(255, 255, 255, 0.2);
+    -moz-box-shadow:0px 1px 4px rgba(0, 0, 0, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 3px 0px rgba(255, 255, 255, 0.2), inset 0px -3px 0px rgba(255, 255, 255, 0.2), inset 50px 0px 0px rgba(255, 255, 255, 0.2);
+    -webkit-box-shadow:0px 1px 4px rgba(0, 0, 0, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 3px 0px rgba(255, 255, 255, 0.2), inset 0px -3px 0px rgba(255, 255, 255, 0.2), inset 50px 0px 0px rgba(255, 255, 255, 0.2);
+}
+.lenauth-style-1-4.style4 a:active{
+    box-shadow:inset 0px 1px 24px rgba(0, 0, 0, 0.4), inset 0px 0px 5px rgba(0, 0, 0, 0.4), inset 50px 0px 0px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow:inset 0px 1px 24px rgba(0, 0, 0, 0.4), inset 0px 0px 5px rgba(0, 0, 0, 0.4), inset 50px 0px 0px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow:inset 0px 1px 24px rgba(0, 0, 0, 0.4), inset 0px 0px 5px rgba(0, 0, 0, 0.4), inset 50px 0px 0px rgba(0, 0, 0, 0.2);
+}
+
+.lenauth-style-1-4.lenauth-icon a{background-position:center center;background-repeat:no-repeat}
+.lenauth-style-1-4.lenauth-icon-text a{background-position:10px center;background-repeat:no-repeat}
+
+.lenauth-ico-facebook{background-color:#3d5999;background-image:url([[pix:auth_lenauth|facebook]])}
+.lenauth-light .lenauth-ico-facebook{background-image:url([[pix:auth_lenauth|facebook-light]])}
+.lenauth-dark .lenauth-ico-facebook{background-image:url([[pix:auth_lenauth|facebook-dark]])}
+.lenauth-ico-facebook .tooltip-text-lenauth{background:#3d5999}
+
+.lenauth-ico-google-plus{background-color:#bd301c;background-image:url([[pix:auth_lenauth|google-plus]])}
+.lenauth-light .lenauth-ico-google-plus{background-color:#bd301c;background-image:url([[pix:auth_lenauth|google-plus-light]])}
+.lenauth-dark .lenauth-ico-google-plus{background-color:#bd301c;background-image:url([[pix:auth_lenauth|google-plus-dark]])}
+.lenauth-ico-google-plus .tooltip-text-lenauth{background:#bd301c}
+
+.lenauth-ico-yahoo{background-color:#8f24aa;background-image:url([[pix:auth_lenauth|yahoo]])}
+.lenauth-light .lenauth-ico-yahoo{background-color:#8f24aa;background-image:url([[pix:auth_lenauth|yahoo-light]])}
+.lenauth-dark .lenauth-ico-yahoo{background-color:#8f24aa;background-image:url([[pix:auth_lenauth|yahoo-dark]])}
+.lenauth-ico-yahoo .tooltip-text-lenauth{background:#8f24aa}
+
+.lenauth-ico-twitter{background-color:#00aced;background-image:url([[pix:auth_lenauth|twitter]])}
+.lenauth-light .lenauth-ico-twitter{background-color:#00aced;background-image:url([[pix:auth_lenauth|twitter-light]])}
+.lenauth-dark .lenauth-ico-twitter{background-color:#00aced;background-image:url([[pix:auth_lenauth|twitter-dark]])}
+.lenauth-ico-twitter .tooltip-text-lenauth{background:#00aced}
+
+.lenauth-ico-vk-en{background-color:#4d75a3;background-image:url([[pix:auth_lenauth|vk-en]])}
+.lenauth-light .lenauth-ico-vk-en{background-color:#3a6892;background-image:url([[pix:auth_lenauth|vk-light-en]])}
+.lenauth-dark .lenauth-ico-vk-en{background-color:#3a6892;background-image:url([[pix:auth_lenauth|vk-dark-en]])}
+.lenauth-ico-vk-en .tooltip-text-lenauth{background:#3a6892}
+
+.lenauth-ico-vk-ru{background-color:#4d75a3;background-image:url([[pix:auth_lenauth|vk-ru]])}
+.lenauth-light .lenauth-ico-vk-ru{background-color:#3a6892;background-image:url([[pix:auth_lenauth|vk-light-ru]])}
+.lenauth-dark .lenauth-ico-vk-ru{background-color:#3a6892;background-image:url([[pix:auth_lenauth|vk-dark-ru]])}
+.lenauth-ico-vk-ru .tooltip-text-lenauth{background:#3a6892}
+
+.lenauth-ico-yandex-en{background-color:#fff;background-image:url([[pix:auth_lenauth|yandex-en]])}
+.lenauth-ico-yandex-en,.lenauth-ico-yandex-en:hover,.lenauth-ico-yandex-en:active,.lenauth-ico-yandex-en:focus{color:#000 !important}
+.lenauth-light .lenauth-ico-yandex-en{background-color:#fff;background-image:url([[pix:auth_lenauth|yandex-light-en]])}
+.lenauth-dark .lenauth-ico-yandex-en{background-color:#fff;background-image:url([[pix:auth_lenauth|yandex-dark-en]])}
+.lenauth-ico-yandex-en .tooltip-text-lenauth{background:#fff}
+
+.lenauth-ico-yandex-ru{background-color:#fff;background-image:url([[pix:auth_lenauth|yandex-ru]])}
+.lenauth-ico-yandex-ru,.lenauth-ico-yandex-ru:hover,.lenauth-ico-yandex-ru:active,.lenauth-ico-yandex-ru:focus{color:#000 !important}
+.lenauth-light .lenauth-ico-yandex-ru{background-color:#fff;background-image:url([[pix:auth_lenauth|yandex-light-ru]])}
+.lenauth-dark .lenauth-ico-yandex-ru{background-color:#fff;background-image:url([[pix:auth_lenauth|yandex-dark-ru]])}
+.lenauth-ico-yandex-ru .tooltip-text-lenauth{background:#fff}
+
+.lenauth-ico-mailru{background-color:#168de2;background-image:url([[pix:auth_lenauth|mailru]])}
+.lenauth-light .lenauth-ico-mailru{background-color:#168de2;background-image:url([[pix:auth_lenauth|mailru-light]])}
+.lenauth-dark .lenauth-ico-mailru{background-color:#168de2;background-image:url([[pix:auth_lenauth|mailru-dark]])}
+.lenauth-ico-mailru .tooltip-text-lenauth{background:#168de2}
+
+/*.lenauth-ico-ok{background-color:#f88040;background-image:url([[pix:auth_lenauth|ok]])}
+.lenauth-light .lenauth-ico-ok{background-color:#f88040;background-image:url([[pix:auth_lenauth|ok-light]])}
+.lenauth-dark .lenauth-ico-ok{background-color:#f88040;background-image:url([[pix:auth_lenauth|ok-dark]])}
+.lenauth-ico-ok .tooltip-text-lenauth{background:#f88040}*/
+
+/*.lenauth-ico-linkedin{background-color:#1793bb;background-image:url([[pix:auth_lenauth|linkedin]])}
+.lenauth-light .lenauth-ico-linkedin{background-color:#1793bb;background-image:url([[pix:auth_lenauth|linkedin-light]])}
+.lenauth-dark .lenauth-ico-linkedin{background-color:#1793bb;background-image:url([[pix:auth_lenauth|linkedin-dark]])}
+.lenauth-ico-linkedin .tooltip-text-lenauth{background:#1793bb}*/
+
+.lenauth-dark, .lenauth-dark a{color:#000}
+
+.lenauth-blue a{background-color:#0078cd!important}
+.lenauth-blue a:hover{background-color:#1787d6!important}
+
+.lenauth-grey a{background-color:#8d8d8d!important}
+.lenauth-grey a:hover{background-color:#9c9c9c!important}
+
+.lenauth-green a{background-color:#639f04!important}
+.lenauth-green a:hover{background-color:#70ad10!important}
+
+.lenauth-yellow{background-color:#c0a300!important}
+.lenauth-yellow:hover{background-color:#d8b806!important}
+
+.lenauth-orange a{background-color:#cd7503!important}
+.lenauth-orange a:hover{background-color:#e28f23!important}
+
+.lenauth-red a{background-color:#bb0707!important}
+.lenauth-red a:hover{background-color:#c81b1b!important}
+
+.lenauth-purple a{background-color:#7800be!important}
+.lenauth-purple a:hover{background-color:#9816e3!important}
+
+.lenauth-pink{background-color:#bd00b6!important}
+.lenauth-pink:hover{background-color:#e117da!important}
+
+.lenauth-white a{background-color:#fff!important}
+.lenauth-white a:hover{background-color:#c9c9c9!important}
+
+.lenauth-black a{background-color:#000!important}
+.lenauth-black a:hover{background-color:#000!important}
+
+
+/*******3D+CIRCLE+FLAT*******/
+
+.lenauth-style-5 a{font-family:"Helvetica Neue","Helvetica","Arial",Sans-Serif;display:block;cursor:pointer;position:relative;border:none;overflow:hidden;font-weight:bold;text-decoration:none;color:#fff}
+.lenauth-style-5 a:hover,.lenauth-style-5 a:focus,.lenauth-style-5 a:active{outline:none;text-decoration:none;color:#fff}
+.lenauth-style-5 a span{display:inline-block;background-image:url([[pix:auth_lenauth|social-sprite]])}
+
+.lenauth-simple-3d a{background:#f5f5f5;text-shadow:0 1px 1px rgba(111, 111, 111, 0);font-size:12px;padding:10px 25px;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.2), inset 0 -5px 0 0 rgba(0,0,0,0.3), inset 0 2px 0 0 rgba(255,255,255,0.5);-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px}
+.lenauth-simple-3d a:active{box-shadow:1px 1px 0 #fff, inset 0 1px 3px rgba(0, 0, 0, 0.4);top:1px}
+.lenauth-simple-3d a:hover{background-color:#f5f5f5}
+.lenauth-simple-3d a span{width:25px;height:20px;margin-left:-15px;margin-right:10px;margin-bottom:-7px}
+.lenauth-simple-3d.small a{padding:8px 10px;font-size:10px;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.2), inset 0 -4px 0 0 rgba(0,0,0,0.3), inset 0 2px 0 0 rgba(255,255,255,0.5)}
+.lenauth-simple-3d.small a:active{box-shadow:1px 1px 0 #fff, inset 0 1px 3px rgba(0, 0, 0, 0.4);top:1px}
+.lenauth-simple-3d.small a span{width:25px;height:20px;margin-left:-2px;margin-right:3px;margin-bottom:-7px}
+.lenauth-simple-flat a{background:#f5f5f5;text-shadow:0 1px 1px rgba(111, 111, 111, 0);font-size:12px;padding:10px 25px;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.0), inset 0 -2px 0 0 rgba(0,0,0,0.0), inset 0 2px 0 0 rgba(255,255,255,0.5);-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px}
+.lenauth-simple-flat.small a{padding:8px 10px;font-size:10px}
+.lenauth-simple-flat a:active{box-shadow:1px 1px 0 #fff, inset 0 1px 15px rgba(0, 0, 0, 0.3)}
+.lenauth-simple-flat a:hover{background-color:#f5f5f5}
+.lenauth-simple-flat a span{width:25px;height:20px;margin-left:-15px;margin-right:10px;margin-bottom:-7px}
+.lenauth-simple-flat.small a span{width:25px;height:20px;margin-left:-2px;margin-right:3px;margin-bottom:-7px}
+.lenauth-circle-3d a{background:#f5f5f5;text-align:center;text-shadow:0 1px 1px rgba(111, 111, 111, 0);font-size:12px;padding:15px 22px;display:inline-block;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.2), inset 0 -5px 0 0 rgba(0,0,0,0.3), inset 0 2px 0 0 rgba(255,255,255,0.5);-webkit-border-radius:99px;-moz-border-radius:99px;border-radius:99px}
+.lenauth-circle-3d a:active{box-shadow:1px 1px 0 #fff, inset 0 1px 3px rgba(0, 0, 0, 0.4);top:1px}
+.lenauth-circle-3d a:hover{background-color:#f5f5f5}
+.lenauth-circle-3d a span{width:20px;height:20px;margin-top:7px}
+.lenauth-circle-3d.small a{padding:5px 13px;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.2), inset 0 -4px 0 0 rgba(0,0,0,0.3), inset 0 2px 0 0 rgba(255,255,255,0.5)}
+.lenauth-circle-3d.small a:active{box-shadow:1px 1px 0 #fff, inset 0 1px 3px rgba(0, 0, 0, 0.4);top:1px}
+.lenauth-circle-flat a{background:#f5f5f5;color:white;text-align:center;text-shadow:0 1px 1px rgba(111, 111, 111, 0);font-size:12px;padding:15px 22px;display:inline-block;-webkit-border-radius:99px;-moz-border-radius:99px;border-radius:99px}
+.lenauth-circle-flat a:active{box-shadow:1px 1px 0 #fff, inset 0 1px 15px rgba(0, 0, 0, 0.3)}
+.lenauth-circle-flat a:hover{background-color:#f5f5f5}
+.lenauth-circle-flat a span{width:21px;height:18px;margin-top:9px}
+.lenauth-circle-flat.small a span{width:20px}
+.lenauth-circle-flat.small a{padding:0px 8px}
+
+.lenauth-style-5 .lenauth-style5-facebook{background:#3b5999}
+.lenauth-style-5 .lenauth-style5-facebook:hover{background-color:#305197}
+.lenauth-style-5 .lenauth-style5-facebook span{background-position:-54px -12px}
+.lenauth-style-5 .lenauth-style5-googlep{background:#252223}
+.lenauth-style-5 .lenauth-style5-googlep:hover{background-color:#252223}
+.lenauth-style-5 .lenauth-style5-googlep span{background-position:-138px -12px}
+
+.lenauth-style-5 .lenauth-style5-yahoo{background:#640f6c}
+.lenauth-style-5 .lenauth-style5-yahoo:hover{background-color:#640f6c}
+.lenauth-style-5 .lenauth-style5-yahoo span{background-position:-98px -98px}
+
+.lenauth-style-5 .lenauth-style5-twitter{background:#00bbf5}
+.lenauth-style-5 .lenauth-style5-twitter:hover{background-color:#00ade2}
+.lenauth-style-5 .lenauth-style5-twitter span{background-position:-10px -12px}
+
+.lenauth-style-5 .lenauth-style5-vk-en,.lenauth-style-5 .lenauth-style5-vk-ru{background:#4d75a3}
+.lenauth-style-5 .lenauth-style5-vk-en:hover,.lenauth-style-5 .lenauth-style5-vk-ru:hover{background-color:#4d75a3}
+.lenauth-style-5 .lenauth-style5-vk-en span{background-position:-10px -98px}
+
+.lenauth-style-5 .lenauth-style5-vk-ru span{background-position:-54px -98px}
+
+.lenauth-style-5 .lenauth-style5-yandex-ru,.lenauth-style-5 .lenauth-style5-yandex-en{background:#ed1c24}
+.lenauth-style-5 .lenauth-style5-yandex-ru:hover,.lenauth-style-5 .lenauth-style5-yandex-en:hover{background-color:#ed1c24}
+.lenauth-style-5 .lenauth-style5-yandex-ru span{background-position:-142px -98px}
+
+.lenauth-style-5 .lenauth-style5-yandex-en span{background-position:-184px -98px}
+
+.lenauth-style-5 .lenauth-style5-mailru{background:#168de2}
+.lenauth-style-5 .lenauth-style5-mailru:hover{background-color:#168de2}
+.lenauth-style-5 .lenauth-style5-mailru span{background-position:-227px -98px}
+
+a.btn.btn-default.lenauth-bootstrap-facebook{
+    background: #3b5998;
+    color: white;
+    border: 1px solid #3b5998;
+}
+a.btn.btn-default.lenauth-bootstrap-facebook:hover, a.btn.btn-default.lenauth-bootstrap-facebook:focus{
+    background: white;
+    border-color: #3b5998;
+    color: #3b5998;
+}
+
+a.btn.btn-default.lenauth-bootstrap-google{
+    background: #db4437;
+    color: white;
+    border: 1px solid #db4437;
+}
+a.btn.btn-default.lenauth-bootstrap-google:hover, a.btn.btn-default.lenauth-bootstrap-google:focus{
+    background: white;
+    border-color: #db4437;
+    color: #db4437;
+}
+
+a.btn.btn-default.lenauth-bootstrap-yahoo{
+    background: #400191;
+    color: white;
+    border: 1px solid #400191;
+}
+a.btn.btn-default.lenauth-bootstrap-yahoo:hover, a.btn.btn-default.lenauth-bootstrap-yahoo:focus{
+    background: white;
+    border-color: #400191;
+    color: #400191;
+}
+
+a.btn.btn-default.lenauth-bootstrap-twitter{
+    background: #55acee;
+    color: white;
+    border: 1px solid #55acee;
+}
+a.btn.btn-default.lenauth-bootstrap-twitter:hover, a.btn.btn-default.lenauth-bootstrap-twitter:focus{
+    background: white;
+    border-color: #55acee;
+    color: #55acee;
+}
+
+a.btn.btn-default.lenauth-bootstrap-yandex{
+    background: #ffcc00;
+    color: black;
+    border: 1px solid #ffcc00;
+}
+a.btn.btn-default.lenauth-bootstrap-yandex:hover, a.btn.btn-default.lenauth-bootstrap-yandex:focus{
+    background: white;
+    border-color: #ffcc00;
+    color: black;
+}
+
+a.btn.btn-default.lenauth-bootstrap-vk{
+    background: #45668e;
+    color: white;
+    border: 1px solid #45668e;
+}
+a.btn.btn-default.lenauth-bootstrap-vk:hover, a.btn.btn-default.lenauth-bootstrap-vk:focus{
+    background: white;
+    border-color: #ffcc00;
+    color: #45668e;
+}
