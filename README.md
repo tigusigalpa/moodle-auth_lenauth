@@ -41,6 +41,10 @@ Its very-very simple. You have two methods: PHP-code or static HTML-code.
 You're welcome for pull requests but against master branch. Thanks!
 
 ## Changelog
+#### Version 1.2.3 (2015112000)
+- Moodle 3.0 support. Thanks to [Amiad](https://github.com/amiad) and [Jarosław Maciejewski](https://github.com/nitro2010)
+- Development mode option added
+
 #### Version 1.2.2 (2015071100)
 - Improvement from [Mark Samberg](https://github.com/mjsamberg) ([pull request #3](https://github.com/tigusigalpa/moodle-auth_lenauth/pull/3)) about [Bootstrap](http://getbootstrap.com/) + [Font Awesome](http://fortawesome.github.io/Font-Awesome/) buttons styles. **NOTE** your current Moodle theme requires Bootstrap and Font Awesome to correct output this buttons skin. Yandex and Mail.Ru logos are out of Font Awesome for now...
 - Double email correct check
