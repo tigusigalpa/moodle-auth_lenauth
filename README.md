@@ -41,7 +41,7 @@ Its very-very simple. You have two methods: PHP-code or static HTML-code.
 You're welcome for pull requests but against master branch. Thanks!
 
 ## Changelog
-#### Version 1.2.3 (2015112000)
+#### Version 1.2.3 (2015112001)
 - Moodle 3.0 support. Thanks to [Amiad](https://github.com/amiad) and [Jarosław Maciejewski](https://github.com/nitro2010)
 - Development mode option added
 
