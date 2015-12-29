@@ -532,3 +532,72 @@ a.btn.btn-default.lenauth-bootstrap-vk:hover, a.btn.btn-default.lenauth-bootstra
     border-color: #ffcc00;
     color: #45668e;
 }
+
+
+a.btn.btn-default.lenauth-bootstrap-simple-facebook{
+    background: #3b5998;
+    border: 1px solid #3b5998;
+    color: white;
+}
+
+a.btn.btn-default.lenauth-bootstrap-simple-facebook:hover, a.btn.btn-default.lenauth-bootstrap-simple-facebook:focus{
+    background: white;
+    border-color: #3b5998;
+    color: #3b5998;
+}
+
+a.btn.btn-default.lenauth-bootstrap-simple-google{
+    background: #db4437;
+    border: 1px solid #db4437;
+    color: white;
+}
+a.btn.btn-default.lenauth-bootstrap-simple-google:hover, a.btn.btn-default.lenauth-bootstrap-simple-google:focus{
+    background: white;
+    border-color: #db4437;
+    color: #db4437;
+}
+
+a.btn.btn-default.lenauth-bootstrap-simple-yahoo{
+    background: #400191;
+    border: 1px solid #400191;
+    color: white;
+}
+a.btn.btn-default.lenauth-bootstrap-simple-yahoo:hover, a.btn.btn-default.lenauth-bootstrap-simple-yahoo:focus{
+    background: white;
+    border-color: #400191;
+    color: #400191;
+}
+
+a.btn.btn-default.lenauth-bootstrap-simple-twitter{
+    background: #55acee;
+    border: 1px solid #55acee;
+    color: white;
+}
+a.btn.btn-default.lenauth-bootstrap-simple-twitter:hover, a.btn.btn-default.lenauth-bootstrap-simple-twitter:focus{
+    background: white;
+    border-color: #55acee;
+    color: #55acee;
+}
+
+a.btn.btn-default.lenauth-bootstrap-simple-yandex{
+    background: #ffcc00;
+    color: black;
+    border: 1px solid #ffcc00;
+    color: white;
+}
+a.btn.btn-default.lenauth-bootstrap-simple-yandex:hover, a.btn.btn-default.lenauth-bootstrap-simple-yandex:focus{
+    background: white;
+    border-color: #ffcc00;
+    color: black;
+}
+
+a.btn.btn-default.lenauth-bootstrap-simple-vk, a.btn.btn-default.lenauth-bootstrap-simple-vk-en{
+    background: #45668e;
+    border: 1px solid #45668e;
+    color: white;
+}
+a.btn.btn-default.lenauth-bootstrap-simple-vk:hover, a.btn.btn-default.lenauth-bootstrap-simple-vk:focus, a.btn.btn-default.lenauth-bootstrap-simple-vk-en:hover, a.btn.btn-default.lenauth-bootstrap-simple-vk-en:focus{
+    background: white;
+    border-color: #ffcc00;
+    color: #45668e;
+}
