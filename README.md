@@ -5,7 +5,7 @@ This plugin allows easy auth method for your Moodle. You just need to register a
 
 ## Features
 - a lot of settings
-- a lot of social buttons skins
+- a lot of social buttons skins including [Font-Awesome](https://fortawesome.github.io/Font-Awesome/) and [Bootstrap](http://getbootstrap.com/) based skins
 - detailed description about OAuth applications register
 - Russian language includes
 - own buttons text (some skins)
@@ -33,7 +33,7 @@ Its very-very simple. You have two methods: PHP-code or static HTML-code.
 
 **Sample PHP-code:**
 
-`<?php if ( file_exists( $CFG->dirroot . '/auth/lenauth/out.php' ) ) : include_once $CFG->dirroot . '/auth/lenauth/out.php'; echo auth_lenauth_out::getInstance()->lenauth_output('style3-text'); endif; ?>`
+`<?php if ( file_exists( $CFG->dirroot . '/auth/lenauth/out.php' ) ) : include_once $CFG->dirroot . '/auth/lenauth/out.php'; echo auth_lenauth_out::getInstance()->lenauth_output('**style3-text**'); endif; ?>`
 
 - **Static HTML-code**. Click **Static HTML-code** link under PHP-code. In new window you will see static HTML-code, so you can copy it and paste in your current theme. **BUT!** this is static code, so if you will change some settings in LenAuth you need to update this HTML-code!
 
@@ -41,6 +41,10 @@ Its very-very simple. You have two methods: PHP-code or static HTML-code.
 You're welcome for pull requests but against master branch. Thanks!
 
 ## Changelog
+#### Version 1.2.4 (2015123100)
+- Yet another [Font-Awesome](https://fortawesome.github.io/Font-Awesome/) and [Bootstrap](http://getbootstrap.com/) based buttons style from [Mark Samberg](https://github.com/mjsamberg) from [The Friday Institute](https://github.com/TheFridayInstitute)
+- Some code improves to hide human errors from Moodle frontend
+
 #### Version 1.2.3 (2015112001)
 - Moodle 3.0 support. Thanks to [Amiad](https://github.com/amiad) and [Jarosław Maciejewski](https://github.com/nitro2010)
 - Development mode option added

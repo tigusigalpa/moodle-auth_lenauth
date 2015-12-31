@@ -4,7 +4,7 @@
  * @author Igor Sazonov ( @tigusigalpa )
  * @link http://lms-service.org/lenauth-plugin-oauth-moodle/
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @version 1.2.3
+ * @version 1.2.4
  * @uses auth_plugin_base core class
  *
  * Authentication Plugin: LenAuth Authentication
@@ -208,7 +208,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
      * VK API version
      * @var string
      */
-    public static $vk_api_version = '5.33';
+    public static $vk_api_version = '5.42';
     
     /**
      * Yahoo API version
