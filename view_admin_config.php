@@ -1347,6 +1347,7 @@ global $CFG;
                             <?php
                             switch ( $style_item ) {
                                 case 'bootstrap-font-awesome':
+                                case 'bootstrap-font-awesome-simple':
                                     echo '<br /><small style="color:red">' . get_string( 'auth_lenauth_bootstrap_fontawesome_needle', 'auth_lenauth' ) . '</small>';
                                     break;
                             }

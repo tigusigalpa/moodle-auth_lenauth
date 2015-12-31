@@ -87,9 +87,9 @@ class auth_lenauth_out extends auth_plugin_lenauth {
                 $mailru_bca = '';
                 //$ok_bca = '';
 
-                $facebook_link = ( !$show_example ) ? 'https://www.facebook.com/dialog/oauth?client_id=' . $this->_oauth_config->auth_lenauth_facebook_app_id . '&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri('facebook') ) . '&scope=email' : 'javascript:;';
+                $facebook_link = ( !$show_example && isset( $this->_oauth_config->auth_lenauth_facebook_app_id ) ) ? 'https://www.facebook.com/dialog/oauth?client_id=' . $this->_oauth_config->auth_lenauth_facebook_app_id . '&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri('facebook') ) . '&scope=email' : 'javascript:;';
 
-                $google_link = ( !$show_example ) ? 'https://accounts.google.com/o/oauth2/auth?client_id=' . $this->_oauth_config->auth_lenauth_google_client_id . '&response_type=code&scope=openid%20profile%20email&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'google' ) ) : 'javascript:;';
+                $google_link = ( !$show_example && isset( $this->_oauth_config->auth_lenauth_google_client_id ) ) ? 'https://accounts.google.com/o/oauth2/auth?client_id=' . $this->_oauth_config->auth_lenauth_google_client_id . '&response_type=code&scope=openid%20profile%20email&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'google' ) ) : 'javascript:;';
                 
                 if ( !$show_example ) {
                     switch ( $this->_oauth_config->auth_lenauth_yahoo_oauth_version ) {
@@ -105,9 +105,9 @@ class auth_lenauth_out extends auth_plugin_lenauth {
 
                 $twitter_link = ( !$show_example ) ? $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=twitter' : 'javascript:;';
 
-                $vk_link = ( !$show_example ) ? 'https://oauth.vk.com/authorize?client_id=' . $this->_oauth_config->auth_lenauth_vk_app_id . '&scope=email&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'vk' ) ) . '&response_type=code&v=' . parent::$vk_api_version : 'javascript:;';
+                $vk_link = ( !$show_example && isset( $this->_oauth_config->auth_lenauth_vk_app_id ) ) ? 'https://oauth.vk.com/authorize?client_id=' . $this->_oauth_config->auth_lenauth_vk_app_id . '&scope=email&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'vk' ) ) . '&response_type=code&v=' . parent::$vk_api_version : 'javascript:;';
                 
-                if ( !$show_example ) {
+                if ( !$show_example && isset( $this->_oauth_config->auth_lenauth_yandex_app_id ) ) {
                     switch ($this->_oauth_config->auth_lenauth_locale) {
                         case 'en':
                             $yandex_link = 'https://oauth.yandex.com/authorize?response_type=code&client_id=' . $this->_oauth_config->auth_lenauth_yandex_app_id . '&display=popup';
@@ -120,7 +120,7 @@ class auth_lenauth_out extends auth_plugin_lenauth {
                     $yandex_link = 'javascript:;';
                 }
 
-                $mailru_link = ( !$show_example ) ? 'https://connect.mail.ru/oauth/authorize?client_id=' . $this->_oauth_config->auth_lenauth_mailru_site_id . '&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'mailru' ) ) . '&response_type=code' : 'javascript:;';
+                $mailru_link = ( !$show_example && isset( $this->_oauth_config->auth_lenauth_mailru_site_id ) ) ? 'https://connect.mail.ru/oauth/authorize?client_id=' . $this->_oauth_config->auth_lenauth_mailru_site_id . '&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'mailru' ) ) . '&response_type=code' : 'javascript:;';
 
                 //$ok_class = 'ok';
                 //$ok_link = ( !$show_example ) ? 'https://accounts.google.com/o/oauth2/auth?client_id=' . $this->_oauth_config->auth_lenauth_google_client_id . '&response_type=code&scope=openid%20profile%20email&redirect_uri=' . urlencode( $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=google' ) : 'javascript:;';
