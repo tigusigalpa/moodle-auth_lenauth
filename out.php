@@ -773,6 +773,31 @@ class auth_lenauth_out extends auth_plugin_lenauth {
                         }
                         $mailru_class = 'btn btn-default lenauth-bootstrap-mailru';
                         break;
+                    case 'bootstrap-font-awesome-simple':
+                        $has_text = false;
+                        $class_div_str = 'lenauth-bootstrap-simple';
+                        $facebook_bca = "<i class='fa fa-facebook'></i>";
+                        $google_bca = "<i class='fa fa-google-plus'></i>";
+                        $yahoo_bca = "<i class='fa fa-yahoo'></i>&nbsp;";
+                        $twitter_bca = "<i class='fa fa-twitter'></i>";
+                        $vk_bca = "<i class='fa fa-vk'></i>";
+                        $yandex_bca = "<i class='fa fa-yandex'></i>";
+                        $mailru_bca = "<i class='fa fa-mailru'></i>";
+                        $facebook_class = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-facebook';
+                        $google_class = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-google';
+                        $yahoo_class = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-yahoo';
+                        $twitter_class = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-twitter';
+                        switch ($this->_oauth_config->auth_lenauth_locale) {
+                            case 'en':
+                                $vk_class = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-vk-en';
+                                $yandex_class = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-yandex-en';
+                                break;
+                            case 'ru':
+                                $vk_class = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-vk-ru';
+                                $yandex_class = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-yandex-ru';
+                        }
+                        $mailru_class = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-mailru';
+                        break;
                 }
 
                 if ( !empty( $class_div_str ) 

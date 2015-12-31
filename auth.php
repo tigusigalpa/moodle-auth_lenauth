@@ -191,7 +191,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
         'smooth-w64-classic-square', 'smooth-w64-classic-rounded', 
         'smooth-w64-classic-circle', 'simple-3d', 'simple-3d-small', 
         '3d-circle', '3d-circle-small', 'simple-flat', 'simple-flat-small', 
-        'simple-flat-circle', 'simple-flat-circle-small', 'bootstrap-font-awesome'
+        'simple-flat-circle', 'simple-flat-circle-small', 'bootstrap-font-awesome','bootstrap-font-awesome-simple'
     );
 
     /**
