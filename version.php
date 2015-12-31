@@ -28,8 +28,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015112001;
+$plugin->version   = 2015123100;
 $plugin->requires  = 2013111805;   // Requires Moodle 2.6.5 or later
-$plugin->release   = '1.2.3 (Build: 2015112001)';
+$plugin->release   = '1.2.4 (Build: 2015123100)';
 $plugin->maturity  = MATURITY_BETA;             // this version's maturity level
 $plugin->component = 'auth_lenauth';
