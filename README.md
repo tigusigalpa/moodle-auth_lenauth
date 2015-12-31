@@ -44,6 +44,7 @@ You're welcome for pull requests but against master branch. Thanks!
 #### Version 1.2.4 (2015123100)
 - Yet another [Font-Awesome](https://fortawesome.github.io/Font-Awesome/) and [Bootstrap](http://getbootstrap.com/) based buttons style from [Mark Samberg](https://github.com/mjsamberg) from [The Friday Institute](https://github.com/TheFridayInstitute)
 - Some code improves to hide human errors from Moodle frontend
+- VK API version update
 
 #### Version 1.2.3 (2015112001)
 - Moodle 3.0 support. Thanks to [Amiad](https://github.com/amiad) and [Jarosław Maciejewski](https://github.com/nitro2010)
