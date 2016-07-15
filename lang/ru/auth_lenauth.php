@@ -72,6 +72,12 @@ $string['auth_lenauth_output_style_key'] = 'Стиль как на сайте';
 $string['auth_lenauth_bootstrap_fontawesome_needle'] = 'Для корректного вывода кнопок в шаблоне необходимо подключение CSS-фреймворка Bootstrap и шрифтов семейства Font-Awesome!';
 
 /**
+ * ERRORS
+ */
+$string['auth_lenauth_user_suspended'] = 'Пользователь заблокирован';
+$string['auth_lenauth_access_token_empty'] = 'Невозможно получить токен. Проверьте настройки Вашего приложения';
+
+/**
  * Facebook Russian locale
  */
 $string['auth_lenauth_facebook_settings'] = 'Настройки Facebook';

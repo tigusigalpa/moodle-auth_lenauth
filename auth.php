@@ -20,7 +20,7 @@
  * Thanks to Jérôme about critical issues for security
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined( 'MOODLE_INTERNAL' ) || die();
 
 require_once( $CFG->libdir . '/authlib.php' ); //requires authentication core library
 require_once( $CFG->libdir . '/formslib.php' );
@@ -208,7 +208,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
      * VK API version
      * @var string
      */
-    public static $vk_api_version = '5.42';
+    public static $vk_api_version = '5.52';
     
     /**
      * Yahoo API version
@@ -395,6 +395,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
         if ( !empty( $authorizationcode ) ) {
             
             $authprovider = required_param( 'authprovider', PARAM_TEXT ); // get authorization provider (webservice name)
+            @setcookie( 'auth_lenauth_authprovider', $authprovider, time() + 604800, '/' );
             $hack_authprovider = ( $authprovider == 'yahoo1' || $authprovider == 'yahoo2' ) ? 'yahoo' : $authprovider;
             $config_field_str = 'auth_lenauth_' . $hack_authprovider . '_social_id_field';
             $this->_field_shortname = $this->_oauth_config->$config_field_str;
@@ -1064,7 +1065,7 @@ class auth_plugin_lenauth extends auth_plugin_base {
                                 if ( $err = email_is_not_allowed( $user_email ) ) {
                                     throw new moodle_exception( $err, 'auth_lenauth' );
                                 }
-                                $user_lenauth = $DB->get_record('user', array('email' => $user_email, 'deleted' => 0, 'mnethostid' => $CFG->mnet_localhost_id));
+                                $user_lenauth = $DB->get_record( 'user', array( 'email' => $user_email, 'deleted' => 0, 'mnethostid' => $CFG->mnet_localhost_id ) );
                             } else {
                                 if ( empty( $user_lenauth ) ) {
                                     $user_lenauth = $this->_lenauth_get_userdata_by_social_id( $social_uid );
@@ -1154,7 +1155,9 @@ class auth_plugin_lenauth extends auth_plugin_base {
                 }
                 
                 if ( $user_lenauth ) {
-
+                    if ( $user_lenauth->suspended == 1 ) {
+                        throw new moodle_exception( 'auth_lenauth_user_suspended', 'auth_lenauth' );
+                    }
                     // update user record
                     if ( !empty( $newuser ) ) {
                         $newuser->id = $user_lenauth->id;
@@ -1185,11 +1188,16 @@ class auth_plugin_lenauth extends auth_plugin_base {
                                     && in_array( $image_header['Content-Type'], array_keys( self::$_allowed_icons_types ) ) ) {
                                     $mime = $image_header['Content-Type'];
                                 } else {
-                                    if ( isset( $image_header['Content-Type'][0] )
-                                        && is_string( $image_header['Content-Type'][0] )
-                                        && in_array( $image_header['Content-Type'][0], array_keys( self::$_allowed_icons_types ) ) ) {
-                                        $mime = $image_header['Content-Type'][0];
+                                    // >>> @ Shaposhnikov D.
+                                    foreach ( $image_header['Content-Type'] as $ct ) {
+                                        if ( !empty( $ct )
+                                            && is_string( $ct )
+                                            && in_array( $ct, array_keys( self::$_allowed_icons_types ) ) ) {
+                                                $mime = $ct;
+                                                break;
+                                        }
                                     }
+                                    // <<<
                                 }
                                 $ext = $this->_lenauth_get_image_extension_from_mime( $mime );
                                 if ( $ext ) {
@@ -1230,9 +1238,29 @@ class auth_plugin_lenauth extends auth_plugin_base {
                 }
                 redirect( $urltogo );
             } else {
-                throw new moodle_exception( 'Could not get access to access token. Check your App Settings', 'auth_lenauth' );
+                throw new moodle_exception( 'auth_lenauth_access_token_empty', 'auth_lenauth' );
             }
         }
+    }
+    
+    /**
+     * Hook for overriding behaviour of logout page.
+     * This method is called from login/logout.php page for all enabled auth plugins.
+     *
+     * @global object
+     * @global string
+     */
+    public function logoutpage_hook() {
+        if ( isset( $_COOKIE['auth_lenauth_authprovider'] ) ) {
+            if ( isset( $_COOKIE[$_COOKIE['auth_lenauth_authprovider']] ) ) {
+                unset( $_COOKIE[$_COOKIE['auth_lenauth_authprovider']] );
+                setcookie( $_COOKIE['auth_lenauth_authprovider'], null, -1, '/' );
+            }
+            unset( $_COOKIE['auth_lenauth_authprovider'] );
+            setcookie( 'auth_lenauth_authprovider', null, -1, '/' );
+        }
+        
+        return true;
     }
 
 

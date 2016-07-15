@@ -42,11 +42,8 @@ $string['auth_lenauth_static_html'] = 'Static HTML-code';
 $string['auth_lenauth_style_not_defined'] = 'This style is not defined as a plugin style';
 $string['auth_lenauth_locale_desc'] = 'Some services have local and international logos, for example, VK and Yandex';
 $string['auth_lenauth_default_country_desc'] = 'Every user registered via LenAuth will have this country selected by default on register page';
-//$string['can_change_password'] = 'User can change password';
 $string['auth_lenauth_can_reset_password_key'] = 'User can reset/change an internal password (<em>recommended</em>)';
 $string['auth_lenauth_can_reset_password_desc'] = 'If the option enabled, user can change an internal password (<strong>nothing by default</strong>) and authorise via Moodle login form without OAuth plugin';
-//$string['password_expire_key'] = 'Number of days to user password expires';
-//$string['password_expire_desc'] = 'Период жизни пароля, необходимо будет создать новый через определенное Вами количество дней. 0 &mdash; значит пароль можно оставить навсегда.';
 $string['auth_lenauth_can_confirm_key'] = 'Moderate new users';
 $string['auth_lenauth_can_confirm_desc'] = 'New users, registered via LenAuth needs to be moderated by Moodle administrator';
 $string['auth_lenauth_retrieve_avatar_key'] = 'Retrieve avatar';
@@ -76,6 +73,11 @@ $string['auth_lenauth_bootstrap_fontawesome_needle'] = 'To make a correct output
 $string['auth_lenauth_output_php_code_key'] = 'Theme PHP-code';
 
 /**
+ * ERRORS
+ */
+$string['auth_lenauth_user_suspended'] = 'User is suspended';
+$string['auth_lenauth_access_token_empty'] = 'Could not get access to access token. Check your App Settings';
+/**
  * Facebook English locale
  */
 $string['auth_lenauth_facebook_settings'] = 'Facebook Settings';
@@ -85,7 +87,7 @@ $string['auth_lenauth_facebook_desc'] = '
     <ol>
         <li>You need to have any social account at <a href="https://www.facebook.com/" target="_blank">Facebook</a></li>
         <li><a href="https://developers.facebook.com/apps/" target="_blank">Register</a> as Facebook developer</li>
-        <li>At developers console you need to create an Application (<strong>+ Add a New App</strong> button) with category <strong>WWW Web-site</strong> and arbitary title</li>
+        <li>At developers console you need to create an Application (<strong>+ Add a New App</strong> button) with category <strong>WWW Web-site</strong> and arbitrary title</li>
         <li>Fill in the application settings <strong>Site URL</strong> as <strong>{$a->wwwroot}</strong>. Next, click on the link <strong><a href="https://developers.facebook.com/apps/" target="_blank">Skip to Developer Dashboard</a></strong></li>
         <li>As a result, you will be given <strong>App ID</strong> and <strong>App Secret</strong> (to become visible, click <strong>Show</strong>). Copy them here.</li>
         <li><strong>IMPORTANT!</strong> at developers console go to tab <strong>Advanced</strong> and fill the field <strong>Valid OAuth redirect URIs</strong>: fill there <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=facebook</strong></li>
