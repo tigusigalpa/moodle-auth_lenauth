@@ -47,7 +47,7 @@ class auth_lenauth_out extends auth_plugin_lenauth {
     public function lenauth_output($style, $show_example = false, $show_html = false) {
         $ret = '';
         
-        if ( in_array( $style, $this->_styles_array ) ) {
+        if ( in_array( $style, $this->styles_array ) ) {
             
             if ( !isloggedin() || isguestuser() || $show_example || $show_html ) {
                 global $CFG;
@@ -87,14 +87,14 @@ class auth_lenauth_out extends auth_plugin_lenauth {
                 $mailru_bca = '';
                 //$ok_bca = '';
 
-                $facebook_link = ( !$show_example && isset( $this->_oauth_config->auth_lenauth_facebook_app_id ) ) ? 'https://www.facebook.com/dialog/oauth?client_id=' . $this->_oauth_config->auth_lenauth_facebook_app_id . '&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri('facebook') ) . '&scope=email' : 'javascript:;';
+                $facebook_link = ( !$show_example && isset( $this->_oauth_config->auth_lenauth_facebook_app_id ) ) ? 'https://www.facebook.com/dialog/oauth?client_id=' . $this->_oauth_config->auth_lenauth_facebook_app_id . '&redirect_uri=' . urlencode( $this->redirectURI('facebook') ) . '&scope=email' : 'javascript:;';
 
-                $google_link = ( !$show_example && isset( $this->_oauth_config->auth_lenauth_google_client_id ) ) ? 'https://accounts.google.com/o/oauth2/auth?client_id=' . $this->_oauth_config->auth_lenauth_google_client_id . '&response_type=code&scope=openid%20profile%20email&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'google' ) ) : 'javascript:;';
+                $google_link = ( !$show_example && isset( $this->_oauth_config->auth_lenauth_google_client_id ) ) ? 'https://accounts.google.com/o/oauth2/auth?client_id=' . $this->_oauth_config->auth_lenauth_google_client_id . '&response_type=code&scope=openid%20profile%20email&redirect_uri=' . urlencode( $this->redirectURI( 'google' ) ) : 'javascript:;';
                 
                 if ( !$show_example ) {
                     switch ( $this->_oauth_config->auth_lenauth_yahoo_oauth_version ) {
                         case 2:
-                            $yahoo_link = 'https://api.login.yahoo.com/oauth2/request_auth?client_id=' . $this->_oauth_config->auth_lenauth_yahoo_consumer_key . '&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'yahoo2' ) ) . '&response_type=code';
+                            $yahoo_link = 'https://api.login.yahoo.com/oauth2/request_auth?client_id=' . $this->_oauth_config->auth_lenauth_yahoo_consumer_key . '&redirect_uri=' . urlencode( $this->redirectURI( 'yahoo2' ) ) . '&response_type=code';
                             break;
                         default:
                             $yahoo_link = $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=yahoo1';
@@ -105,7 +105,7 @@ class auth_lenauth_out extends auth_plugin_lenauth {
 
                 $twitter_link = ( !$show_example ) ? $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=twitter' : 'javascript:;';
 
-                $vk_link = ( !$show_example && isset( $this->_oauth_config->auth_lenauth_vk_app_id ) ) ? 'https://oauth.vk.com/authorize?client_id=' . $this->_oauth_config->auth_lenauth_vk_app_id . '&scope=email&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'vk' ) ) . '&response_type=code&v=' . parent::$vk_api_version : 'javascript:;';
+                $vk_link = ( !$show_example && isset( $this->_oauth_config->auth_lenauth_vk_app_id ) ) ? 'https://oauth.vk.com/authorize?client_id=' . $this->_oauth_config->auth_lenauth_vk_app_id . '&scope=email&redirect_uri=' . urlencode( $this->redirectURI( 'vk' ) ) . '&response_type=code&v=' . parent::$vk_api_version : 'javascript:;';
                 
                 if ( !$show_example && isset( $this->_oauth_config->auth_lenauth_yandex_app_id ) ) {
                     switch ($this->_oauth_config->auth_lenauth_locale) {
@@ -120,7 +120,7 @@ class auth_lenauth_out extends auth_plugin_lenauth {
                     $yandex_link = 'javascript:;';
                 }
 
-                $mailru_link = ( !$show_example && isset( $this->_oauth_config->auth_lenauth_mailru_site_id ) ) ? 'https://connect.mail.ru/oauth/authorize?client_id=' . $this->_oauth_config->auth_lenauth_mailru_site_id . '&redirect_uri=' . urlencode( $this->_lenauth_redirect_uri( 'mailru' ) ) . '&response_type=code' : 'javascript:;';
+                $mailru_link = ( !$show_example && isset( $this->_oauth_config->auth_lenauth_mailru_site_id ) ) ? 'https://connect.mail.ru/oauth/authorize?client_id=' . $this->_oauth_config->auth_lenauth_mailru_site_id . '&redirect_uri=' . urlencode( $this->redirectURI( 'mailru' ) ) . '&response_type=code' : 'javascript:;';
 
                 //$ok_class = 'ok';
                 //$ok_link = ( !$show_example ) ? 'https://accounts.google.com/o/oauth2/auth?client_id=' . $this->_oauth_config->auth_lenauth_google_client_id . '&response_type=code&scope=openid%20profile%20email&redirect_uri=' . urlencode( $CFG->wwwroot . '/auth/lenauth/redirect.php?auth_service=google' ) : 'javascript:;';
@@ -821,7 +821,7 @@ class auth_lenauth_out extends auth_plugin_lenauth {
 
                     $ret .= '<div class="lenauth-buttons' . ( !empty( $class_div_str ) ? ' ' . $class_div_str : '' ) .'"' . $style_div_str . '><ul>';
                     
-                    $order_array = isset( $this->_oauth_config->auth_lenauth_order ) ? json_decode( $this->_oauth_config->auth_lenauth_order, true ) : $this->_default_order;
+                    $order_array = isset( $this->_oauth_config->auth_lenauth_order ) ? json_decode( $this->_oauth_config->auth_lenauth_order, true ) : $this->default_order;
                     
                     foreach ( $order_array as $service_name ) :
                         

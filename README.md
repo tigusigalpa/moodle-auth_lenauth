@@ -90,7 +90,7 @@ You're welcome for pull requests but against master branch. Thanks!
 #### Version 1.0.4 (2014111300)
 - check permissions for file **view_admin_config.php**
 - edited config names and method names to [Frankenstyle](https://docs.moodle.org/dev/Frankenstyle)
-- fixed SQL request for function **_lenauth_get_userdata_by_social_id** to Postgresql compatibility
+- fixed SQL request for function **getUserDataBySocialId** to Postgresql compatibility
 - more documentation/metainfo for some functions
 - fix for Yandex button link for English locale
 

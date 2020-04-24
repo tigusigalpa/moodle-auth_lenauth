@@ -1339,7 +1339,7 @@ global $CFG;
                 </thead>
                 <tbody>
                     <?php
-                    foreach ( $this->_styles_array as $style_item ) : ?>
+                    foreach ( $this->styles_array as $style_item ) : ?>
                     <tr>
                         <td>
                             <?php echo auth_lenauth_out::getInstance()->lenauth_output($style_item, true); ?>

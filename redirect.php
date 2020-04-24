@@ -6,8 +6,8 @@ $code = '';
 $state = '';
 $error = false;
 $error_code = '';
-$oauth_token = false;
-$oauth_verifier = false;
+$OAuthToken = false;
+$OAuthVerifier = false;
 
 $auth_service = optional_param( 'auth_service', '', PARAM_TEXT );
 
@@ -57,10 +57,10 @@ if ( !empty( $auth_service ) ) {
             
         case 'yahoo1':
             $code = $auth_service;
-            $oauth_token = false;
-            if ( isset( $_REQUEST['oauth_token'] ) ) $oauth_token = optional_param( 'oauth_token', '', PARAM_TEXT );
-            $oauth_verifier = false;
-            if ( isset( $_REQUEST['oauth_verifier'] ) ) $oauth_verifier = optional_param( 'oauth_verifier', '', PARAM_TEXT );
+            $OAuthToken = false;
+            if ( isset( $_REQUEST['oauth_token'] ) ) $OAuthToken = optional_param( 'oauth_token', '', PARAM_TEXT );
+            $OAuthVerifier = false;
+            if ( isset( $_REQUEST['oauth_verifier'] ) ) $OAuthVerifier = optional_param( 'oauth_verifier', '', PARAM_TEXT );
             break;
             
         case 'yahoo2':
@@ -70,10 +70,10 @@ if ( !empty( $auth_service ) ) {
             
         case 'twitter':
             $code = $auth_service;
-            $oauth_token = false;
-            if ( isset( $_REQUEST['oauth_token'] ) ) $oauth_token = optional_param( 'oauth_token', '', PARAM_TEXT );
-            $oauth_verifier = false;
-            if ( isset( $_REQUEST['oauth_verifier'] ) ) $oauth_verifier = optional_param( 'oauth_verifier', '', PARAM_TEXT );
+            $OAuthToken = false;
+            if ( isset( $_REQUEST['oauth_token'] ) ) $OAuthToken = optional_param( 'oauth_token', '', PARAM_TEXT );
+            $OAuthVerifier = false;
+            if ( isset( $_REQUEST['oauth_verifier'] ) ) $OAuthVerifier = optional_param( 'oauth_verifier', '', PARAM_TEXT );
             break;
         
         case 'vk':
@@ -152,8 +152,8 @@ if ( empty( $error ) ) {
      */
     $moodle_url_params = array( 'oauthcode' => $code, 'authprovider' => $auth_service );
     if ( !empty( $state ) ) $moodle_url_params['state'] = $state;
-    if ( $oauth_token ) $moodle_url_params['oauth_token'] = $oauth_token;
-    if ( $oauth_verifier ) $moodle_url_params['oauth_verifier'] = $oauth_verifier;
+    if ( $OAuthToken ) $moodle_url_params['oauth_token'] = $OAuthToken;
+    if ( $OAuthVerifier ) $moodle_url_params['oauth_verifier'] = $OAuthVerifier;
     $url = new moodle_url( $loginurl, $moodle_url_params );
 } else {
     $moodle_index_url_errors = array( 'oauth_failure' => $error );

@@ -22,7 +22,7 @@
  *
  * @package    auth
  * @subpackage lenauth
- * @copyright  2014 Igor Sazonov ( @tigusigalpa )
+ * @copyright  2020 Igor Sazonov <sovletig@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
