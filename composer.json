@@ -1,0 +1,10 @@
+{
+    "name": "tigusigalpa/moodle_auth_lenauth",
+    "authors": [
+        {
+            "name": "Igor Sazonov",
+            "email": "sovletig@gmail.com"
+        }
+    ],
+    "require": {}
+}

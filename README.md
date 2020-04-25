@@ -33,7 +33,7 @@ Its very-very simple. You have two methods: PHP-code or static HTML-code.
 
 **Sample PHP-code:**
 
-`<?php if ( file_exists( $CFG->dirroot . '/auth/lenauth/out.php' ) ) : include_once $CFG->dirroot . '/auth/lenauth/out.php'; echo auth_lenauth_out::getInstance()->lenauth_output('style3-text'); endif; ?>`
+`<?php if (file_exists($CFG->dirroot . '/auth/lenauth/out.php')) : include_once $CFG->dirroot . '/auth/lenauth/out.php'; echo auth_lenauth_out::getInstance()->lenauth_output('style3-text'); endif; ?>`
 
 - **Static HTML-code**. Click **Static HTML-code** link under PHP-code. In new window you will see static HTML-code, so you can copy it and paste in your current theme. **BUT!** this is static code, so if you will change some settings in LenAuth you need to update this HTML-code!
 

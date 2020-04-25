@@ -15,23 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Uninstall trigger for component 'auth_lenauth'
+ * Auth LenAuth autoload.
  *
- * @link      https://docs.moodle.org/dev/Installing_and_upgrading_plugin_database_tables#uninstall.php
  * @package   auth_lenauth
- * @copyright Igor Sazonov <sovletig@gmail.com>
+ * @copyright 2020 Igor Sazonov <sovletig@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function xmldb_auth_lenauth_uninstall()
-{
-    global $DB;
-    $DB->delete_records('config_plugins', ['plugin' => 'auth_lenauth']);
-    foreach (['facebook', 'google', 'yahoo', 'twitter', 'vk', 'yandex', 'mailru'] as $social) {
-        $infoField = $DB->get_record('user_info_field', ['shortname' => 'auth_lenauth_' . $social . '_social_id']);
-        if (!empty($infoField) && !empty($infoField->id)) {
-            $DB->delete_records('user_info_data', ['fieldid' => $infoField->id]);
-        }
-        $DB->delete_records('user_info_field', ['shortname' => 'auth_lenauth_' . $social . '_social_id']);
-    }
+require_once __DIR__ . '/../../config.php';
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require __DIR__ . '/vendor/autoload.php';
 }
+spl_autoload_register(function ($class) {
+    if (!class_exists($class)) {
+        $arr = $tmp = explode('\\', $class);
+        $cnt = count($arr);
+        if ($cnt > 1 && $arr[0] == 'Tigusigalpa') {
+            unset($tmp[0]);
+            $file = __DIR__ . '/src/' . join('/', $tmp) . '.php';
+            if ($file && file_exists($file)) {
+                require $file;
+            }
+        }
+    }
+});

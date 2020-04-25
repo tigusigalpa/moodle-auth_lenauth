@@ -1,2 +1,2 @@
 <?php
- die( 'silence is golden' );
+ die('silence is golden');

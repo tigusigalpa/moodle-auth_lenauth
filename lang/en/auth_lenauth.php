@@ -236,12 +236,3 @@ $string['auth_lenauth_mailru_desc'] = '
         <li><em>Optionally</em>: Set up your application: <strong>Icon for lists</strong>, <strong>Image for dialogs</strong></li>
     </ol>';
 $string['auth_lenauth_mailru_binding'] = 'MailRu Social ID';
-
-/**
- * Odnoklassniki English locale
- */
-/*$string['auth_ok_settings'] = 'OdnoKlassniki';
-$string['auth_ok_app_id_key'] = 'Application ID';
-$string['auth_ok_public_key_key'] = 'Public key';
-$string['auth_ok_secret_key_key'] = 'Secret key';
-$string['auth_ok_button_text_default'] = 'Odnoklassniki';*/
