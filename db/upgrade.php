@@ -15,27 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Auth LenAuth autoload.
+ * Upgrade trigger for component 'auth_lenauth'
  *
+ * @link      https://docs.moodle.org/dev/Upgrade_API
  * @package   auth_lenauth
- * @copyright 2020 Igor Sazonov <sovletig@gmail.com>
+ * @copyright Igor Sazonov <sovletig@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once __DIR__ . '/../../config.php';
-if (file_exists(__DIR__ . '/vendor/autoload.php')) {
-    require __DIR__ . '/vendor/autoload.php';
+defined('MOODLE_INTERNAL') || die;
+
+function xmldb_auth_lenauth_upgrade($oldVersion)
+{
+
 }
-spl_autoload_register(function ($class) {
-    if (!class_exists($class)) {
-        $arr = $tmp = explode('\\', $class);
-        $cnt = count($arr);
-        if ($cnt > 2 && $arr[0] == 'Tigusigalpa' && $arr[1] == 'Auth_LenAuth') {
-            unset($tmp[0], $tmp[1]);
-            $file = __DIR__ . '/src/' . join('/', $tmp) . '.php';
-            if ($file && file_exists($file)) {
-                require $file;
-            }
-        }
-    }
-});

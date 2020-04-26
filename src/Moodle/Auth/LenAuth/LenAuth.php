@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace Tigusigalpa\Moodle\Auth\LenAuth;
+namespace Tigusigalpa\Auth_LenAuth\Moodle\Auth\LenAuth;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -23,8 +23,8 @@ class LenAuth extends \auth_plugin_base
     public const SETTINGS = [
         'facebook' => [
             'fields' => [
-                'app_id',
-                'app_secret',
+                'app_id' => 'text',
+                'app_secret' => 'password',
             ],
             /**
              * Facebook settings
@@ -38,9 +38,9 @@ class LenAuth extends \auth_plugin_base
         ],
         'google' => [
             'fields' => [
-                'client_id',
-                'client_secret',
-                'project_id',
+                'client_id' => 'text',
+                'client_secret' => 'password',
+                'project_id' => 'text',
             ],
             /**
              * Google settings
@@ -55,8 +55,9 @@ class LenAuth extends \auth_plugin_base
         ],
         'yahoo' => [
             'fields' => [
-                'client_secret',
-                'project_id',
+                'application_id' => 'text',
+                'consumer_key' => 'text',
+                'consumer_secret' => 'password',
             ],
             /**
              * Yahoo OAuth2 settings
@@ -74,9 +75,9 @@ class LenAuth extends \auth_plugin_base
         ],
         'twitter' => [
             'fields' => [
-                'consumer_key',
-                'consumer_secret',
-                'application_id',
+                'consumer_key' => 'text',
+                'consumer_secret' => 'password',
+                'application_id' => 'text',
             ],
             /**
              * Twitter settings
@@ -94,8 +95,8 @@ class LenAuth extends \auth_plugin_base
         ],
         'vk' => [
             'fields' => [
-                'app_id',
-                'app_secret',
+                'app_id' => 'text',
+                'app_secret' => 'password',
             ],
             /**
              * VK.com settings
@@ -112,8 +113,8 @@ class LenAuth extends \auth_plugin_base
         ],
         'yandex' => [
             'fields' => [
-                'app_id',
-                'app_password',
+                'app_id' => 'text',
+                'app_password' => 'password',
             ],
             /**
              * @link http://api.yandex.ru/oauth/doc/dg/reference/obtain-access-token.xml
@@ -128,8 +129,9 @@ class LenAuth extends \auth_plugin_base
         ],
         'mailru' => [
             'fields' => [
-                'site_id',
-                'app_password',
+                'site_id' => 'text',
+                'client_private' => 'password',
+                'client_secret' => 'password',
             ],
             /**
              * Mail.ru settings
@@ -143,6 +145,30 @@ class LenAuth extends \auth_plugin_base
                 'request_api_url'   => 'http://www.appsmail.ru/platform/api',
             ],
         ],
+    ];
+
+    /**
+     * List of available styles
+     *
+     * @var array
+     */
+    public const STYLES = [
+        'default', 'style1',
+        'style1-dark-white', 'style1-light-black', 'style1-text',
+        'style2-text', 'style3-text', 'style4-text',
+        'smooth-w32-button-square', 'smooth-w32-button-rounded',
+        'smooth-w32-button-circle', 'smooth-w48-button-square',
+        'smooth-w48-button-rounded', 'smooth-w48-button-circle',
+        'smooth-w64-button-square', 'smooth-w64-button-rounded',
+        'smooth-w64-button-circle', 'smooth-w32-classic-square',
+        'smooth-w32-classic-square', 'smooth-w32-classic-rounded',
+        'smooth-w32-classic-circle', 'smooth-w48-classic-square',
+        'smooth-w48-classic-rounded', 'smooth-w48-classic-circle',
+        'smooth-w64-classic-square', 'smooth-w64-classic-rounded',
+        'smooth-w64-classic-circle', 'simple-3d', 'simple-3d-small',
+        '3d-circle', '3d-circle-small', 'simple-flat', 'simple-flat-small',
+        'simple-flat-circle', 'simple-flat-circle-small',
+        'bootstrap-font-awesome','bootstrap-font-awesome-simple',
     ];
 
     public const ALLOWED_ICONS_TYPES = [
@@ -201,11 +227,6 @@ class LenAuth extends \auth_plugin_base
         $this->errorlogtag = '[AUTH lenauth]';
     }
 
-    public static function getSocials()
-    {
-        return array_keys(self::SOCIALS);
-    }
-
     public function getConfig(string $setting = '')
     {
         if (!$this->config) {
@@ -242,7 +263,7 @@ class LenAuth extends \auth_plugin_base
         $user = $this->db->get_record(
             'user',
             ['username' => $userName, 'mnethostid' => $this->cfg->mnet_localhost_id]
-       );
+        );
         //check for user (username) exist and authentication method
         if (!empty($user) && ($user->auth == 'lenauth')) {
             if ($code = optional_param('code', '', PARAM_ALPHANUMEXT)) {
@@ -272,7 +293,7 @@ class LenAuth extends \auth_plugin_base
      */
     public function can_confirm()
     {
-        if ($canConfirm = $this->getConfig('auth_lenauth_can_confirm')) {
+        if ($canConfirm = $this->getConfig('can_confirm')) {
             return $canConfirm;
         }
         return false;
@@ -286,7 +307,7 @@ class LenAuth extends \auth_plugin_base
      */
     public function can_reset_password()
     {
-        if ($canResetPassword = $this->getConfig('auth_lenauth_can_reset_password')) {
+        if ($canResetPassword = $this->getConfig('can_reset_password')) {
             return $canResetPassword;
         }
         return false;
@@ -316,7 +337,10 @@ class LenAuth extends \auth_plugin_base
     protected function getFieldId()
     {
         return $this->fieldShortName ? $this->db->get_field(
-            'user_info_field', 'id', ['shortname' => $this->fieldShortName]) : false;
+            'user_info_field',
+            'id',
+            ['shortname' => $this->fieldShortName]
+        ) : false;
     }
 
     /**
@@ -353,7 +377,7 @@ class LenAuth extends \auth_plugin_base
                             AND uif.shortname = ?
                             AND u.deleted = ? AND u.mnethostid = ?',
                 [$socialUId, $this->fieldId, $this->fieldShortName, 0, $this->cfg->mnet_localhost_id]
-           );
+            );
         }
         return $ret;
     }
@@ -427,7 +451,8 @@ class LenAuth extends \auth_plugin_base
         }
         $signature = implode('&', $this->urlEncodeRfc3986([
             strtoupper($this->curlType),
-            $this->sendOAuthRequest ? self::SETTINGS['twitter']['settings']['request_token_url'] : self::SETTINGS['twitter']['settings']['token_url'],
+            $this->sendOAuthRequest ? self::SETTINGS['twitter']['settings']['request_token_url']
+                : self::SETTINGS['twitter']['settings']['token_url'],
             implode('&', $encodedParams)
         ]));
         $params['oauth_signature'] = base64_encode(
@@ -436,18 +461,18 @@ class LenAuth extends \auth_plugin_base
                 $signature,
                 implode('&', $this->urlEncodeRfc3986(
                     [
-                        $this->getConfig('auth_lenauth_twitter_consumer_secret'),
+                        $this->getConfig('twitter_consumer_secret'),
                         $OAuthTokenSecret ? $OAuthTokenSecret : '',
                     ]
-               )),
+                )),
                 true
-           )
-       );
-
+            )
+        );
         $header = '';
         foreach ($params as $key => $value) {
             if (preg_match('/^oauth_/', $key)) {
-                $header .= ($header === '' ? ' ' : ', ') . $this->urlEncodeRfc3986($key) . '="' . $this->urlEncodeRfc3986($value) . '"';
+                $header .= ($header === '' ? ' ' : ', ') . $this->urlEncodeRfc3986($key) . '="'
+                    . $this->urlEncodeRfc3986($value) . '"';
             }
         }
         return [
@@ -460,7 +485,7 @@ class LenAuth extends \auth_plugin_base
     protected function twitterRequestArray()
     {
         return [
-            'oauth_consumer_key' => $this->getConfig('auth_lenauth_twitter_consumer_key'),
+            'oauth_consumer_key' => $this->getConfig('twitter_consumer_key'),
             //'oauth_nonce' => md5(microtime(true) . $_SERVER['REMOTE_ADDR']),
             'oauth_nonce' => md5(microtime(true)),
             'oauth_signature_method' => 'HMAC-SHA1',
@@ -491,7 +516,7 @@ class LenAuth extends \auth_plugin_base
         if (!empty($authorizationCode)) {
             $authProvider = required_param('authprovider', PARAM_TEXT); // get authorization provider (webservice name)
             @setcookie('auth_lenauth_authprovider', $authProvider, time() + 604800, '/');
-            $configFieldStr = 'auth_lenauth_' . $authProvider . '_social_id_field';
+            $configFieldStr = $authProvider . '_social_id_field';
             $this->fieldShortName = $this->getConfig($configFieldStr);
             $this->fieldId = $this->getFieldId();
 
@@ -501,7 +526,7 @@ class LenAuth extends \auth_plugin_base
             //if we have access_token in $_COOKIE, so do not need to make request fot the one
             $this->sendOAuthRequest = !isset($_COOKIE[$authProvider]['access_token']);
             //if service is not enabled, why should we make request? hack protect. maybe
-            $enabledStr = 'auth_lenauth_' . $authProvider . '_enabled';
+            $enabledStr = $authProvider . '_enabled';
             if (empty($this->getConfig($enabledStr))) {
                 throw new \moodle_exception('Service not enabled in your LenAuth Settings', 'auth_lenauth');
             }
@@ -510,33 +535,32 @@ class LenAuth extends \auth_plugin_base
                     /**
                      * @link https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow/v2.0#exchangecode
                      */
-                    $params['client_id'] = $this->getConfig('auth_lenauth_facebook_app_id');
-                    $params['client_secret'] = $this->getConfig('auth_lenauth_facebook_app_secret');
+                    $params['client_id'] = $this->getConfig('facebook_app_id');
+                    $params['client_secret'] = $this->getConfig('facebook_app_secret');
                     break;
                 case 'google':
                     /**
                      * @link https://developers.google.com/accounts/docs/OAuth2Login#exchangecode
                      */
-                    $params['client_id']     = $this->getConfig('auth_lenauth_google_client_id');
-                    $params['client_secret'] = $this->getConfig('auth_lenauth_google_client_secret');
+                    $params['client_id']     = $this->getConfig('google_client_id');
+                    $params['client_secret'] = $this->getConfig('google_client_secret');
                     $params['grant_type']    = self::SETTINGS[$authProvider]['settings']['grant_type'];
                     break;
                 case 'yahoo':
                     $params['grant_type']    = self::SETTINGS[$authProvider]['settings']['grant_type'];
                     $curlOptions = [
-                        'USERPWD' => $this->getConfig('auth_lenauth_yahoo_consumer_key') . ':'
-                            . $this->getConfig('auth_lenauth_yahoo_consumer_secret')
+                        'USERPWD' => $this->getConfig('yahoo_consumer_key') . ':'
+                            . $this->getConfig('yahoo_consumer_secret')
                     ];
                     break;
                 case 'twitter':
-                    if (!empty($this->getConfig('auth_lenauth_twitter_enabled'))) {
+                    if (!empty($this->getConfig('twitter_enabled'))) {
                         if (!isset($_COOKIE[$authProvider]['access_token'])) {
                             $params = array_merge(
-                                $this->twitterRequestArray($this->getConfig('auth_lenauth_twitter_consumer_secret') . '&'),
+                                $this->twitterRequestArray($this->getConfig('twitter_consumer_secret') . '&'),
                                 ['oauth_callback' => $this->redirectURI($authProvider)]
-                           );
+                            );
                             $code = $redirectURI = false;
-
                             $this->sendOAuthRequest = (isset($_REQUEST['oauth_token'], $_REQUEST['oauth_verifier'])) ? false : true;
                             $OAuthVerifier = false;
                             if (!$this->sendOAuthRequest && isset($_COOKIE[$authProvider]['oauth_token_secret'])) {
@@ -551,16 +575,6 @@ class LenAuth extends \auth_plugin_base
                             } else {
                                 $curlHeader = $this->setTwitterHeader($params);
                             }
-
-                            //$curlHeader = $this->setTwitterHeader($params, $accessToken/*, $OAuthTokenSecret = false*/);
-                            /*$curlOptions = [
-                                'CURLOPT_RETURNTRANSFER' => true,
-                                'CURLOPT_FOLLOWLOCATION' => true
-                            ];
-                            if (!empty($params['oauth_callback'])) {
-                                $curlOptions['CURLOPT_POSTFIELDS'] = http_build_query([]);
-                            }*/
-                            //TWITTER IS GOOD!!
                             $encodeParams = false;
                         } else {
                             $this->sendOAuthRequest = false;
@@ -571,17 +585,17 @@ class LenAuth extends \auth_plugin_base
                     /**
                      * @link http://vk.com/dev/auth_sites
                      */
-                    $params['client_id'] = $this->getConfig('auth_lenauth_vk_app_id');
-                    $params['client_secret'] = $this->getConfig('auth_lenauth_vk_app_secret');
+                    $params['client_id'] = $this->getConfig('vk_app_id');
+                    $params['client_secret'] = $this->getConfig('vk_app_secret');
                     break;
                 case 'yandex':
                     $params['grant_type'] = self::SETTINGS[$authProvider]['settings']['grant_type'];
-                    $params['client_id'] = $this->getConfig('auth_lenauth_yandex_app_id');
-                    $params['client_secret'] = $this->getConfig('auth_lenauth_yandex_app_password');
+                    $params['client_id'] = $this->getConfig('yandex_app_id');
+                    $params['client_secret'] = $this->getConfig('yandex_app_password');
                     break;
                 case 'mailru':
-                    $params['client_id'] = $this->getConfig('auth_lenauth_mailru_site_id');
-                    $params['client_secret'] = $this->getConfig('auth_lenauth_mailru_client_secret');
+                    $params['client_id'] = $this->getConfig('mailru_site_id');
+                    $params['client_secret'] = $this->getConfig('mailru_client_secret');
                     $params['grant_type'] = self::SETTINGS[$authProvider]['settings']['grant_type'];
                     break;
                 default: // if authorization provider is wrong
@@ -618,13 +632,13 @@ class LenAuth extends \auth_plugin_base
                             self::SETTINGS[$authProvider]['settings']['request_token_url'],
                             //hack for twitter
                             $encodeParams ? $this->generateQueryData($params) : $params
-                       );
+                        );
                         break;
                     default:
                         $curlTokensValues = $curl->get(
                             self::SETTINGS[$authProvider]['settings']['request_token_url'] . '?' .
                             ($encodeParams ? $this->generateQueryData($params) : $params)
-                       );
+                        );
                         break;
                 }
             }
@@ -641,8 +655,8 @@ class LenAuth extends \auth_plugin_base
                             if (!empty($expires) && !empty($accessToken)) {
                                 setcookie($authProvider . '[access_token]', $accessToken, time() + $expires, '/');
                             } else {
-                                throw new \moodle_exception('Can not get access for "access_token" 
-                                or/and "expires" params after request', 'auth_lenauth');
+                                throw new \moodle_exception('Can not get access for "access_token" '
+                                . 'or/and "expires" params after request', 'auth_lenauth');
                             }
                         } else {
                             if (isset($_COOKIE[$authProvider]['access_token'])) {
@@ -660,8 +674,8 @@ class LenAuth extends \auth_plugin_base
                             if (!empty($accessToken) && !empty($expires)) {
                                 setcookie($authProvider . '[access_token]', $accessToken, time() + $expires, '/');
                             } else {
-                                throw new \moodle_exception('Can not get access for "access_token" 
-                                or/and "expires" params after request', 'auth_lenauth');
+                                throw new \moodle_exception('Can not get access for "access_token" '
+                                . 'or/and "expires" params after request', 'auth_lenauth');
                             }
                         } else {
                             if (isset($_COOKIE[$authProvider]['access_token'])) {
@@ -684,8 +698,8 @@ class LenAuth extends \auth_plugin_base
                                     setcookie($authProvider . '[user_id]', $userId, time() + $expires, '/');
                                 }
                             } else {
-                                throw new \moodle_exception('Can not get access for "access_token" 
-                                or/and "expires" params after request', 'auth_lenauth');
+                                throw new \moodle_exception('Can not get access for "access_token" '
+                                . 'or/and "expires" params after request', 'auth_lenauth');
                             }
                         } else {
                             if (isset($_COOKIE[$authProvider]['access_token'], $_COOKIE[$authProvider]['user_id'])) {
@@ -700,11 +714,17 @@ class LenAuth extends \auth_plugin_base
                         if ($this->sendOAuthRequest || !isset($_COOKIE[$authProvider]['oauth_token_secret'])) {
                             parse_str($curlTokensValues, $tokenValues);
                             $accessToken = $SESSION->twitter_access_token = $tokenValues['oauth_token'];
-                            setcookie($authProvider . '[oauth_token_secret]', $tokenValues['oauth_token_secret'],
-                                time() + self::SETTINGS[$authProvider]['settings']['expire'], '/');
+                            setcookie(
+                                $authProvider . '[oauth_token_secret]',
+                                $tokenValues['oauth_token_secret'],
+                                time() + self::SETTINGS[$authProvider]['settings']['expire'],
+                                '/'
+                            );
                         } else {
-                            if (isset($_COOKIE[$authProvider]['access_token'],
-                                    $_COOKIE[$authProvider]['oauth_token_secret'])
+                            if (isset(
+                                $_COOKIE[$authProvider]['access_token'],
+                                $_COOKIE[$authProvider]['oauth_token_secret']
+                            )
                                 || isset($SESSION->twitter_access_token, $SESSION->twitter_oauth_verifier)) {
                                 $accessToken = isset($_COOKIE[$authProvider]['access_token'])
                                     ? $_COOKIE[$authProvider]['access_token'] : $SESSION->twitter_access_token;
@@ -719,10 +739,12 @@ class LenAuth extends \auth_plugin_base
                         if ($this->sendOAuthRequest || !isset($_COOKIE[$authProvider]['access_token'])) {
                             $tokenValues  = json_decode($curlTokensValues, true);
                             if (isset($tokenValues['error'])) {
-                                throw new \moodle_exception('Native VK Error ' . $tokenValues['error'] . (isset($tokenValues['error_description']) ? ' with description: ' . $tokenValues['error_description'] : ''), 'auth_lenauth');
+                                throw new \moodle_exception('Native VK Error ' . $tokenValues['error']
+                                    . (isset($tokenValues['error_description']) ? ' with description: '
+                                        . $tokenValues['error_description'] : ''), 'auth_lenauth');
                             }
-                            $expires      = $tokenValues['expires_in']; //86400 = 24 hours
-                            $accessToken  = $tokenValues['access_token'];
+                            $expires = $tokenValues['expires_in']; //86400 = 24 hours
+                            $accessToken = $tokenValues['access_token'];
                             if (!empty($accessToken) && !empty($expires)) {
                                 setcookie($authProvider . '[access_token]', $accessToken, time() + $expires, '/');
                             }
@@ -757,7 +779,8 @@ class LenAuth extends \auth_plugin_base
                             if (!empty($expires) && !empty($accessToken)) {
                                 setcookie($authProvider . '[access_token]', $accessToken, time() + $expires, '/');
                             } else {
-                                throw new \moodle_exception('Can not get access for "access_token" or/and "expires" params after request', 'auth_lenauth');
+                                throw new \moodle_exception('Can not get access for "access_token" '
+                                    . 'or/and "expires" params after request', 'auth_lenauth');
                             }
                         } else {
                             if (isset($_COOKIE[$authProvider]['access_token'])) {
@@ -816,7 +839,7 @@ class LenAuth extends \auth_plugin_base
                         $firstName = $curlFinalData['first_name'];
                         $lastName = $curlFinalData['last_name'];
                         $isVerified = $curlFinalData['verified'];
-                        if ($this->getConfig('auth_lenauth_retrieve_avatar')) {
+                        if ($this->getConfig('retrieve_avatar')) {
                             $imageURL = 'http://graph.facebook.com/' . $socialUId . '/picture';
                         }
                         break;
@@ -842,7 +865,7 @@ class LenAuth extends \auth_plugin_base
                         $userEmail = $curlFinalData['emails'][0]['value'];
                         $firstName = $curlFinalData['name']['givenName'];
                         $lastName = $curlFinalData['name']['familyName'];
-                        if ($this->getConfig('auth_lenauth_retrieve_avatar')) {
+                        if ($this->getConfig('retrieve_avatar')) {
                             $imageURL = isset($curlFinalData['image']['url']) ? $curlFinalData['image']['url'] : '';
                         }
                         break;
@@ -871,7 +894,7 @@ class LenAuth extends \auth_plugin_base
                         }
                         $firstName = $curlFinalData['profile']['givenName'];
                         $lastName = $curlFinalData['profile']['familyName'];
-                        if ($this->getConfig('auth_lenauth_retrieve_avatar')) {
+                        if ($this->getConfig('retrieve_avatar')) {
                             $imageURL = isset($curlFinalData['profile']['image']['imageUrl'])
                                 ? $curlFinalData['profile']['image']['imageUrl'] : '';
                         }
@@ -889,14 +912,17 @@ class LenAuth extends \auth_plugin_base
                                 'oauth_token' => $accessToken,
                                 'oauth_token_secret' => $_COOKIE[$authProvider]['oauth_token_secret']
                             ]
-                       );
-                        $curlHeader = $this->setTwitterHeader($queryParams, $accessToken,
-                            $_COOKIE[$authProvider]['oauth_token_secret']);
+                        );
+                        $curlHeader = $this->setTwitterHeader(
+                            $queryParams,
+                            $accessToken,
+                            $_COOKIE[$authProvider]['oauth_token_secret']
+                        );
                         $curl->setHeader($curlHeader);
                         $curlFinalDataPre = $curl->post(
                             self::SETTINGS[$authProvider]['settings']['token_url'],
                             $queryParams
-                       );
+                        );
                         $json_decoded = json_decode($curlFinalDataPre, true);
                         if (isset($json_decoded['error']) && isset($json_decoded['request'])) {
                             throw new \moodle_exception('Native Twitter Error: ' . $json_decoded['error']
@@ -904,8 +930,9 @@ class LenAuth extends \auth_plugin_base
                         }
                         parse_str($curlFinalDataPre, $curlFinalData);
                         $socialUId = $curlFinalData['user_id'];
-                        if ($this->getConfig('auth_lenauth_retrieve_avatar')) {
-                            $imageURL_pre = 'https://twitter.com/' . $curlFinalData['screen_name'] . '/profile_image?size=original';
+                        if ($this->getConfig('retrieve_avatar')) {
+                            $imageURL_pre = 'https://twitter.com/' . $curlFinalData['screen_name']
+                                . '/profile_image?size=original';
                             $imageHeader = get_headers($imageURL_pre, 1);
                             $imageURL = $imageHeader['location'];
                         }
@@ -933,7 +960,7 @@ class LenAuth extends \auth_plugin_base
                         $additionalFieldsPre = $curl->get('http://api.vk.com/method/users.get?user_ids='
                             . $socialUId . '&fields=' . join(',', $fieldsArray));
                         $additionalFields = json_decode($additionalFieldsPre, true);
-                        if ($this->getConfig('auth_lenauth_retrieve_avatar')) {
+                        if ($this->getConfig('retrieve_avatar')) {
                             $imageURL = isset($additionalFields['response'][0][$fieldsArray['avatar']])
                                 ? $additionalFields['response'][0][$fieldsArray['avatar']] : '';
                         }
@@ -952,7 +979,7 @@ class LenAuth extends \auth_plugin_base
                         $firstName = $curlFinalData['first_name'];
                         $lastName = $curlFinalData['last_name'];
                         //$nickname = $curlFinalData['display_name'];
-                        if ($this->getConfig('auth_lenauth_retrieve_avatar')) {
+                        if ($this->getConfig('retrieve_avatar')) {
                             /**
                              * @link https://tech.yandex.ru/passport/doc/dg/reference/response-docpage/#norights_5
                              */
@@ -991,7 +1018,7 @@ class LenAuth extends \auth_plugin_base
                         $lastName = $curlFinalData[0]['last_name'];
                         $isVerified = $curlFinalData[0]['is_verified'];
                         //$birthday = $curlFinalData[0]['birthday']; //dd.mm.YYYY
-                        if ($this->getConfig('auth_lenauth_retrieve_avatar')) {
+                        if ($this->getConfig('retrieve_avatar')) {
                             $imageURL = isset($curlFinalData[0]['pic_big']) ? $curlFinalData[0]['pic_big'] : '';
                         }
                         break;
@@ -999,7 +1026,7 @@ class LenAuth extends \auth_plugin_base
                         throw new \moodle_exception('Unknown OAuth Provider', 'auth_lenauth');
                 }
                 //development mode
-                if ($this->cfg->debugdeveloper == 1 && $this->getConfig('auth_lenauth_dev_mode')) {
+                if ($this->cfg->debugdeveloper == 1 && $this->getConfig('dev_mode')) {
                     throw new \moodle_exception('lenauth_debug_info_not_error', 'auth_lenauth', '', 'AUTHPROVIDER: ' . $authProvider . ' >>>>>REQUEST:' . http_build_query($queryParams, '', '<--->') . ' >>>>>RESPONSE: ' . http_build_query($curlFinalData, '', ' <---> '));
                 }
                 /**
@@ -1019,7 +1046,7 @@ class LenAuth extends \auth_plugin_base
                                         'deleted' => 0,
                                         'mnethostid' => $this->cfg->mnet_localhost_id,
                                     ]
-                               );
+                                );
                             } else {
                                 if (empty($userLenAuth)) {
                                     $userLenAuth = $this->getUserDataBySocialId($socialUId);
@@ -1038,20 +1065,20 @@ class LenAuth extends \auth_plugin_base
                     @setcookie($authProvider, null, time() - 3600);
                     throw new \moodle_exception('Final request returns nothing', 'auth_lenauth');
                 }
-                $lastUserNumber = intval($this->getConfig('auth_lenauth_last_user_number'));
+                $lastUserNumber = intval($this->getConfig('last_user_number'));
                 $lastUserNumber = empty($lastUserNumber) ? 1 : $lastUserNumber + 1;
-                //$userName = $this->getConfig('auth_lenauth_user_prefix . $lastUserNumber; //@todo
+                //$userName = $this->getConfig('user_prefix . $lastUserNumber; //@todo
                 /**
                  * If user with email from webservice not exists, we will create an account
                  */
                 if (empty($userLenAuth)) {
-                    $userName = $this->getConfig('auth_lenauth_user_prefix') . $lastUserNumber;
+                    $userName = $this->getConfig('user_prefix') . $lastUserNumber;
                     //check for username exists in DB
                     $userLenAuth_check = $this->db->get_record('user', ['username' => $userName]);
                     $i_check = 0;
                     while (!empty($userLenAuth_check)) {
                         $userLenAuth_check = $userLenAuth_check + 1;
-                        $userName = $this->getConfig('auth_lenauth_user_prefix') . $lastUserNumber;
+                        $userName = $this->getConfig('user_prefix') . $lastUserNumber;
                         $userLenAuth_check = $this->db->get_record('user', ['username' => $userName]);
                         $i_check++;
                         if ($i_check > 20) {
@@ -1066,19 +1093,23 @@ class LenAuth extends \auth_plugin_base
                 } else {
                     $userName = $userLenAuth->username;
                 }
-                set_config('auth_lenauth_last_user_number', $lastUserNumber, 'auth_lenauth');
+                set_config('last_user_number', $lastUserNumber, 'auth_lenauth');
                 if (!empty($socialUId)) {
                     $userSocialUIdCustomField = [
                         'userid' => $userLenAuth->id,
                         'fieldid' => $this->fieldId,
                         'data' => $socialUId,
                     ];
-                    if (!$this->db->record_exists('user_info_data',
-                        ['userid' => $userLenAuth->id, 'fieldid' => $this->fieldId])) {
+                    if (!$this->db->record_exists(
+                        'user_info_data',
+                        ['userid' => $userLenAuth->id, 'fieldid' => $this->fieldId]
+                    )) {
                         $this->db->insert_record('user_info_data', $userSocialUIdCustomField);
                     } else {
-                        $record = $this->db->get_record('user_info_data',
-                            ['userid' => $userLenAuth->id, 'fieldid' => $this->fieldId]);
+                        $record = $this->db->get_record(
+                            'user_info_data',
+                            ['userid' => $userLenAuth->id, 'fieldid' => $this->fieldId]
+                        );
                         $userSocialUIdCustomField['id'] = $record->id;
                         $this->db->update_record('user_info_data', $userSocialUIdCustomField);
                     }
@@ -1100,12 +1131,12 @@ class LenAuth extends \auth_plugin_base
                 if (!empty($lastName)) {
                     $newUser->lastname = $lastName;
                 }
-                if (!empty($this->getConfig('auth_lenauth_default_country'))) {
-                    $newUser->country = $this->getConfig('auth_lenauth_default_country');
+                if (!empty($this->getConfig('default_country'))) {
+                    $newUser->country = $this->getConfig('default_country');
                 }
                 if ($userLenAuth) {
                     if ($userLenAuth->suspended == 1) {
-                        throw new \moodle_exception('auth_lenauth_user_suspended', 'auth_lenauth');
+                        throw new \moodle_exception('user_suspended', 'auth_lenauth');
                     }
                     // update user record
                     if (!empty($newUser)) {
@@ -1126,7 +1157,7 @@ class LenAuth extends \auth_plugin_base
 
                         $userLenAuth = (object) array_merge((array) $userLenAuth, (array) $newUser);
                         $this->db->update_record('user', $userLenAuth);
-                        if ($this->getConfig('auth_lenauth_retrieve_avatar')) {
+                        if ($this->getConfig('retrieve_avatar')) {
                             //processing user avatar from social webservice
                             if (!empty($imageURL) && intval($userLenAuth->picture) === 0) {
                                 $imageHeader = get_headers($imageURL, 1);
@@ -1156,11 +1187,17 @@ class LenAuth extends \auth_plugin_base
                                     $tempFile = $templFolder . '/' . $tempFileName;
                                     if (copy($imageURL, $tempFile)) {
                                         require_once $this->cfg->libdir . '/gdlib.php';
-                                        $userIconId = process_new_icon(\context_user::instance($newUser->id,
-                                            MUST_EXIST), 'user', 'icon', 0, $tempFile);
+                                        $userIconId = process_new_icon(\context_user::instance(
+                                            $newUser->id,
+                                            MUST_EXIST
+                                        ), 'user', 'icon', 0, $tempFile);
                                         if ($userIconId) {
-                                            $this->db->set_field('user', 'picture',
-                                                $userIconId, ['id' => $newUser->id]);
+                                            $this->db->set_field(
+                                                'user',
+                                                'picture',
+                                                $userIconId,
+                                                ['id' => $newUser->id]
+                                            );
                                         }
                                         unset($tempFile);
                                     }
@@ -1185,7 +1222,7 @@ class LenAuth extends \auth_plugin_base
                 }
                 redirect($urlToGo);
             } else {
-                throw new \moodle_exception('auth_lenauth_access_token_empty', 'auth_lenauth');
+                throw new \moodle_exception('access_token_empty', 'auth_lenauth');
             }
         }
     }
@@ -1220,120 +1257,119 @@ class LenAuth extends \auth_plugin_base
     {
         if (has_capability('moodle/user:update', \context_system::instance())) {
             // set to defaults if undefined while save
-            if (!isset($config->auth_lenauth_user_prefix)) {
-                $config->auth_lenauth_user_prefix = 'lenauth_user_';
+            if (!isset($config->user_prefix)) {
+                $config->user_prefix = 'lenauth_user_';
             }
-            if (!isset($config->auth_lenauth_default_country)) {
-                $config->auth_lenauth_default_country = '';
+            if (!isset($config->default_country)) {
+                $config->default_country = '';
             }
-            if (!isset($config->auth_lenauth_locale)) {
-                $config->auth_lenauth_locale = 'en';
+            if (!isset($config->locale)) {
+                $config->locale = 'en';
             }
             /*if (empty($config->can_change_password)) {
                 $config->can_change_password = 0;
             } else {
                 $config->can_change_password = 1;
             }*/
-            if (empty($config->auth_lenauth_can_reset_password)) {
-                $config->auth_lenauth_can_reset_password = 0;
+            if (empty($config->can_reset_password)) {
+                $config->can_reset_password = 0;
             } else {
-                $config->auth_lenauth_can_reset_password = 1;
+                $config->can_reset_password = 1;
             }
-            if (empty($config->auth_lenauth_can_confirm)) {
-                $config->auth_lenauth_can_confirm = 0;
+            if (empty($config->can_confirm)) {
+                $config->can_confirm = 0;
             } else {
-                $config->auth_lenauth_can_confirm = 1;
+                $config->can_confirm = 1;
             }
-            if (empty($config->auth_lenauth_retrieve_avatar)) {
-                $config->auth_lenauth_retrieve_avatar = 0;
+            if (empty($config->retrieve_avatar)) {
+                $config->retrieve_avatar = 0;
             } else {
-                $config->auth_lenauth_retrieve_avatar = 1;
+                $config->retrieve_avatar = 1;
             }
-            if (empty($config->auth_lenauth_dev_mode)) {
-                $config->auth_lenauth_dev_mode = 0;
+            if (empty($config->dev_mode)) {
+                $config->dev_mode = 0;
             } else {
-                $config->auth_lenauth_dev_mode = 1;
+                $config->dev_mode = 1;
             }
-            if (!isset($config->auth_lenauth_display_buttons)) {
-                $config->auth_lenauth_display_buttons = 'inline-block';
+            if (!isset($config->display_buttons)) {
+                $config->display_buttons = 'inline-block';
             }
-            if (!isset($config->auth_lenauth_button_width)) {
-                $config->auth_lenauth_button_width = 0;
+            if (!isset($config->button_width)) {
+                $config->button_width = 0;
             }
-            if (!isset($config->auth_lenauth_button_margin_top)) {
-                $config->auth_lenauth_button_margin_top = 10;
+            if (!isset($config->button_margin_top)) {
+                $config->button_margin_top = 10;
             }
-            if (!isset($config->auth_lenauth_button_margin_right)) {
-                $config->auth_lenauth_button_margin_right = 10;
+            if (!isset($config->button_margin_right)) {
+                $config->button_margin_right = 10;
             }
-            if (!isset($config->auth_lenauth_button_margin_bottom)) {
-                $config->auth_lenauth_button_margin_bottom = 10;
+            if (!isset($config->button_margin_bottom)) {
+                $config->button_margin_bottom = 10;
             }
-            if (!isset($config->auth_lenauth_button_margin_left)) {
-                $config->auth_lenauth_button_margin_left = 10;
+            if (!isset($config->button_margin_left)) {
+                $config->button_margin_left = 10;
             }
-
-            if (!isset($config->auth_lenauth_display_div)) {
-                $config->auth_lenauth_display_div = 'block';
+            if (!isset($config->display_div)) {
+                $config->display_div = 'block';
             }
-            if (!isset($config->auth_lenauth_div_width)) {
-                $config->auth_lenauth_div_width = 0;
+            if (!isset($config->div_width)) {
+                $config->div_width = 0;
             }
-            if (!isset($config->auth_lenauth_div_margin_top)) {
-                $config->auth_lenauth_div_margin_top = 0;
+            if (!isset($config->div_margin_top)) {
+                $config->div_margin_top = 0;
             }
-            if (!isset($config->auth_lenauth_div_margin_right)) {
-                $config->auth_lenauth_div_margin_right = 0;
+            if (!isset($config->div_margin_right)) {
+                $config->div_margin_right = 0;
             }
-            if (!isset($config->auth_lenauth_div_margin_bottom)) {
-                $config->auth_lenauth_div_margin_bottom = 0;
+            if (!isset($config->div_margin_bottom)) {
+                $config->div_margin_bottom = 0;
             }
-            if (!isset($config->auth_lenauth_div_margin_left)) {
-                $config->auth_lenauth_div_margin_left = 0;
+            if (!isset($config->div_margin_left)) {
+                $config->div_margin_left = 0;
             }
-            if (!isset($config->auth_lenauth_order)) {
-                $config->auth_lenauth_order = json_encode($this->default_order);
+            if (!isset($config->order)) {
+                $config->order = json_encode($this->default_order);
             }
-            foreach (self::SOCIALS as $socialName => $socialData) {
-                $config->{'auth_lenauth_' . $socialName . '_enabled'} = !empty($config->{'auth_lenauth_' . $socialName . '_enabled'}) ? 1 : 0;
-                set_config('auth_lenauth_' . $socialName . '_enabled', intval($config->{'auth_lenauth_' . $socialName . '_enabled'}), 'auth_lenauth');
-                foreach ($socialData['fields'] as $key) {
-                    if (!isset($config->{'auth_lenauth_' . $socialName . '_' . $key})) {
-                        $config->{'auth_lenauth_' . $socialName . '_' . $key} = '';
+            foreach (self::SETTINGS as $socialName => $socialData) {
+                $config->{$socialName . '_enabled'} = !empty($config->{$socialName . '_enabled'}) ? 1 : 0;
+                set_config($socialName . '_enabled', intval($config->{$socialName . '_enabled'}), 'auth_lenauth');
+                foreach (array_keys($socialData['fields']) as $key) {
+                    if (!isset($config->{$socialName . '_' . $key})) {
+                        $config->{$socialName . '_' . $key} = '';
                     }
-                    set_config('auth_lenauth_' . $socialName . '_' . $key, trim($config->{'auth_lenauth_' . $socialName . '_' . $key}), 'auth_lenauth');
+                    set_config($socialName . '_' . $key, trim($config->{$socialName . '_' . $key}), 'auth_lenauth');
                 }
-                if (!isset($config->{'auth_lenauth_' . $socialName . '_button_text'})) {
-                    $config->{'auth_lenauth_' . $socialName . '_button_text'} = get_string('auth_lenauth_' . $socialName . '_button_text_default', 'auth_lenauth');
+                if (!isset($config->{$socialName . '_button_text'})) {
+                    $config->{$socialName . '_button_text'} = get_string($socialName . '_button_text_default', 'auth_lenauth');
                 }
-                set_config('auth_lenauth_' . $socialName . '_button_text', trim($config->{'auth_lenauth_' . $socialName . '_button_text'}), 'auth_lenauth');
+                set_config($socialName . '_button_text', trim($config->{$socialName . '_button_text'}), 'auth_lenauth');
             }
 
-            set_config('auth_lenauth_user_prefix', trim($config->auth_lenauth_user_prefix), 'auth_lenauth');
-            set_config('auth_lenauth_default_country', trim($config->auth_lenauth_default_country), 'auth_lenauth');
-            set_config('auth_lenauth_locale', trim($config->auth_lenauth_locale), 'auth_lenauth');
+            set_config('user_prefix', trim($config->user_prefix), 'auth_lenauth');
+            set_config('default_country', trim($config->default_country), 'auth_lenauth');
+            set_config('locale', trim($config->locale), 'auth_lenauth');
             //set_config('can_change_password',                  intval($config->can_change_password),              'auth_lenauth');
-            set_config('auth_lenauth_can_reset_password', intval($config->auth_lenauth_can_reset_password), 'auth_lenauth');
-            set_config('auth_lenauth_can_confirm', intval($config->auth_lenauth_can_confirm), 'auth_lenauth');
-            set_config('auth_lenauth_retrieve_avatar', intval($config->auth_lenauth_retrieve_avatar), 'auth_lenauth');
-            set_config('auth_lenauth_dev_mode', intval($config->auth_lenauth_dev_mode), 'auth_lenauth');
+            set_config('can_reset_password', intval($config->can_reset_password), 'auth_lenauth');
+            set_config('can_confirm', intval($config->can_confirm), 'auth_lenauth');
+            set_config('retrieve_avatar', intval($config->retrieve_avatar), 'auth_lenauth');
+            set_config('dev_mode', intval($config->dev_mode), 'auth_lenauth');
 
-            set_config('auth_lenauth_display_buttons', trim($config->auth_lenauth_display_buttons), 'auth_lenauth');
-            set_config('auth_lenauth_button_width', intval($config->auth_lenauth_button_width), 'auth_lenauth');
-            set_config('auth_lenauth_button_margin_top', intval($config->auth_lenauth_button_margin_top), 'auth_lenauth');
-            set_config('auth_lenauth_button_margin_right', intval($config->auth_lenauth_button_margin_right), 'auth_lenauth');
-            set_config('auth_lenauth_button_margin_bottom', intval($config->auth_lenauth_button_margin_bottom), 'auth_lenauth');
-            set_config('auth_lenauth_button_margin_left', intval($config->auth_lenauth_button_margin_left), 'auth_lenauth');
+            set_config('display_buttons', trim($config->display_buttons), 'auth_lenauth');
+            set_config('button_width', intval($config->button_width), 'auth_lenauth');
+            set_config('button_margin_top', intval($config->button_margin_top), 'auth_lenauth');
+            set_config('button_margin_right', intval($config->button_margin_right), 'auth_lenauth');
+            set_config('button_margin_bottom', intval($config->button_margin_bottom), 'auth_lenauth');
+            set_config('button_margin_left', intval($config->button_margin_left), 'auth_lenauth');
 
-            set_config('auth_lenauth_display_div', trim($config->auth_lenauth_display_div), 'auth_lenauth');
-            set_config('auth_lenauth_div_width', intval($config->auth_lenauth_div_width), 'auth_lenauth');
-            set_config('auth_lenauth_div_margin_top', intval($config->auth_lenauth_div_margin_top), 'auth_lenauth');
-            set_config('auth_lenauth_div_margin_right', intval($config->auth_lenauth_div_margin_right), 'auth_lenauth');
-            set_config('auth_lenauth_div_margin_bottom', intval($config->auth_lenauth_div_margin_bottom), 'auth_lenauth');
-            set_config('auth_lenauth_div_margin_left', intval($config->auth_lenauth_div_margin_left), 'auth_lenauth');
+            set_config('display_div', trim($config->display_div), 'auth_lenauth');
+            set_config('div_width', intval($config->div_width), 'auth_lenauth');
+            set_config('div_margin_top', intval($config->div_margin_top), 'auth_lenauth');
+            set_config('div_margin_right', intval($config->div_margin_right), 'auth_lenauth');
+            set_config('div_margin_bottom', intval($config->div_margin_bottom), 'auth_lenauth');
+            set_config('div_margin_left', intval($config->div_margin_left), 'auth_lenauth');
 
-            $order_array = $this->makeOrder($config->auth_lenauth_order);
-            set_config('auth_lenauth_order', json_encode($order_array), 'auth_lenauth');
+            $order_array = $this->makeOrder($config->order);
+            set_config('order', json_encode($order_array), 'auth_lenauth');
             return true;
         }
         throw new \moodle_exception('You do not have permissions', 'auth_lenauth');
@@ -1370,93 +1406,77 @@ class LenAuth extends \auth_plugin_base
     public function output(string $style, bool $showExample = false, bool $showHTML = false)
     {
         $ret = '';
-        if (in_array($style, $this->styles_array)) {
+        if (in_array($style, self::STYLES)) {
             if (!isloggedin() || isguestuser() || $showExample || $showHTML) {
                 //$li_class = '';
-                $styleButtonStr = ' style="display:' . $this->getConfig('auth_lenauth_display_buttons') . ';';
-                if ($this->getConfig('auth_lenauth_button_margin_top') > 0
-                    || $this->getConfig('auth_lenauth_button_margin_right') > 0
-                    || $this->getConfig('auth_lenauth_button_margin_bottom') > 0
-                    || $this->getConfig('auth_lenauth_button_margin_right') > 0) {
-                    $styleButtonStr .= 'margin:' . $this->getConfig('auth_lenauth_button_margin_top') . 'px '
-                        . $this->getConfig('auth_lenauth_button_margin_right') . 'px '
-                        . $this->getConfig('auth_lenauth_button_margin_bottom') . 'px '
-                        . $this->getConfig('auth_lenauth_button_margin_right') . 'px;';
+                $styleButtonStr = ' style="display:' . $this->getConfig('display_buttons') . ';';
+                if ($this->getConfig('button_margin_top') > 0
+                    || $this->getConfig('button_margin_right') > 0
+                    || $this->getConfig('button_margin_bottom') > 0
+                    || $this->getConfig('button_margin_right') > 0) {
+                    $styleButtonStr .= 'margin:' . $this->getConfig('button_margin_top') . 'px '
+                        . $this->getConfig('button_margin_right') . 'px '
+                        . $this->getConfig('button_margin_bottom') . 'px '
+                        . $this->getConfig('button_margin_right') . 'px;';
                 }
                 $classDivStr = '';
-                $styleDivStr = ' style="display:' . $this->getConfig('auth_lenauth_display_div') . ';';
-                if ($this->getConfig('auth_lenauth_div_margin_top') > 0
-                    || $this->getConfig('auth_lenauth_div_margin_right') > 0
-                    || $this->getConfig('auth_lenauth_div_margin_bottom') > 0
-                    || $this->getConfig('auth_lenauth_div_margin_right') > 0) {
-                    $styleDivStr .= 'margin:' . $this->getConfig('auth_lenauth_div_margin_top') . 'px '
-                        . $this->getConfig('auth_lenauth_div_margin_right') . 'px '
-                        . $this->getConfig('auth_lenauth_div_margin_bottom') . 'px '
-                        . $this->getConfig('auth_lenauth_div_margin_right') . 'px;';
+                $styleDivStr = ' style="display:' . $this->getConfig('display_div') . ';';
+                if ($this->getConfig('div_margin_top') > 0
+                    || $this->getConfig('div_margin_right') > 0
+                    || $this->getConfig('div_margin_bottom') > 0
+                    || $this->getConfig('div_margin_right') > 0) {
+                    $styleDivStr .= 'margin:' . $this->getConfig('div_margin_top') . 'px '
+                        . $this->getConfig('div_margin_right') . 'px '
+                        . $this->getConfig('div_margin_bottom') . 'px '
+                        . $this->getConfig('div_margin_right') . 'px;';
                 }
-                if ($this->getConfig('auth_lenauth_div_width') > 0) {
-                    $styleButtonStr .= 'width:' . $this->getConfig('auth_lenauth_div_width') . 'px;';
+                if ($this->getConfig('div_width') > 0) {
+                    $styleButtonStr .= 'width:' . $this->getConfig('div_width') . 'px;';
                 }
 
-                $facebookClass = '';
-                $googleClass = '';
-                $yahooClass = '';
-                $twitterClass = '';
-                $vkClass = '';
-                $yandexClass = '';
-                $mailruClass = '';
+                $facebookClass = $googleClass = $yahooClass = $twitterClass = $vkClass = $yandexClass = $mailruClass
+                    = $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA = $mailruBCA = '';
+                $hasText = $autoWidth = false;
 
-                $hasText = false;
-                $autoWidth = true;
-
-                $facebook_bca = '';
-                $google_bca = '';
-                $yahoo_bca = '';
-                $twitter_bca = '';
-                $vk_bca = '';
-                $yandex_bca = '';
-                $mailru_bca = '';
-                //$ok_bca = '';
-
-                $facebookLink = (!$showExample && $this->getConfig('auth_lenauth_facebook_app_id'))
+                $facebookLink = (!$showExample && $this->getConfig('facebook_app_id'))
                     ? 'https://www.facebook.com/dialog/oauth?client_id='
-                    . $this->getConfig('auth_lenauth_facebook_app_id') . '&redirect_uri='
+                    . $this->getConfig('facebook_app_id') . '&redirect_uri='
                     . urlencode($this->redirectURI('facebook')) . '&scope=email' : 'javascript:;';
-                $googleLink = (!$showExample && $this->getConfig('auth_lenauth_google_client_id'))
+                $googleLink = (!$showExample && $this->getConfig('google_client_id'))
                     ? 'https://accounts.google.com/o/oauth2/auth?client_id='
-                    . $this->getConfig('auth_lenauth_google_client_id')
+                    . $this->getConfig('google_client_id')
                     . '&response_type=code&scope=openid%20profile%20email&redirect_uri='
                     . urlencode($this->redirectURI('google')) : 'javascript:;';
-                $yahooLink = (!$showExample && $this->getConfig('auth_lenauth_yahoo_project_id'))
+                $yahooLink = (!$showExample && $this->getConfig('yahoo_project_id'))
                     ? 'https://api.login.yahoo.com/oauth2/request_auth?client_id='
-                    . $this->getConfig('auth_lenauth_yahoo_consumer_key')
+                    . $this->getConfig('yahoo_consumer_key')
                     . '&redirect_uri=' . urlencode($this->redirectURI('yahoo'))
                     . '&response_type=code' : 'javascript:;';
                 $twitterLink = !$showExample ? $this->cfg->wwwroot
                     . '/auth/lenauth/redirect.php?auth_service=twitter' : 'javascript:;';
-                $vkLink = (!$showExample && $this->getConfig('auth_lenauth_vk_app_id'))
+                $vkLink = (!$showExample && $this->getConfig('vk_app_id'))
                     ? 'https://oauth.vk.com/authorize?client_id='
-                    . $this->getConfig('auth_lenauth_vk_app_id')
+                    . $this->getConfig('vk_app_id')
                     . '&scope=email&redirect_uri='
                     . urlencode($this->redirectURI('vk'))
                     . '&response_type=code&v=' . self::SETTINGS['vk']['meta']['api_version'] : 'javascript:;';
-                if (!$showExample && $this->getConfig('auth_lenauth_yandex_app_id')) {
-                    switch ($this->getConfig('auth_lenauth_locale')) {
+                if (!$showExample && $this->getConfig('yandex_app_id')) {
+                    switch ($this->getConfig('locale')) {
                         case 'en':
                             $yandexLink = 'https://oauth.yandex.com/authorize?response_type=code&client_id='
-                                . $this->getConfig('auth_lenauth_yandex_app_id') . '&display=popup';
+                                . $this->getConfig('yandex_app_id') . '&display=popup';
                             break;
                         case 'ru':
                             $yandexLink = 'https://oauth.yandex.ru/authorize?response_type=code&client_id='
-                                . $this->getConfig('auth_lenauth_yandex_app_id') . '&display=popup';
+                                . $this->getConfig('yandex_app_id') . '&display=popup';
                             break;
                     }
                 } else {
                     $yandexLink = 'javascript:;';
                 }
-                $mailruLink = (!$showExample && $this->getConfig('auth_lenauth_mailru_site_id'))
+                $mailruLink = (!$showExample && $this->getConfig('mailru_site_id'))
                     ? 'https://connect.mail.ru/oauth/authorize?client_id='
-                    . $this->getConfig('auth_lenauth_mailru_site_id') . '&redirect_uri='
+                    . $this->getConfig('mailru_site_id') . '&redirect_uri='
                     . urlencode($this->redirectURI('mailru')) . '&response_type=code' : 'javascript:;';
                 switch ($style) {
                     case 'default':
@@ -1469,7 +1489,7 @@ class LenAuth extends \auth_plugin_base
                         $googleClass = 'lenauth-ico-google-plus';
                         $yahooClass = 'lenauth-ico-yahoo';
                         $twitterClass = 'lenauth-ico-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-ico-vk-en';
                                 $yandexClass = 'lenauth-ico-yandex-en';
@@ -1487,7 +1507,7 @@ class LenAuth extends \auth_plugin_base
                         $googleClass = 'lenauth-ico-google-plus';
                         $yahooClass = 'lenauth-ico-yahoo';
                         $twitterClass = 'lenauth-ico-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-ico-vk-en';
                                 $yandexClass = 'lenauth-ico-yandex-en';
@@ -1505,7 +1525,7 @@ class LenAuth extends \auth_plugin_base
                         $googleClass = 'lenauth-ico-google-plus';
                         $yahooClass = 'lenauth-ico-yahoo';
                         $twitterClass = 'lenauth-ico-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-ico-vk-en';
                                 $yandexClass = 'lenauth-ico-yandex-en';
@@ -1524,7 +1544,7 @@ class LenAuth extends \auth_plugin_base
                         $googleClass = 'lenauth-ico-google-plus';
                         $yahooClass = 'lenauth-ico-yahoo';
                         $twitterClass = 'lenauth-ico-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-ico-vk-en';
                                 $yandexClass = 'lenauth-ico-yandex-en';
@@ -1544,7 +1564,7 @@ class LenAuth extends \auth_plugin_base
                         $googleClass = 'lenauth-ico-google-plus';
                         $yahooClass = 'lenauth-ico-yahoo';
                         $twitterClass = 'lenauth-ico-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-ico-vk-en';
                                 $yandexClass = 'lenauth-ico-yandex-en';
@@ -1564,7 +1584,7 @@ class LenAuth extends \auth_plugin_base
                         $googleClass = 'lenauth-ico-google-plus';
                         $yahooClass = 'lenauth-ico-yahoo';
                         $twitterClass = 'lenauth-ico-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-ico-vk-en';
                                 $yandexClass = 'lenauth-ico-yandex-en';
@@ -1584,7 +1604,7 @@ class LenAuth extends \auth_plugin_base
                         $googleClass = 'lenauth-ico-google-plus';
                         $yahooClass = 'lenauth-ico-yahoo';
                         $twitterClass = 'lenauth-ico-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-ico-vk-en';
                                 $yandexClass = 'lenauth-ico-yandex-en';
@@ -1598,12 +1618,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w32-button-square':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-button w32 lenauth-smooth-square';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1617,12 +1638,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w32-button-rounded':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-button w32 lenauth-smooth-rounded';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1635,12 +1657,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w32-button-circle':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-button w32 lenauth-smooth-circle';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1653,12 +1676,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w48-button-square':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-button w48 lenauth-smooth-square';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1671,12 +1695,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w48-button-rounded':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-button w48 lenauth-smooth-rounded';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1689,12 +1714,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w48-button-circle':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-button w48 lenauth-smooth-circle';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1707,12 +1733,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w64-button-square':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-button w64 lenauth-smooth-square';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1725,12 +1752,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w64-button-rounded':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-button w64 lenauth-smooth-rounded';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1743,12 +1771,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w64-button-circle':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-button w64 lenauth-smooth-circle';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1762,12 +1791,13 @@ class LenAuth extends \auth_plugin_base
 
                     case 'smooth-w32-classic-square':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-classic w32 lenauth-smooth-square';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1780,12 +1810,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w32-classic-rounded':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-classic w32 lenauth-smooth-rounded';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1798,12 +1829,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w32-classic-circle':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-classic w32 lenauth-smooth-circle';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1816,12 +1848,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w48-classic-square':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-classic w48 lenauth-smooth-square';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1834,12 +1867,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w48-classic-rounded':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-classic w48 lenauth-smooth-rounded';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1852,12 +1886,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w48-classic-circle':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-classic w48 lenauth-smooth-circle';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1870,12 +1905,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w64-classic-square':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-classic w64 lenauth-smooth-square';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1888,12 +1924,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w64-classic-rounded':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-classic w64 lenauth-smooth-rounded';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1906,12 +1943,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'smooth-w64-classic-circle':
                         $classDivStr = 'lenauth-smooth lenauth-smooth-classic w64 lenauth-smooth-circle';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span class="link_act"><label class="img_act"></label></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span class="link_act"><label class="img_act"></label></span>';
                         $facebookClass = 'lenauth-smooth-button-facebook';
                         $googleClass = 'lenauth-smooth-button-googleplus';
                         $yahooClass = 'lenauth-smooth-button-yahoo';
                         $twitterClass = 'lenauth-smooth-button-twitter-1';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-smooth-button-vk-en';
                                 $yandexClass = 'lenauth-smooth-button-yandex-en';
@@ -1925,12 +1963,13 @@ class LenAuth extends \auth_plugin_base
                     case 'simple-3d':
                         $hasText = true;
                         $classDivStr = 'lenauth-style-5 lenauth-simple-3d';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span></span>';
                         $facebookClass = 'lenauth-style5-facebook';
                         $googleClass = 'lenauth-style5-googlep';
                         $yahooClass = 'lenauth-style5-yahoo';
                         $twitterClass = 'lenauth-style5-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-style5-vk-en';
                                 $yandexClass = 'lenauth-style5-yandex-en';
@@ -1944,12 +1983,13 @@ class LenAuth extends \auth_plugin_base
                     case 'simple-3d-small':
                         $hasText = true;
                         $classDivStr = 'lenauth-style-5 lenauth-simple-3d small';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span></span>';
                         $facebookClass = 'lenauth-style5-facebook';
                         $googleClass = 'lenauth-style5-googlep';
                         $yahooClass = 'lenauth-style5-yahoo';
                         $twitterClass = 'lenauth-style5-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-style5-vk-en';
                                 $yandexClass = 'lenauth-style5-yandex-en';
@@ -1962,12 +2002,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case '3d-circle':
                         $classDivStr = 'lenauth-style-5 lenauth-circle-3d';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span></span>';
                         $facebookClass = 'lenauth-style5-facebook';
                         $googleClass = 'lenauth-style5-googlep';
                         $yahooClass = 'lenauth-style5-yahoo';
                         $twitterClass = 'lenauth-style5-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-style5-vk-en';
                                 $yandexClass = 'lenauth-style5-yandex-en';
@@ -1980,12 +2021,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case '3d-circle-small':
                         $classDivStr = 'lenauth-style-5 lenauth-circle-3d small';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span></span>';
                         $facebookClass = 'lenauth-style5-facebook';
                         $googleClass = 'lenauth-style5-googlep';
                         $yahooClass = 'lenauth-style5-yahoo';
                         $twitterClass = 'lenauth-style5-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-style5-vk-en';
                                 $yandexClass = 'lenauth-style5-yandex-en';
@@ -1999,12 +2041,13 @@ class LenAuth extends \auth_plugin_base
                     case 'simple-flat':
                         $hasText = true;
                         $classDivStr = 'lenauth-style-5 lenauth-simple-flat';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span></span>';
                         $facebookClass = 'lenauth-style5-facebook';
                         $googleClass = 'lenauth-style5-googlep';
                         $yahooClass = 'lenauth-style5-yahoo';
                         $twitterClass = 'lenauth-style5-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-style5-vk-en';
                                 $yandexClass = 'lenauth-style5-yandex-en';
@@ -2018,12 +2061,13 @@ class LenAuth extends \auth_plugin_base
                     case 'simple-flat-small':
                         $hasText = true;
                         $classDivStr = 'lenauth-style-5 lenauth-simple-flat small';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span></span>';
                         $facebookClass = 'lenauth-style5-facebook';
                         $googleClass = 'lenauth-style5-googlep';
                         $yahooClass = 'lenauth-style5-yahoo';
                         $twitterClass = 'lenauth-style5-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-style5-vk-en';
                                 $yandexClass = 'lenauth-style5-yandex-en';
@@ -2036,12 +2080,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'simple-flat-circle':
                         $classDivStr = 'lenauth-style-5 lenauth-circle-flat';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span></span>';
                         $facebookClass = 'lenauth-style5-facebook';
                         $googleClass = 'lenauth-style5-googlep';
                         $yahooClass = 'lenauth-style5-yahoo';
                         $twitterClass = 'lenauth-style5-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-style5-vk-en';
                                 $yandexClass = 'lenauth-style5-yandex-en';
@@ -2054,12 +2099,13 @@ class LenAuth extends \auth_plugin_base
                         break;
                     case 'simple-flat-circle-small':
                         $classDivStr = 'lenauth-style-5 lenauth-circle-flat small';
-                        $facebook_bca = $google_bca = $yahoo_bca = $twitter_bca = $vk_bca = $yandex_bca = $mailru_bca = '<span></span>';
+                        $facebookBCA = $googleBCA = $yahooBCA = $twitterBCA = $vkBCA = $yandexBCA
+                            = $mailruBCA = '<span></span>';
                         $facebookClass = 'lenauth-style5-facebook';
                         $googleClass = 'lenauth-style5-googlep';
                         $yahooClass = 'lenauth-style5-yahoo';
                         $twitterClass = 'lenauth-style5-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'lenauth-style5-vk-en';
                                 $yandexClass = 'lenauth-style5-yandex-en';
@@ -2073,18 +2119,18 @@ class LenAuth extends \auth_plugin_base
                     case 'bootstrap-font-awesome':
                         $hasText = true;
                         $classDivStr = 'lenauth-bootstrap';
-                        $facebook_bca = "<i class='fa fa-facebook-square'></i>&nbsp;";
-                        $google_bca = "<i class='fa fa-google-plus-square'></i>&nbsp;";
-                        $yahoo_bca = "<i class='fa fa-yahoo'></i>&nbsp;";
-                        $twitter_bca = "<i class='fa fa-twitter-square'></i>&nbsp;";
-                        $vk_bca = "<i class='fa fa-vk'></i>&nbsp;";
-                        $yandex_bca = "<i class='fa fa-yandex'></i>&nbsp;";
-                        $mailru_bca = "<i class='fa fa-mailru'></i>&nbsp;";
+                        $facebookBCA = "<i class='fa fa-facebook-square'></i>&nbsp;";
+                        $googleBCA = "<i class='fa fa-google-plus-square'></i>&nbsp;";
+                        $yahooBCA = "<i class='fa fa-yahoo'></i>&nbsp;";
+                        $twitterBCA = "<i class='fa fa-twitter-square'></i>&nbsp;";
+                        $vkBCA = "<i class='fa fa-vk'></i>&nbsp;";
+                        $yandexBCA = "<i class='fa fa-yandex'></i>&nbsp;";
+                        $mailruBCA = "<i class='fa fa-mailru'></i>&nbsp;";
                         $facebookClass = 'btn btn-default lenauth-bootstrap-facebook';
                         $googleClass = 'btn btn-default lenauth-bootstrap-google';
                         $yahooClass = 'btn btn-default lenauth-bootstrap-yahoo';
                         $twitterClass = 'btn btn-default lenauth-bootstrap-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'btn btn-default lenauth-bootstrap-vk-en';
                                 $yandexClass = 'btn btn-default lenauth-bootstrap-yandex-en';
@@ -2098,111 +2144,112 @@ class LenAuth extends \auth_plugin_base
                     case 'bootstrap-font-awesome-simple':
                         $hasText = false;
                         $classDivStr = 'lenauth-bootstrap-simple';
-                        $facebook_bca = "<i class='fa fa-facebook'></i>";
-                        $google_bca = "<i class='fa fa-google-plus'></i>";
-                        $yahoo_bca = "<i class='fa fa-yahoo'></i>&nbsp;";
-                        $twitter_bca = "<i class='fa fa-twitter'></i>";
-                        $vk_bca = "<i class='fa fa-vk'></i>";
-                        $yandex_bca = "<i class='fa fa-yandex'></i>";
-                        $mailru_bca = "<i class='fa fa-mailru'></i>";
+                        $facebookBCA = "<i class='fa fa-facebook'></i>";
+                        $googleBCA = "<i class='fa fa-google-plus'></i>";
+                        $yahooBCA = "<i class='fa fa-yahoo'></i>&nbsp;";
+                        $twitterBCA = "<i class='fa fa-twitter'></i>";
+                        $vkBCA = "<i class='fa fa-vk'></i>";
+                        $yandexBCA = "<i class='fa fa-yandex'></i>";
+                        $mailruBCA = "<i class='fa fa-mailru'></i>";
                         $facebookClass = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-facebook';
                         $googleClass = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-google';
                         $yahooClass = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-yahoo';
                         $twitterClass = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-twitter';
-                        switch ($this->getConfig('auth_lenauth_locale')) {
+                        switch ($this->getConfig('locale')) {
                             case 'en':
                                 $vkClass = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-vk-en';
-                                $yandexClass = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-yandex-en';
+                                $yandexClass = 'btn btn-default lenauth-bootstrap-simple '
+                                . 'lenauth-bootstrap-simple-yandex-en';
                                 break;
                             case 'ru':
                                 $vkClass = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-vk-ru';
-                                $yandexClass = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-yandex-ru';
+                                $yandexClass = 'btn btn-default lenauth-bootstrap-simple '
+                                . 'lenauth-bootstrap-simple-yandex-ru';
                         }
                         $mailruClass = 'btn btn-default lenauth-bootstrap-simple lenauth-bootstrap-simple-mailru';
                         break;
                 }
                 if (!empty($classDivStr)
                     && (
-                        $this->getConfig('auth_lenauth_facebook_enabled')
-                        || $this->getConfig('auth_lenauth_google_enabled')
-                        || $this->getConfig('auth_lenauth_yahoo_enabled')
-                        || $this->getConfig('auth_lenauth_twitter_enabled')
-                        || $this->getConfig('auth_lenauth_vk_enabled')
-                        || $this->getConfig('auth_lenauth_yandex_enabled')
-                        || $this->getConfig('auth_lenauth_mailru_enabled')
+                        $this->getConfig('facebook_enabled')
+                        || $this->getConfig('google_enabled')
+                        || $this->getConfig('yahoo_enabled')
+                        || $this->getConfig('twitter_enabled')
+                        || $this->getConfig('vk_enabled')
+                        || $this->getConfig('yandex_enabled')
+                        || $this->getConfig('mailru_enabled')
                    ) || $showExample
-               ) {
-                    if (!$autoWidth && $this->getConfig('auth_lenauth_button_width') > 0) {
-                        $styleButtonStr .= 'width:' . $this->getConfig('auth_lenauth_button_width') . 'px;';
+                ) {
+                    if (!$autoWidth && $this->getConfig('button_width') > 0) {
+                        $styleButtonStr .= 'width:' . $this->getConfig('button_width') . 'px;';
                     }
                     $styleDivStr .= '"';
                     $styleButtonStr .= '"';
                     $ret .= '<div class="lenauth-buttons' . (!empty($classDivStr) ? ' ' . $classDivStr : '')
                         . '"' . $styleDivStr . '><ul>';
 
-                    $order_array = $this->getConfig('auth_lenauth_order')
-                        ? json_decode($this->getConfig('auth_lenauth_order'), true) : $this->default_order;
+                    $order_array = $this->getConfig('order')
+                        ? json_decode($this->getConfig('order'), true) : $this->default_order;
                     foreach ($order_array as $service_name) :
                         switch ($service_name) {
                             case 'facebook':
-                                if (($this->getConfig('auth_lenauth_facebook_enabled')
-                                        && !empty($this->getConfig('auth_lenauth_facebook_app_id'))
-                                        && !empty($this->getConfig('auth_lenauth_facebook_app_secret'))
+                                if (($this->getConfig('facebook_enabled')
+                                        && !empty($this->getConfig('facebook_app_id'))
+                                        && !empty($this->getConfig('facebook_app_secret'))
                                         && !$showExample) || $showExample) {
-                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $facebookClass . '" href="' . $facebookLink . '">' . $facebook_bca . ($hasText ? $this->getConfig('auth_lenauth_facebook_button_text') : '') . '</a></li>';
+                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $facebookClass . '" href="' . $facebookLink . '">' . $facebookBCA . ($hasText ? $this->getConfig('facebook_button_text') : '') . '</a></li>';
                                 }
                                 break;
                             case 'google':
-                                if ($this->getConfig('auth_lenauth_google_enabled') && !empty($this->getConfig('auth_lenauth_google_client_id')) && !empty($this->getConfig('auth_lenauth_google_client_secret')) && !$showExample) {
-                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $googleClass . '" href="' . $googleLink . '">' . $google_bca . ($hasText ? $this->getConfig('auth_lenauth_google_button_text') : '') . '</a></li>';
+                                if ($this->getConfig('google_enabled') && !empty($this->getConfig('google_client_id')) && !empty($this->getConfig('google_client_secret')) && !$showExample) {
+                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $googleClass . '" href="' . $googleLink . '">' . $googleBCA . ($hasText ? $this->getConfig('google_button_text') : '') . '</a></li>';
                                 }
                                 break;
 
                             case 'yahoo':
-                                if ($this->getConfig('auth_lenauth_yahoo_enabled') && !empty($this->getConfig('auth_lenauth_yahoo_consumer_key')) && !empty($this->getConfig('auth_lenauth_yahoo_consumer_secret')) && !$showExample) {
-                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $yahooClass . '" href="' . $yahooLink . '">' . $yahoo_bca . ($hasText ? $this->getConfig('auth_lenauth_yahoo_button_text') : '') . '</a></li>';
+                                if ($this->getConfig('yahoo_enabled') && !empty($this->getConfig('yahoo_consumer_key')) && !empty($this->getConfig('yahoo_consumer_secret')) && !$showExample) {
+                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $yahooClass . '" href="' . $yahooLink . '">' . $yahooBCA . ($hasText ? $this->getConfig('yahoo_button_text') : '') . '</a></li>';
                                 }
                                 break;
                             case 'twitter':
-                                if (($this->getConfig('auth_lenauth_twitter_enabled')
-                                        && !empty($this->getConfig('auth_lenauth_twitter_consumer_key'))
-                                        && !empty($this->getConfig('auth_lenauth_twitter_consumer_secret'))
+                                if (($this->getConfig('twitter_enabled')
+                                        && !empty($this->getConfig('twitter_consumer_key'))
+                                        && !empty($this->getConfig('twitter_consumer_secret'))
                                         && !$showExample) || $showExample) {
-                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $twitterClass . '" href="' . $twitterLink . '">' . $twitter_bca . ($hasText ? $this->getConfig('auth_lenauth_twitter_button_text') : '') . '</a></li>';
+                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $twitterClass . '" href="' . $twitterLink . '">' . $twitterBCA . ($hasText ? $this->getConfig('twitter_button_text') : '') . '</a></li>';
                                 }
                                 break;
                             case 'vk':
-                                if ($this->getConfig('auth_lenauth_vk_enabled')
-                                    && !empty($this->getConfig('auth_lenauth_vk_app_id'))
-                                    && !empty($this->getConfig('auth_lenauth_vk_app_secret')) || $showExample) {
-                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $vkClass . '" href="' . $vkLink . '">' . $vk_bca . ($hasText ? $this->getConfig('auth_lenauth_vk_button_text') : '') . '</a></li>';
+                                if ($this->getConfig('vk_enabled')
+                                    && !empty($this->getConfig('vk_app_id'))
+                                    && !empty($this->getConfig('vk_app_secret')) || $showExample) {
+                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $vkClass . '" href="' . $vkLink . '">' . $vkBCA . ($hasText ? $this->getConfig('vk_button_text') : '') . '</a></li>';
                                 }
                                 break;
                             case 'yandex':
-                                if ($this->getConfig('auth_lenauth_yandex_enabled')
-                                    && !empty($this->getConfig('auth_lenauth_yandex_app_id'))
-                                    && !empty($this->getConfig('auth_lenauth_yandex_app_password'))
+                                if ($this->getConfig('yandex_enabled')
+                                    && !empty($this->getConfig('yandex_app_id'))
+                                    && !empty($this->getConfig('yandex_app_password'))
                                     && !$showExample) {
-                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $yandexClass . '" href="' . $yandexLink . '">' . $yandex_bca . ($hasText ? $this->getConfig('auth_lenauth_yandex_button_text') : '') . '</a></li>';
+                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $yandexClass . '" href="' . $yandexLink . '">' . $yandexBCA . ($hasText ? $this->getConfig('yandex_button_text') : '') . '</a></li>';
                                 }
                                 break;
                             case 'mailru':
-                                if ($this->getConfig('auth_lenauth_mailru_enabled')
-                                    && !empty($this->getConfig('auth_lenauth_mailru_site_id'))
-                                    && !empty($this->getConfig('auth_lenauth_mailru_client_private'))
-                                    && !empty($this->getConfig('auth_lenauth_mailru_client_secret'))
+                                if ($this->getConfig('mailru_enabled')
+                                    && !empty($this->getConfig('mailru_site_id'))
+                                    && !empty($this->getConfig('mailru_client_private'))
+                                    && !empty($this->getConfig('mailru_client_secret'))
                                     && !$showExample) {
-                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $mailruClass . '" href="' . $mailruLink . '">' . $mailru_bca . ($hasText ? $this->getConfig('auth_lenauth_mailru_button_text') : '') . '</a></li>';
+                                    $ret .= '<li' . $styleButtonStr . '><a class="' . $mailruClass . '" href="' . $mailruLink . '">' . $mailruBCA . ($hasText ? $this->getConfig('mailru_button_text') : '') . '</a></li>';
                                 }
                                 break;
                         }
                     endforeach;
                     $ret .= '</ul></div>';
-
                 }
             }
         } else {
-            $ret = get_string('auth_lenauth_style_not_defined', 'auth_lenauth');
+            $ret = get_string('style_not_defined', 'auth_lenauth');
         }
         return $ret;
     }

@@ -23,6 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
+
 function xmldb_auth_lenauth_install()
 {
     global $DB;
@@ -39,56 +41,56 @@ function xmldb_auth_lenauth_install()
     $defaultInfoField->defaultformat = 0;
     foreach (['facebook', 'google', 'yahoo', 'twitter', 'vk', 'yandex', 'mailru'] as $social) {
         $infoField = new \stdClass();
-        $infoField->shortname = 'auth_lenauth_' . $social . '_social_id';
-        $infoField->name = get_string('auth_lenauth_' . $social . '_binding', 'auth_lenauth');
+        $infoField->shortname = $social . '_social_id';
+        $infoField->name = get_string($social . '_binding', 'auth_lenauth');
         $infoFieldObj = (object) array_merge((array) $infoField, (array) $defaultInfoField);
         if ($DB->insert_record('user_info_field', $infoFieldObj)) {
             set_config(
-                'auth_lenauth_' . $social . '_social_id_field',
-                'auth_lenauth_' . $social . '_social_id',
+                $social . '_social_id_field',
+                $social . '_social_id',
                 'auth_lenauth'
-           );
+            );
             set_config(
-                'auth_lenauth_' . $social . '_button_text',
-                get_string('auth_lenauth_' . $social . '_button_text_default', 'auth_lenauth'),
+                $social . '_button_text',
+                get_string($social . '_button_text_default', 'auth_lenauth'),
                 'auth_lenauth'
-           );
+            );
         }
     }
 
-    set_config('auth_lenauth_display_buttons', 'inline-block', 'auth_lenauth');
-    set_config('auth_lenauth_display_div', 'block', 'auth_lenauth');
-    set_config('auth_lenauth_locale', 'en', 'auth_lenauth');
-    set_config('auth_lenauth_default_country', '', 'auth_lenauth');
-    set_config('auth_lenauth_user_prefix', 'lenauth_user_', 'auth_lenauth');
-    set_config('auth_lenauth_can_reset_password', 0, 'auth_lenauth');
-    set_config('auth_lenauth_can_confirm', 0, 'auth_lenauth');
-    set_config('auth_lenauth_retrieve_avatar', 0, 'auth_lenauth');
+    set_config('display_buttons', 'inline-block', 'auth_lenauth');
+    set_config('display_div', 'block', 'auth_lenauth');
+    set_config('locale', 'en', 'auth_lenauth');
+    set_config('default_country', '', 'auth_lenauth');
+    set_config('user_prefix', 'lenauth_user_', 'auth_lenauth');
+    set_config('can_reset_password', 0, 'auth_lenauth');
+    set_config('can_confirm', 0, 'auth_lenauth');
+    set_config('retrieve_avatar', 0, 'auth_lenauth');
     
-    set_config('auth_lenauth_div_width', 0, 'auth_lenauth');
-    set_config('auth_lenauth_button_width', 0, 'auth_lenauth');
+    set_config('div_width', 0, 'auth_lenauth');
+    set_config('button_width', 0, 'auth_lenauth');
     
-    set_config('auth_lenauth_facebook_enabled', 0, 'auth_lenauth');
-    set_config('auth_lenauth_google_enabled', 0, 'auth_lenauth');
-    set_config('auth_lenauth_yahoo_enabled', 0, 'auth_lenauth');
-    set_config('auth_lenauth_twitter_enabled', 0, 'auth_lenauth');
-    set_config('auth_lenauth_vk_enabled', 0, 'auth_lenauth');
-    set_config('auth_lenauth_yandex_enabled', 0, 'auth_lenauth');
-    set_config('auth_lenauth_mailru_enabled', 0, 'auth_lenauth');
+    set_config('facebook_enabled', 0, 'auth_lenauth');
+    set_config('google_enabled', 0, 'auth_lenauth');
+    set_config('yahoo_enabled', 0, 'auth_lenauth');
+    set_config('twitter_enabled', 0, 'auth_lenauth');
+    set_config('vk_enabled', 0, 'auth_lenauth');
+    set_config('yandex_enabled', 0, 'auth_lenauth');
+    set_config('mailru_enabled', 0, 'auth_lenauth');
     
-    set_config('auth_lenauth_div_margin_top', 0, 'auth_lenauth');
-    set_config('auth_lenauth_div_margin_right', 0, 'auth_lenauth');
-    set_config('auth_lenauth_div_margin_bottom', 0, 'auth_lenauth');
-    set_config('auth_lenauth_div_margin_left', 0, 'auth_lenauth');
+    set_config('div_margin_top', 0, 'auth_lenauth');
+    set_config('div_margin_right', 0, 'auth_lenauth');
+    set_config('div_margin_bottom', 0, 'auth_lenauth');
+    set_config('div_margin_left', 0, 'auth_lenauth');
 
-    set_config('auth_lenauth_button_margin_top', 10, 'auth_lenauth');
-    set_config('auth_lenauth_button_margin_right', 10, 'auth_lenauth');
-    set_config('auth_lenauth_button_margin_bottom', 10, 'auth_lenauth');
-    set_config('auth_lenauth_button_margin_left', 10, 'auth_lenauth');
+    set_config('button_margin_top', 10, 'auth_lenauth');
+    set_config('button_margin_right', 10, 'auth_lenauth');
+    set_config('button_margin_bottom', 10, 'auth_lenauth');
+    set_config('button_margin_left', 10, 'auth_lenauth');
     
     $default_order = [
         1 => 'facebook', 2 => 'google', 3 => 'yahoo', 4 => 'twitter',
         5 => 'vk', 6 => 'yandex', 7 => 'mailru'
     ];
-    set_config('auth_lenauth_order', json_encode($default_order), 'auth_lenauth');
+    set_config('order', json_encode($default_order), 'auth_lenauth');
 }

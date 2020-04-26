@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -33,37 +32,37 @@ $string['pluginname'] = 'LenAuth';
 $string['auth_lenauthdescription'] = 'This plugin for Moodle allows you easily add authentication methods (log-in or automatically sing-up) via OAuth providers of social plugins: Facebook. Google, Yahoo, Twitter, VK, Yandex, Mail.Ru. Several templates of social sign-in buttons and links, own text for buttons, lot of settings, English and Russian languages localization.';
 $string['auth_lenauth_main_settings'] = 'Main settings';
 
-$string['auth_lenauth_user_prefix_key'] = 'User prefix';
-$string['auth_lenauth_user_prefix_desc'] = 'Moodle users nickname prefix, authorised via LenAuth';
-$string['auth_lenauth_default_country_key'] = 'Default country';
-$string['auth_lenauth_locale_en_key'] = 'International logos';
-$string['auth_lenauth_locale_ru_key'] = 'Russian logos';
+$string['user_prefix_key'] = 'User prefix';
+$string['user_prefix_desc'] = 'Moodle users nickname prefix, authorised via LenAuth';
+$string['default_country_key'] = 'Default country';
+$string['locale_en_key'] = 'International logos';
+$string['locale_ru_key'] = 'Russian logos';
 $string['auth_lenauth_static_html'] = 'Static HTML-code';
-$string['auth_lenauth_style_not_defined'] = 'This style is not defined as a plugin style';
-$string['auth_lenauth_locale_desc'] = 'Some services have local and international logos, for example, VK and Yandex';
-$string['auth_lenauth_default_country_desc'] = 'Every user registered via LenAuth will have this country selected by default on register page';
-$string['auth_lenauth_can_reset_password_key'] = 'User can reset/change an internal password (<em>recommended</em>)';
-$string['auth_lenauth_can_reset_password_desc'] = 'If the option enabled, user can change an internal password (<strong>nothing by default</strong>) and authorise via Moodle login form without OAuth plugin';
-$string['auth_lenauth_can_confirm_key'] = 'Moderate new users';
-$string['auth_lenauth_can_confirm_desc'] = 'New users, registered via LenAuth needs to be moderated by Moodle administrator';
-$string['auth_lenauth_retrieve_avatar_key'] = 'Retrieve avatar';
-$string['auth_lenauth_retrieve_avatar_desc'] = 'If option checked and if user is newbie or exists without Moodle-based avatar, it will be uploaded automatically if it exists at social profile';
-$string['auth_lenauth_dev_mode_key'] = 'Development mode';
-$string['auth_lenauth_dev_mode_desc'] = 'If you are developer and you need to check OAuth webservices response, just set this option on.<br /><strong style="color:red">Moodle native DEVELOPER mode is required</strong>';
+$string['style_not_defined'] = 'This style is not defined as a plugin style';
+$string['locale_desc'] = 'Some services have local and international logos, for example, VK and Yandex';
+$string['default_country_desc'] = 'Every user registered via LenAuth will have this country selected by default on register page';
+$string['can_reset_password_key'] = 'User can reset/change an internal password (<em>recommended</em>)';
+$string['can_reset_password_desc'] = 'If the option enabled, user can change an internal password (<strong>nothing by default</strong>) and authorise via Moodle login form without OAuth plugin';
+$string['can_confirm_key'] = 'Moderate new users';
+$string['can_confirm_desc'] = 'New users, registered via LenAuth needs to be moderated by Moodle administrator';
+$string['retrieve_avatar_key'] = 'Retrieve avatar';
+$string['retrieve_avatar_desc'] = 'If option checked and if user is newbie or exists without Moodle-based avatar, it will be uploaded automatically if it exists at social profile';
+$string['dev_mode_key'] = 'Development mode';
+$string['dev_mode_desc'] = 'If you are developer and you need to check OAuth webservices response, just set this option on.<br /><strong style="color:red">Moodle native DEVELOPER mode is required</strong>';
 
-$string['auth_lenauth_empty_code_param'] = 'Someting wrong, code GET-param is empty. Check your App settings in LenAuth';
+$string['empty_code_param'] = 'Someting wrong, code GET-param is empty. Check your App settings in LenAuth';
 
-$string['auth_lenauth_buttons_settings'] = 'Buttons settings';
+$string['buttons_settings'] = 'Buttons settings';
 
-$string['auth_lenauth_buttons_location'] = 'Buttons location';
-$string['auth_lenauth_display_inline'] = 'Inline';
-$string['auth_lenauth_display_block'] = 'Block';
+$string['buttons_location'] = 'Buttons location';
+$string['display_inline'] = 'Inline';
+$string['display_block'] = 'Block';
 
-$string['auth_lenauth_margin_top_key'] = 'Margin top (px)';
-$string['auth_lenauth_margin_right_key'] = 'Margin right (px)';
-$string['auth_lenauth_margin_bottom_key'] = 'Margin bottom (px)';
-$string['auth_lenauth_margin_left_key'] = 'Margin left (px)';
-$string['auth_lenauth_order'] = 'Order';
+$string['margin_top_key'] = 'Margin top (px)';
+$string['margin_right_key'] = 'Margin right (px)';
+$string['margin_bottom_key'] = 'Margin bottom (px)';
+$string['margin_left_key'] = 'Margin left (px)';
+$string['order'] = 'Order';
 
 
 $string['auth_lenauth_div_settings'] = 'Buttons area settings';
@@ -82,8 +81,8 @@ $string['auth_lenauth_access_token_empty'] = 'Could not get access to access tok
  */
 $string['auth_lenauth_facebook_settings'] = 'Facebook Settings';
 $string['auth_lenauth_facebook_dashboard'] = 'Facebook App Dashboard';
-$string['auth_lenauth_facebook_app_id_key'] = 'App ID';
-$string['auth_lenauth_facebook_desc'] = '
+$string['facebook_app_id'] = 'App ID';
+$string['facebook_desc'] = '
     <ol>
         <li>You need to have any social account at <a href="https://www.facebook.com/" target="_blank">Facebook</a></li>
         <li><a href="https://developers.facebook.com/apps/" target="_blank">Register</a> as Facebook developer</li>
@@ -92,8 +91,8 @@ $string['auth_lenauth_facebook_desc'] = '
         <li>As a result, you will be given <strong>App ID</strong> and <strong>App Secret</strong> (to become visible, click <strong>Show</strong>). Copy them here.</li>
         <li><strong>IMPORTANT!</strong> at developers console go to tab <strong>Advanced</strong> and fill the field <strong>Valid OAuth redirect URIs</strong>: fill there <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=facebook</strong></li>
     </ol>';
-$string['auth_lenauth_facebook_app_secret_key'] = 'App secret';
-$string['auth_lenauth_facebook_button_text_default'] = 'Facebook';
+$string['facebook_app_secret'] = 'App secret';
+$string['facebook_button_text_default'] = 'Facebook';
 $string['auth_lenauth_facebook_binding'] = 'Facebook Social ID';
 
 /**
@@ -101,8 +100,8 @@ $string['auth_lenauth_facebook_binding'] = 'Facebook Social ID';
  */
 $string['auth_lenauth_google_settings'] = 'Google Settings';
 $string['auth_lenauth_google_dashboard'] = 'Project settings';
-$string['auth_lenauth_google_client_id_key'] = 'Client ID';
-$string['auth_lenauth_google_desc'] = '
+$string['google_client_id'] = 'Client ID';
+$string['google_desc'] = '
     <ol>
         <li>You need to have any registered account at <a href="https://accounts.google.com/SignUp" target="_blank">Google</a></li>
         <li><a href="https://console.developers.google.com/" target="_blank">Create a Project</a> (<strong>Create Project</strong> button) at Google developers console</li>
@@ -111,10 +110,10 @@ $string['auth_lenauth_google_desc'] = '
         <li>At the Project in section <strong>APIs &amp; auth &raquo; Credentials</strong> copy here <strong>CLIENT ID</strong> and <strong>CLIENT SECRET</strong></li>
         <li>Parameter <strong>Project ID</strong> is not required, you can copy it from menu section <strong>Overview</strong> at console at the top of page</li>
     </ol>';
-$string['auth_lenauth_google_client_secret_key'] = 'Client secret';
-$string['auth_lenauth_google_project_id_key'] = 'Project ID';
-$string['auth_lenauth_google_button_text_default'] = 'Google';
-$string['auth_lenauth_google_binding'] = 'Google Social ID';
+$string['google_client_secret'] = 'Client secret';
+$string['google_project_id'] = 'Project ID';
+$string['google_button_text_default'] = 'Google';
+$string['google_binding'] = 'Google Social ID';
 
 /**
  * Yahoo English locale
@@ -122,11 +121,11 @@ $string['auth_lenauth_google_binding'] = 'Google Social ID';
 $string['auth_lenauth_yahoo_settings'] = 'Yahoo Settings';
 $string['auth_lenauth_yahoo_oauth_1_note'] = 'if you already have Yahoo OAuth account';
 $string['auth_lenauth_yahoo_oauth_2_note'] = 'recommended for new apps';
-$string['auth_lenauth_yahoo_application_id'] = 'Application ID';
-$string['auth_lenauth_yahoo_consumer_key'] = 'Consumer Key';
-$string['auth_lenauth_yahoo_consumer_secret'] = 'Consumer Secret';
-$string['auth_lenauth_yahoo_button_text_default'] = 'Yahoo';
-$string['auth_lenauth_yahoo_desc'] = '
+$string['yahoo_application_id'] = 'Application ID';
+$string['yahoo_consumer_key'] = 'Consumer Key';
+$string['yahoo_consumer_secret'] = 'Consumer Secret';
+$string['yahoo_button_text_default'] = 'Yahoo';
+$string['yahoo_desc'] = '
     <ol>
         <li>You need to have any account at <a href="https://edit.yahoo.com/registration" target="_blank">Yahoo</a></li>
         <li>
@@ -142,7 +141,7 @@ $string['auth_lenauth_yahoo_desc'] = '
         <li>Copy here: <strong>Consumer Key</strong>, <strong>Consumer Secret</strong> from Application settings</li>
         <li><em>Optionally</em>: copy here <strong>Application ID</strong>, at top of application settings page</li>
     </ol>';
-$string['auth_lenauth_yahoo_binding'] = 'Yahoo Social ID';
+$string['yahoo_binding'] = 'Yahoo Social ID';
 
 $string['auth_lenauth_front_error'] = 'We can not authenticate you due OAuth authorization';
 $string['auth_lenauth_error_code'] = 'Error code';
@@ -152,11 +151,11 @@ $string['auth_lenauth_error_code'] = 'Error code';
  */
 $string['auth_lenauth_twitter_settings'] = 'Twitter Settings';
 $string['auth_lenauth_twitter_dashboard'] = 'Application dashboard';
-$string['auth_lenauth_twitter_application_id'] = 'Application ID';
-$string['auth_lenauth_twitter_consumer_key'] = 'Consumer Key';
-$string['auth_lenauth_twitter_consumer_secret'] = 'Consumer Secret';
-$string['auth_lenauth_twitter_button_text_default'] = 'Twitter';
-$string['auth_lenauth_twitter_desc'] = '
+$string['twitter_application_id'] = 'Application ID';
+$string['twitter_consumer_key'] = 'Consumer Key';
+$string['twitter_consumer_secret'] = 'Consumer Secret';
+$string['twitter_button_text_default'] = 'Twitter';
+$string['twitter_desc'] = '
     <ol>
         <li>You need to have any social account at <a href="https://twitter.com/" target="_blank">Twitter</a></li>
         <li>
@@ -178,10 +177,10 @@ $string['auth_lenauth_twitter_binding'] = 'Twitter Social ID';
  */
 $string['auth_lenauth_vk_settings'] = 'VK.com Settings';
 $string['auth_lenauth_vk_dashboard'] = 'Application settings';
-$string['auth_lenauth_vk_app_id_key'] = 'App ID';
-$string['auth_lenauth_vk_app_secret_key'] = 'App secret';
-$string['auth_lenauth_vk_button_text_default'] = 'VK';
-$string['auth_lenauth_vk_desc'] = '
+$string['vk_app_id'] = 'App ID';
+$string['vk_app_secret'] = 'App secret';
+$string['vk_button_text_default'] = 'VK';
+$string['vk_desc'] = '
     <ol>
         <li>You need to have any account at social network <a href="http://vk.com/" target="_blank">VK</a></li>
         <li>
@@ -201,8 +200,8 @@ $string['auth_lenauth_vk_binding'] = 'VK Social ID';
  */
 $string['auth_lenauth_yandex_settings'] = 'Yandex Settings';
 $string['auth_lenauth_yandex_dashboard'] = 'Yandex App Dashboard';
-$string['auth_lenauth_yandex_app_id'] = 'Site ID';
-$string['auth_lenauth_yandex_desc'] = '
+$string['yandex_app_id'] = 'Site ID';
+$string['yandex_desc'] = '
     <ol>
         <li>You need to have any account at <a href="https://passport.yandex.com/registration/" target="_blank">Yandex</a></li>
         <li><a href="https://oauth.yandex.com/client/new" target="_blank">Register</a> your OAuth client</li>
@@ -215,8 +214,8 @@ $string['auth_lenauth_yandex_desc'] = '
         </li>
         <li>Copy here 2 parameters: <strong>ID</strong>, <strong>Password</strong></li>
     </ol>';
-$string['auth_lenauth_yandex_app_password_key'] = 'App password';
-$string['auth_lenauth_yandex_button_text_default'] = 'Yandex';
+$string['yandex_app_password'] = 'App password';
+$string['yandex_button_text_default'] = 'Yandex';
 $string['auth_lenauth_yandex_binding'] = 'Yandex Social ID';
 
 /**
@@ -224,11 +223,11 @@ $string['auth_lenauth_yandex_binding'] = 'Yandex Social ID';
  */
 $string['auth_lenauth_mailru_settings'] = 'Mail.ru Settings';
 $string['auth_lenauth_mailru_dashboard'] = 'Mail.ru site settings';
-$string['auth_lenauth_mailru_site_id'] = 'Site ID';
-$string['auth_lenauth_mailru_client_private_key'] = 'Private key';
-$string['auth_lenauth_mailru_client_secret_key'] = 'Secret key';
-$string['auth_lenauth_mailru_button_text_default'] = 'Mail.ru';
-$string['auth_lenauth_mailru_desc'] = '
+$string['mailru_site_id'] = 'Site ID';
+$string['mailru_client_private'] = 'Private key';
+$string['mailru_client_secret'] = 'Secret key';
+$string['mailru_button_text_default'] = 'Mail.ru';
+$string['mailru_desc'] = '
     <ol>
         <li>You need to have any account at <a href="https://e.mail.ru/signup?from=main_noc" target="_blank">Mail.ru</a></li>
         <li><a href="http://api.mail.ru/sites/my/add" target="_blank">Register</a> your website. <em>Upload receiver.html is not required, it is desirable.</em></li>
