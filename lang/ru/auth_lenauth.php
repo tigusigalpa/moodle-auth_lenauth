@@ -26,7 +26,7 @@ $string['pluginname'] = 'LenAuth';
 $string['auth_lenauthdescription'] = 'Данный модуль авторизации позволяет пользователям авторизовываться в Вашем Moodle через OAuth-протокол популярных социальных сетей и поисковиков: Фейсбук, Google, Yahoo, Twitter, Вконтакте, Яндекс, Мейл.ру. При первой авторизации пользователя, он автоматически регистрируется в системе, а при дальнейших попытках входа, система автоматически определяет зарегистрированного пользователя.';
 $string['auth_lenauth_main_settings'] = 'Общие настройки';
 $string['auth_lenauth_enabled_key'] = 'Включено';
-$string['auth_lenauth_buttontext_key'] = 'Текст кнопки';
+$string['button_text'] = 'Текст кнопки';
 $string['auth_lenauth_button_div_width'] = 'Ширина (<em>0 = авто</em>)';
 $string['auth_lenauth_binding_key'] = 'Привязка';
 $string['auth_lenauth_output_settings'] = 'Настройки визуализации';
@@ -79,37 +79,63 @@ $string['auth_lenauth_access_token_empty'] = 'Невозможно получи�
 /**
  * Facebook Russian locale
  */
-$string['auth_lenauth_facebook_settings'] = 'Настройки Facebook';
-$string['auth_lenauth_facebook_dashboard'] = 'Панель управления приложением';
-$string['facebook_app_id'] = 'ID приложения';
 $string['facebook_desc'] = '
     <ol>
         <li>У Вас должен быть зарегистрирован любой аккаунт на <a href="https://www.facebook.com/" target="_blank">Facebook</a></li>
         <li><a href="https://developers.facebook.com/apps/" target="_blank">Зарегистрируйтесь</a> как разработчик Facebook. <em>Процедура ни к чему не обязывает.</em></li>
-        <li>В консоли разработчика необходимо создать приложение (кнопка <strong>+ Add a New App</strong>) с категорией <strong>WWW Веб-сайт</strong> и произвольным названием</li>
-        <li>Заполните в процессе настройки приложения <strong>Site URL</strong> как <strong>{$a->wwwroot}</strong>. Далее нажмите ссылку <strong><a href="https://developers.facebook.com/apps/" target="_blank">Skip to Developer Dashboard</a></strong></li>
-        <li>В результате Вам будут выданы <strong>App ID</strong> и <strong>App Secret</strong> (чтобы он стал виден нажмите <strong>Show</strong>). Скопируйте их сюда.</li>
-        <li><strong>ВАЖНО!</strong> в консоли приложения зайдите во вкладку <strong>Advanced</strong> и заполните поле <strong>Valid OAuth redirect URIs</strong>: впишите там <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=facebook</strong></li>
+        <li>В <a href="https://developers.facebook.com/apps/" target="_blank">консоли разработчика</a> необходимо создать новый ID приложения (кнопка <strong>Добавить новое приложение</strong>).
+            <ol>
+                <li><strong>Отображаемое название</strong>: Ваше название</li>
+                <li><strong>Эл. адрес для связи</strong>: Ваш адрес электронной почты</li>
+                <li>Нажмите кнопку <strong>Создайте ID приложения</strong> и, по необходимости, выполните проверку безопасности</li>
+            </ol>
+        </li>
+        <li>Добавьте продукт <strong>Вход через Facebook</strong>
+            <ol>
+                <li>нажмите кнопку &laquo;<strong>Настроить</strong>&raquo;</li>
+                <li>выберите платформу приложения &laquo;<strong>WWW (Веб)</strong>&raquo;
+                    <ol>
+                        <li>Ваш сайт
+                            <ul>
+                                <li>URL сайта: <strong style="color:red">{$a->wwwroot}</strong>, &laquo;<strong>Save</strong>&raquo;, &laquo;<strong>Продолжить</strong>&raquo;</li>
+                            </ul>
+                        </li>
+                        <li><strong>Настройка Facebook SDK для Javascript</strong> &mdash; &laquo;<strong>Далее</strong>&raquo;</li>
+                        <li><strong>Проверка статуса входа</strong> &mdash; &laquo;<strong>Далее</strong>&raquo;</li>
+                        <li><strong>Добавление кнопки &laquo;Вход через Facebook&raquo;</strong> &mdash; &laquo;<strong>Далее</strong>&raquo;</li>
+                    </ol>
+                </li>
+            </ol>
+        </li>
+        <li>В <a href="https://developers.facebook.com/apps/" target="_blank">консоли разработчика Facebook</a> в данном проекте в подкатегории &laquo;<strong>Настройки</strong>&raquo; &rarr; &laquo;<strong>Основное</strong>&raquo;:
+            <ol>Заполните следующие значения:
+                <li>Домены приложений: <strong style="color:red">{$a->wwwroot}</strong></li>
+            </ol>
+            <ol>Скопируйте и сохраните сюда следующие значения:
+                <li><strong>Идентификатор приложения</strong></li>
+                <li><strong>Секрет приложения</strong></li>
+            </ol>
+        </li>
+        <li>В подкатегории &laquo;<strong>Товары</strong>&raquo;  &rarr; &laquo;<strong>Вход через Facebook</strong>&raquo; &rarr; &laquo;<strong>Настройки</strong>&raquo; в разделе &laquo;<strong>Клиентские настройки OAuth</strong>&raquo; в поле &laquo;<strong>Действительные URI перенаправления для OAuth</strong>&raquo; вставьте значение <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=facebook</strong></li>
     </ol>';
-$string['facebook_app_secret'] = 'Секретный ключ приложения (App Secret)';
+$string['facebook_app_id'] = 'Идентификатор приложения';
+$string['facebook_app_secret'] = 'Секрет приложения';
 $string['facebook_button_text_default'] = 'Фейсбук';
 $string['auth_lenauth_facebook_binding'] = 'ID Фейсбука';
 
 /**
  * Google Russian locale
  */
-$string['auth_lenauth_google_settings'] = 'Настройки Google';
-$string['auth_lenauth_google_dashboard'] = 'Настройки приложения';
-$string['google_client_id'] = 'CLIENT ID';
 $string['google_desc'] = '
     <ol>
         <li>У Вас должен быть зарегистрирован любой аккаунт в <a href="https://accounts.google.com/SignUp" target="_blank">Google</a></li>
         <li><a href="https://console.developers.google.com/" target="_blank">Создайте приложение</a> (<strong>Create Project</strong>) в консоли разработчиков Google</li>
         <li>В консоли разработчика в разделе <strong>APIs &amp; auth &raquo; Credentials</strong> создайте <strong>OAuth Client ID</strong></li>
-        <li><strong>ВНИМАНИЕ!</strong> Приложение Google позволяет вводить несколько <strong>Redirect URI</strong>, Вам же необходимо ввести только один, а именно &mdash; <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=google</strong></li>
+        <li><strong>ВНИМАНИЕ!</strong> Приложение Google позволяет вводить несколько <strong>Redirect URI</strong>, Вам же необходимо ввести только один, а именно &mdash; <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=google</strong></li>
         <li>В приложении в разделе <strong>APIs &amp; auth &raquo; Credentials</strong> скопируйте сюда <strong>CLIENT ID</strong> и <strong>CLIENT SECRET</strong></li>
         <li>Параметр <strong>Project ID</strong> не обязателен, его Вы можете скопировать из пункта меню <strong>Overview</strong> в консоли сверху страницы</li>
     </ol>';
+$string['google_client_id'] = 'CLIENT ID';
 $string['google_client_secret'] = 'CLIENT SECRET';
 $string['google_project_id'] = 'Project ID';
 $string['google_button_text_default'] = 'Google';
@@ -118,13 +144,6 @@ $string['google_binding'] = 'ID Гугл';
 /**
  * Yahoo Russian locale
  */
-$string['auth_lenauth_yahoo_settings'] = 'Настройки Yahoo';
-$string['auth_lenauth_yahoo_oauth_1_note'] = 'если у Вас уже есть приложение Yahoo';
-$string['auth_lenauth_yahoo_oauth_2_note'] = 'рекомендуется для создания новых приложений';
-$string['yahoo_application_id'] = 'Application ID';
-$string['yahoo_consumer_key'] = 'Consumer Key';
-$string['yahoo_consumer_secret'] = 'Consumer Secret';
-$string['yahoo_button_text_default'] = 'Yahoo';
 $string['yahoo_desc'] = '
     <ol>
         <li>У Вас должен быть зарегистрирован любой аккаунт в <a href="https://edit.yahoo.com/registration" target="_blank">Yahoo</a></li>
@@ -141,13 +160,18 @@ $string['yahoo_desc'] = '
         <li>Из настроек приложения скопируйте сюда: <strong>Consumer Key</strong>, <strong>Consumer Secret</strong></li>
         <li><em>Необязательно</em>: скопируйте сюда <strong>Application ID</strong>, сверху страницы приложения</li>
     </ol>';
+$string['auth_lenauth_yahoo_settings'] = 'Настройки Yahoo';
+$string['auth_lenauth_yahoo_oauth_1_note'] = 'если у Вас уже есть приложение Yahoo';
+$string['auth_lenauth_yahoo_oauth_2_note'] = 'рекомендуется для создания новых приложений';
+$string['yahoo_application_id'] = 'Application ID';
+$string['yahoo_consumer_key'] = 'Consumer Key';
+$string['yahoo_consumer_secret'] = 'Consumer Secret';
+$string['yahoo_button_text_default'] = 'Yahoo';
 $string['yahoo_binding'] = 'ID Yahoo';
 
 /**
  * Twitter Russian locale
  */
-$string['auth_lenauth_twitter_settings'] = 'Настройки Twitter';
-$string['auth_lenauth_twitter_dashboard'] = 'Настройки приложения';
 $string['twitter_application_id'] = 'ID приложения';
 $string['twitter_consumer_key'] = 'Consumer Key';
 $string['twitter_consumer_secret'] = 'Consumer Secret';
@@ -160,7 +184,7 @@ $string['twitter_desc'] = '
                 <li>Name: <strong>Назовите Ваше приложение</strong></li>
                 <li>Description: <strong>Опишите Ваше приложение</strong></li>
                 <li>Website: <strong>{$a->wwwroot}</strong></li>
-                <li>Callback URL: <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=twitter</strong></li>
+                <li>Callback URL: <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=twitter</strong></li>
                 <li>Developer Rules of the Road: отметьте галочку <strong>Yes, I agree</strong></li>
             </ul>
         </li>
@@ -205,7 +229,7 @@ $string['yandex_desc'] = '
             <ul><strong>Настройте приложение</strong>:
                 <li>Поля <strong>название</strong>, <strong>описание</strong>, </strong>ссылка на иконку</strong> и <strong>ссылка на приложение</strong> приложения на Ваше усмотрение</li>
                 <li>В поле <strong>Права</strong> выбираем <strong>Яндекс.Логин</strong> и выставляем все 2 опции (email, ФИО)</li>
-                <li>В поле <strong>Callback URI</strong> ставим ссылку <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=yandex' . '</strong></li>
+                <li>В поле <strong>Callback URI</strong> ставим ссылку <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=yandex' . '</strong></li>
             </ul>
         </li>
         <li>Скопируйте сюда 2 параметра: <strong>ID</strong>, <strong>Пароль</strong></li>

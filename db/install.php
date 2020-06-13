@@ -23,7 +23,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
+
+require_once __DIR__ . '/../../../auth/lenauth/autoload.php';
 
 function xmldb_auth_lenauth_install()
 {

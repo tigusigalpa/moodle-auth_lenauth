@@ -22,11 +22,12 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
 require_once __DIR__ . '/../../auth/lenauth/autoload.php';
 
 if ($ADMIN->fulltree) {
+    $stringManager = get_string_manager();
     $settings->add(new \admin_setting_heading(
         'auth_lenauth/general',
         get_string('general'),
@@ -47,7 +48,7 @@ if ($ADMIN->fulltree) {
         get_string('can_reset_password_desc', 'auth_lenauth'),
         0
     ));
-//registerauth
+
     $settings->add(new \admin_setting_configcheckbox(
         'auth_lenauth/can_confirm',
         get_string('can_confirm_key', 'auth_lenauth'),
@@ -68,13 +69,28 @@ if ($ADMIN->fulltree) {
                 'wwwroot' => $CFG->wwwroot
             ])
         ));
-        foreach ($socialData['fields'] as $fieldName => $fieldType) {
+        $settings->add(new \admin_setting_configcheckbox(
+            'auth_lenauth/' . $socialName . '_enabled',
+            get_string('enable'),
+            '',
+            0
+        ));
+        $settings->add(new \admin_setting_configtext(
+            'auth_lenauth/' . $socialName . '_button_text',
+            get_string('button_text', 'auth_lenauth'),
+            '',
+            get_string($socialName . '_button_text_default', 'auth_lenauth')
+        ));
+        foreach ($socialData['fields'] as $fieldName => $fieldData) {
             $key = $socialName . '_' . $fieldName;
-            switch ($fieldType) {
+            $title = isset($fieldData['title']) ? $fieldData['title'] :
+                ($stringManager->string_exists($key, 'auth_lenauth') ? get_string($key, 'auth_lenauth')
+                    : ($stringManager->string_exists($fieldName, 'core') ? get_string($fieldName) : ''));
+            switch ($fieldData['type']) {
                 case 'text':
                     $settings->add(new \admin_setting_configtext(
                         'auth_lenauth/' . $key,
-                        get_string($key, 'auth_lenauth'),
+                        $title,
                         '',
                         '',
                         PARAM_ALPHANUMEXT
@@ -83,10 +99,22 @@ if ($ADMIN->fulltree) {
                 case 'password':
                     $settings->add(new \admin_setting_configpasswordunmask(
                         'auth_lenauth/' . $key,
-                        get_string($key, 'auth_lenauth'),
+                        $title,
                         '',
                         ''
                     ));
+                    break;
+                case 'select':
+                    if (isset($fieldData['options']) && !empty($fieldData['options'])
+                        && is_array($fieldData['options'])) {
+                        $settings->add(new \admin_setting_configselect(
+                            'auth_lenauth/' . $key,
+                            $title,
+                            '',
+                            '',
+                            $fieldData['options']
+                        ));
+                    }
                     break;
             }
         }

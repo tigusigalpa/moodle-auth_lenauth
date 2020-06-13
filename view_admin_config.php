@@ -212,7 +212,7 @@ global $CFG;
         </td>
     </tr>
     <tr>
-        <td align="right" width="15%"><label for="facebook_button_text"><?php echo get_string('auth_lenauth_buttontext_key', 'auth_lenauth'); ?></label></td>
+        <td align="right" width="15%"><label for="facebook_button_text"><?php echo get_string('button_text', 'auth_lenauth'); ?></label></td>
         <td width="35%"><?php echo html_writer::empty_tag('input',
                                         array('type' => 'text',
                                             'id'      => 'facebook_button_text',
@@ -334,7 +334,7 @@ global $CFG;
         </td>
     </tr>
     <tr>
-        <td align="right" width="15%"><label for="google_button_text"><?php echo get_string('auth_lenauth_buttontext_key', 'auth_lenauth'); ?></label></td>
+        <td align="right" width="15%"><label for="google_button_text"><?php echo get_string('button_text', 'auth_lenauth'); ?></label></td>
         <td width="35%"><?php echo html_writer::empty_tag('input',
                                         array('type' => 'text',
                                             'id'      => 'google_button_text',
@@ -483,7 +483,7 @@ global $CFG;
         </td>
     </tr>
     <tr>
-        <td align="right" width="15%"><label for="yahoo_button_text"><?php echo get_string('auth_lenauth_buttontext_key', 'auth_lenauth'); ?></label></td>
+        <td align="right" width="15%"><label for="yahoo_button_text"><?php echo get_string('button_text', 'auth_lenauth'); ?></label></td>
         <td width="35%"><?php echo html_writer::empty_tag('input',
                                         array('type' => 'text',
                                             'id'      => 'yahoo_button_text',
@@ -619,7 +619,7 @@ global $CFG;
         </td>
     </tr>
     <tr>
-        <td align="right" width="15%"><label for="twitter_button_text"><?php echo get_string('auth_lenauth_buttontext_key', 'auth_lenauth'); ?></label></td>
+        <td align="right" width="15%"><label for="twitter_button_text"><?php echo get_string('button_text', 'auth_lenauth'); ?></label></td>
         <td width="35%"><?php echo html_writer::empty_tag('input',
                                         array('type' => 'text',
                                             'id'      => 'twitter_button_text',
@@ -727,7 +727,7 @@ global $CFG;
             </td>
     </tr>
     <tr>
-        <td align="right" width="15%"><label for="vk_button_text"><?php echo get_string('auth_lenauth_buttontext_key', 'auth_lenauth'); ?></label></td>
+        <td align="right" width="15%"><label for="vk_button_text"><?php echo get_string('button_text', 'auth_lenauth'); ?></label></td>
         <td width="35%"><?php echo html_writer::empty_tag('input',
                                         array('type' => 'text',
                                             'id'      => 'vk_button_text',
@@ -837,7 +837,7 @@ global $CFG;
         </td>
     </tr>
     <tr>
-        <td align="right" width="15%"><label for="yandex_button_text"><?php echo get_string('auth_lenauth_buttontext_key', 'auth_lenauth'); ?></label></td>
+        <td align="right" width="15%"><label for="yandex_button_text"><?php echo get_string('button_text', 'auth_lenauth'); ?></label></td>
         <td width="35%"><?php echo html_writer::empty_tag('input',
                                         array('type' => 'text',
                                             'id'      => 'yandex_button_text',
@@ -961,7 +961,7 @@ global $CFG;
         </td>
     </tr>
     <tr>
-        <td align="right" width="15%"><label for="mailru_button_text"><?php echo get_string('auth_lenauth_buttontext_key', 'auth_lenauth'); ?></label></td>
+        <td align="right" width="15%"><label for="mailru_button_text"><?php echo get_string('button_text', 'auth_lenauth'); ?></label></td>
         <td width="35%"><?php echo html_writer::empty_tag('input',
                                         array('type' => 'text',
                                             'id'      => 'mailru_button_text',

@@ -24,10 +24,9 @@
 
 namespace Tigusigalpa\Auth_LenAuth\Moodle\Admin\Setting;
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once $CFG->libdir . '/adminlib.php';
+require_once __DIR__ . '/../../../../../../lib/adminlib.php';
 
 /**
  * Notification panel

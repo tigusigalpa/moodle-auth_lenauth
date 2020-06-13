@@ -26,7 +26,7 @@
  * @author  Igor Sazonov <sovletig@gmail.com>
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
 require_once __DIR__ . '/../../auth/lenauth/autoload.php';
 require_once __DIR__ . '/../../lib/authlib.php';

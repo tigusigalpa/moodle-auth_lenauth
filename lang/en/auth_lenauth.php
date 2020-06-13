@@ -23,7 +23,7 @@
  */
 
 $string['auth_lenauth_enabled_key'] = 'Enabled';
-$string['auth_lenauth_buttontext_key'] = 'Button text';
+$string['button_text'] = 'Button text';
 $string['auth_lenauth_button_div_width'] = 'Width (<em>0 = auto</em>)';
 $string['auth_lenauth_binding_key'] = 'Binding';
 $string['auth_lenauth_output_settings'] = 'Output settings';
@@ -89,7 +89,7 @@ $string['facebook_desc'] = '
         <li>At developers console you need to create an Application (<strong>+ Add a New App</strong> button) with category <strong>WWW Web-site</strong> and arbitrary title</li>
         <li>Fill in the application settings <strong>Site URL</strong> as <strong>{$a->wwwroot}</strong>. Next, click on the link <strong><a href="https://developers.facebook.com/apps/" target="_blank">Skip to Developer Dashboard</a></strong></li>
         <li>As a result, you will be given <strong>App ID</strong> and <strong>App Secret</strong> (to become visible, click <strong>Show</strong>). Copy them here.</li>
-        <li><strong>IMPORTANT!</strong> at developers console go to tab <strong>Advanced</strong> and fill the field <strong>Valid OAuth redirect URIs</strong>: fill there <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=facebook</strong></li>
+        <li><strong>IMPORTANT!</strong> at developers console go to tab <strong>Advanced</strong> and fill the field <strong>Valid OAuth redirect URIs</strong>: fill there <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=facebook</strong></li>
     </ol>';
 $string['facebook_app_secret'] = 'App secret';
 $string['facebook_button_text_default'] = 'Facebook';
@@ -106,7 +106,7 @@ $string['google_desc'] = '
         <li>You need to have any registered account at <a href="https://accounts.google.com/SignUp" target="_blank">Google</a></li>
         <li><a href="https://console.developers.google.com/" target="_blank">Create a Project</a> (<strong>Create Project</strong> button) at Google developers console</li>
         <li>At developers console in section <strong>APIs &amp; auth &raquo; Credentials</strong> create <strong>OAuth Client ID</strong></li>
-        <li><strong>ATTENTION!</strong> Google Project allows to enter several <strong>Redirect URI</strong>, but you need to fill just one, and this is &mdash; <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=google</strong></li>
+        <li><strong>ATTENTION!</strong> Google Project allows to enter several <strong>Redirect URI</strong>, but you need to fill just one, and this is &mdash; <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=google</strong></li>
         <li>At the Project in section <strong>APIs &amp; auth &raquo; Credentials</strong> copy here <strong>CLIENT ID</strong> and <strong>CLIENT SECRET</strong></li>
         <li>Parameter <strong>Project ID</strong> is not required, you can copy it from menu section <strong>Overview</strong> at console at the top of page</li>
     </ol>';
@@ -163,7 +163,7 @@ $string['twitter_desc'] = '
                 <li>Name: <strong>Title of your application</strong></li>
                 <li>Description: <strong>Describe your application</strong></li>
                 <li>Website: <strong>{$a->wwwroot}</strong></li>
-                <li>Callback URL: <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=twitter</strong></li>
+                <li>Callback URL: <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=twitter</strong></li>
                 <li>Developer Rules of the Road: check the option <strong>Yes, I agree</strong></li>
             </ul>
         </li>
@@ -209,7 +209,7 @@ $string['yandex_desc'] = '
             <ul><strong>Configure the client</strong>:
                 <li>Fields <strong>Title</strong>, <strong>Description</strong>, </strong>Link to icon</strong> и <strong>Link to client site</strong> of client at your discretion</li>
                 <li>The field <strong>Scopes</strong> need to be <strong>Yandex.Username</strong> and check 2 options (Email address; User name, surname and gender)</li>
-                <li>The field <strong>Callback URL</strong> need to be as <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?auth_service=yandex' . '</strong></li>
+                <li>The field <strong>Callback URL</strong> need to be as <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=yandex' . '</strong></li>
             </ul>
         </li>
         <li>Copy here 2 parameters: <strong>ID</strong>, <strong>Password</strong></li>

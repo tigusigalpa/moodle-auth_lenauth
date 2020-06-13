@@ -23,10 +23,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2016071500;
-$plugin->requires  = 2013111805;   // Requires Moodle 2.6.5 or later
+$plugin->requires  = 2013111805;
 $plugin->release   = '1.2.5 (Build: 2016071500)';
-$plugin->maturity  = MATURITY_BETA;             // this version's maturity level
+$plugin->maturity  = MATURITY_STABLE;
 $plugin->component = 'auth_lenauth';
