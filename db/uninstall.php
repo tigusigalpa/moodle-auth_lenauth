@@ -23,15 +23,23 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once __DIR__ . '/../../../auth/lenauth/autoload.php';
+
+use \Tigusigalpa\Auth_LenAuth\Moodle\Auth\LenAuth\LenAuth;
+
 function xmldb_auth_lenauth_uninstall()
 {
     global $DB;
     $DB->delete_records('config_plugins', ['plugin' => 'auth_lenauth']);
-    foreach (['facebook', 'google', 'yahoo', 'twitter', 'vk', 'yandex', 'mailru'] as $social) {
-        $infoField = $DB->get_record('user_info_field', ['shortname' => 'auth_lenauth_' . $social . '_social_id']);
-        if (!empty($infoField) && !empty($infoField->id)) {
-            $DB->delete_records('user_info_data', ['fieldid' => $infoField->id]);
+    if ($userInfoFieldsCategory = LenAuth::getUserInfoFieldsCategory()) {
+        $DB->delete_records('user_info_category', ['id' => $userInfoFieldsCategory->id]);
+        foreach (array_keys(LenAuth::SETTINGS) as $social) {
+            if ($infoField = $DB->get_record('user_info_field', ['shortname' => $social . '_social_id'])) {
+                $DB->delete_records('user_info_data', ['fieldid' => $infoField->id]);
+            }
         }
-        $DB->delete_records('user_info_field', ['shortname' => 'auth_lenauth_' . $social . '_social_id']);
     }
+    return true;
 }

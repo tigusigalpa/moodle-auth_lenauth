@@ -370,6 +370,18 @@ class LenAuth extends \auth_plugin_base
         return join('&', $query);
     }
 
+    public static function getUserInfoFieldsCategory(string $key = '')
+    {
+        global $DB;
+        if ($row = $DB->get_record('user_info_category', ['name' => get_string('pluginname', 'auth_lenauth')])) {
+            if ($key && isset($row->$key)) {
+                return $row->$key;
+            }
+            return $row;
+        }
+        return null;
+    }
+
     /**
      * The function gets additional field ID of specified webservice shortname from user_info_field table
      *
@@ -435,6 +447,19 @@ class LenAuth extends \auth_plugin_base
             );
         }
         return $ret;
+    }
+
+    public static function getUserInfoCategorySortOrder() : int
+    {
+        global $DB;
+        if ($categories = $DB->get_records('user_info_category')) {
+            $sortOrders = [];
+            foreach ($categories as $category) {
+                $sortOrders[$category->sortorder] = $category->sortorder;
+            }
+            return max($sortOrders) + 1;
+        }
+        return 1;
     }
 
     /**
