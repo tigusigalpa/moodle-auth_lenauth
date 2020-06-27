@@ -93,7 +93,8 @@ if ($ADMIN->fulltree) {
                         $title,
                         '',
                         '',
-                        PARAM_ALPHANUMEXT
+                        (isset($fieldData['paramtype']) && !empty($fieldData['paramtype']))
+                            ? $fieldData['paramtype'] : PARAM_ALPHANUMEXT
                     ));
                     break;
                 case 'password':

@@ -47,11 +47,11 @@ class provider implements
     public static function get_metadata(collection $collection) : collection
     {
         return $collection->add_database_table('user_info_data', [
-            'userid' => 'privacy:metadata:profilefield_datetime:userid',
-            'fieldid' => 'privacy:metadata:profilefield_datetime:fieldid',
-            'data' => 'privacy:metadata:profilefield_datetime:data',
-            'dataformat' => 'privacy:metadata:profilefield_datetime:dataformat'
-        ], 'privacy:metadata:profilefield_datetime:tableexplanation');
+            'userid' => 'privacy:metadata:auth_lenauth:userid',
+            'fieldid' => 'privacy:metadata:auth_lenauth:fieldid',
+            'data' => 'privacy:metadata:auth_lenauth:data',
+            'dataformat' => 'privacy:metadata:auth_lenauth:dataformat'
+        ], 'privacy:metadata:auth_lenauth:tableexplanation');
     }
 
     /**
@@ -94,11 +94,10 @@ class provider implements
         }
 
         $sql = "SELECT uda.userid
-                  FROM {user_info_data} uind
-                  JOIN {user_info_field} uif ON uind.fieldid = uif.id
+                  FROM {user_info_data} uid
+                  JOIN {user_info_field} uif ON uid.fieldid = uif.id
                   JOIN {user_info_category} uic ON uif.categoryid = uic.id
-                 WHERE uind.userid = :userid
-                       AND uic.id = :categoryid";
+                 WHERE uid.userid = :userid AND uic.id = :categoryid";
 
         $params = [
             'userid' => $context->instanceid,
@@ -185,8 +184,8 @@ class provider implements
     {
         global $DB;
         $params = [
-            'userid' => $userid,
-            'categoryid' => LenAuth::getUserInfoFieldsCategory('id')
+            'categoryid' => LenAuth::getUserInfoFieldsCategory('id'),
+            'userid' => $userid
         ];
 
         $DB->delete_records_select('user_info_data', "fieldid IN (
@@ -207,8 +206,7 @@ class provider implements
                   FROM {user_info_data} uda
                   JOIN {user_info_field} uif ON uda.fieldid = uif.id
                   JOIN {user_info_category} uic ON uif.categoryid = uic.id
-                 WHERE uda.userid = :userid
-                       AND uic.id = :categoryid";
+                 WHERE uda.userid = :userid AND uic.id = :categoryid";
         $params = [
             'userid' => $userid,
             'categoryid' => LenAuth::getUserInfoFieldsCategory('id')

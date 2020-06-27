@@ -22,14 +22,22 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'LenAuth';
-$string['auth_lenauthdescription'] = 'Данный модуль авторизации позволяет пользователям авторизовываться в Вашем Moodle через OAuth-протокол популярных социальных сетей и поисковиков: Фейсбук, Google, Yahoo, Twitter, Вконтакте, Яндекс, Мейл.ру. При первой авторизации пользователя, он автоматически регистрируется в системе, а при дальнейших попытках входа, система автоматически определяет зарегистрированного пользователя.';
-$string['auth_lenauth_main_settings'] = 'Общие настройки';
 $string['auth_lenauth_enabled_key'] = 'Включено';
 $string['button_text'] = 'Текст кнопки';
 $string['auth_lenauth_button_div_width'] = 'Ширина (<em>0 = авто</em>)';
 $string['auth_lenauth_binding_key'] = 'Привязка';
 $string['auth_lenauth_output_settings'] = 'Настройки визуализации';
+
+$string['privacy:metadata:auth_lenauth:userid'] = 'Идентификатор пользователя, данные которого хранятся в поле профиля пользователя LenAuth';
+$string['privacy:metadata:auth_lenauth:fieldid'] = 'Идентификатор поля профиля';
+$string['privacy:metadata:auth_lenauth:data'] = 'Поле социального ID в данных профиля пользователя плагина LenAuth';
+$string['privacy:metadata:auth_lenauth:dataformat'] = 'Формат поля социального ID в данных профиля пользователя LenAuth';
+$string['privacy:metadata:auth_lenauth:tableexplanation'] = 'Дополнительные данные профиля';
+
+$string['pluginname'] = 'LenAuth';
+$string['auth_lenauthdescription'] = 'Данный модуль авторизации позволяет пользователям авторизовываться в Вашем Moodle через OAuth-протокол популярных социальных сетей и поисковиков: Фейсбук, Google, Yahoo, Twitter, Вконтакте, Яндекс, Мейл.ру. При первой авторизации пользователя, он автоматически регистрируется в системе, а при дальнейших попытках входа, система автоматически определяет зарегистрированного пользователя.';
+$string['auth_lenauth_main_settings'] = 'Общие настройки';
+
 $string['user_prefix_key'] = 'Префикс';
 $string['user_prefix_desc'] = 'Префикс у никнейма пользователя';
 $string['default_country_key'] = 'Страна по-умолчанию';
@@ -39,11 +47,8 @@ $string['auth_lenauth_static_html'] = 'Статичный HTML-код';
 $string['style_not_defined'] = 'Данный стиль не является стилем плагина';
 $string['locale_desc'] = 'Некоторые сервисы имеют локальные и международные логотипы, например, ВКонтакте и Яндекс.';
 $string['default_country_desc'] = 'У каждый впервые регистрируемого пользователя, который первый раз авторизовывается через LenAuth будет выбрана данная страна по-умолчанию';
-//$string['can_change_password'] = 'Пользователь может менять пароль';
 $string['can_reset_password_key'] = 'Пользователь может сбрасывать/менять внутренний пароль (<em>рекомендуется</em>)';
 $string['can_reset_password_desc'] = 'Если включить опцию, то пользователь сможет поменять заданный внутренний пароль (<strong>по-умолчанию он не задан</strong>) и авторизовываться через обычную форму логина';
-//$string['password_expire_key'] = 'Время жизни пароля (дни)';
-//$string['password_expire_desc'] = 'Период жизни пароля, необходимо будет создать новый через определенное Вами количество дней. 0 &mdash; значит пароль можно оставить навсегда.';
 $string['can_confirm_key'] = 'Модерация новых пользователей';
 $string['can_confirm_desc'] = 'Все новые пользователи, зарегистрированные через LenAuth должны будут быть одобрены администратором Moodle';
 $string['retrieve_avatar_key'] = 'Подгружать аватар';
@@ -79,6 +84,7 @@ $string['auth_lenauth_access_token_empty'] = 'Невозможно получи�
 /**
  * Facebook Russian locale
  */
+$string['facebook_app_id'] = 'App ID';
 $string['facebook_desc'] = '
     <ol>
         <li>У Вас должен быть зарегистрирован любой аккаунт на <a href="https://www.facebook.com/" target="_blank">Facebook</a></li>
@@ -118,7 +124,6 @@ $string['facebook_desc'] = '
         </li>
         <li>В подкатегории &laquo;<strong>Товары</strong>&raquo;  &rarr; &laquo;<strong>Вход через Facebook</strong>&raquo; &rarr; &laquo;<strong>Настройки</strong>&raquo; в разделе &laquo;<strong>Клиентские настройки OAuth</strong>&raquo; в поле &laquo;<strong>Действительные URI перенаправления для OAuth</strong>&raquo; вставьте значение <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=facebook</strong></li>
     </ol>';
-$string['facebook_app_id'] = 'Идентификатор приложения';
 $string['facebook_app_secret'] = 'Секрет приложения';
 $string['facebook_button_text_default'] = 'Фейсбук';
 $string['auth_lenauth_facebook_binding'] = 'ID Фейсбука';
@@ -126,6 +131,7 @@ $string['auth_lenauth_facebook_binding'] = 'ID Фейсбука';
 /**
  * Google Russian locale
  */
+$string['google_client_id'] = 'Client ID';
 $string['google_desc'] = '
     <ol>
         <li>У Вас должен быть зарегистрирован любой аккаунт в <a href="https://accounts.google.com/SignUp" target="_blank">Google</a></li>
@@ -135,7 +141,6 @@ $string['google_desc'] = '
         <li>В приложении в разделе <strong>APIs &amp; auth &raquo; Credentials</strong> скопируйте сюда <strong>CLIENT ID</strong> и <strong>CLIENT SECRET</strong></li>
         <li>Параметр <strong>Project ID</strong> не обязателен, его Вы можете скопировать из пункта меню <strong>Overview</strong> в консоли сверху страницы</li>
     </ol>';
-$string['google_client_id'] = 'CLIENT ID';
 $string['google_client_secret'] = 'CLIENT SECRET';
 $string['google_project_id'] = 'Project ID';
 $string['google_button_text_default'] = 'Google';
@@ -144,6 +149,13 @@ $string['google_binding'] = 'ID Гугл';
 /**
  * Yahoo Russian locale
  */
+$string['auth_lenauth_yahoo_settings'] = 'Настройки Yahoo';
+$string['auth_lenauth_yahoo_oauth_1_note'] = 'если у Вас уже есть приложение Yahoo';
+$string['auth_lenauth_yahoo_oauth_2_note'] = 'рекомендуется для создания новых приложений';
+$string['yahoo_application_id'] = 'Application ID';
+$string['yahoo_consumer_key'] = 'Consumer Key';
+$string['yahoo_consumer_secret'] = 'Consumer Secret';
+$string['yahoo_button_text_default'] = 'Yahoo';
 $string['yahoo_desc'] = '
     <ol>
         <li>У Вас должен быть зарегистрирован любой аккаунт в <a href="https://edit.yahoo.com/registration" target="_blank">Yahoo</a></li>
@@ -160,13 +172,6 @@ $string['yahoo_desc'] = '
         <li>Из настроек приложения скопируйте сюда: <strong>Consumer Key</strong>, <strong>Consumer Secret</strong></li>
         <li><em>Необязательно</em>: скопируйте сюда <strong>Application ID</strong>, сверху страницы приложения</li>
     </ol>';
-$string['auth_lenauth_yahoo_settings'] = 'Настройки Yahoo';
-$string['auth_lenauth_yahoo_oauth_1_note'] = 'если у Вас уже есть приложение Yahoo';
-$string['auth_lenauth_yahoo_oauth_2_note'] = 'рекомендуется для создания новых приложений';
-$string['yahoo_application_id'] = 'Application ID';
-$string['yahoo_consumer_key'] = 'Consumer Key';
-$string['yahoo_consumer_secret'] = 'Consumer Secret';
-$string['yahoo_button_text_default'] = 'Yahoo';
 $string['yahoo_binding'] = 'ID Yahoo';
 
 /**

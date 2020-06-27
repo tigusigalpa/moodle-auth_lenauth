@@ -28,6 +28,12 @@ $string['auth_lenauth_button_div_width'] = 'Width (<em>0 = auto</em>)';
 $string['auth_lenauth_binding_key'] = 'Binding';
 $string['auth_lenauth_output_settings'] = 'Output settings';
 
+$string['privacy:metadata:auth_lenauth:userid'] = 'The ID of the user whose data is stored by the LenAuth user profile field';
+$string['privacy:metadata:auth_lenauth:fieldid'] = 'The ID of the profile field';
+$string['privacy:metadata:auth_lenauth:data'] = 'LenAuth user profile social ID field user data';
+$string['privacy:metadata:auth_lenauth:dataformat'] = 'The format of LenAuth user profile social ID field user data';
+$string['privacy:metadata:auth_lenauth:tableexplanation'] = 'Additional profile data';
+
 $string['pluginname'] = 'LenAuth';
 $string['auth_lenauthdescription'] = 'This plugin for Moodle allows you easily add authentication methods (log-in or automatically sing-up) via OAuth providers of social plugins: Facebook. Google, Yahoo, Twitter, VK, Yandex, Mail.Ru. Several templates of social sign-in buttons and links, own text for buttons, lot of settings, English and Russian languages localization.';
 $string['auth_lenauth_main_settings'] = 'Main settings';
@@ -64,32 +70,59 @@ $string['margin_bottom_key'] = 'Margin bottom (px)';
 $string['margin_left_key'] = 'Margin left (px)';
 $string['order'] = 'Order';
 
-
 $string['auth_lenauth_div_settings'] = 'Buttons area settings';
 $string['auth_lenauth_div_location'] = 'Area location';
 $string['auth_lenauth_output_style_key'] = 'Live style';
 $string['auth_lenauth_bootstrap_fontawesome_needle'] = 'To make a correct output your theme is required CSS-framework Bootstrap and fonts Font-Awesome!';
-$string['auth_lenauth_output_php_code_key'] = 'Theme PHP-code';
 
 /**
  * ERRORS
  */
 $string['auth_lenauth_user_suspended'] = 'User is suspended';
 $string['auth_lenauth_access_token_empty'] = 'Could not get access to access token. Check your App Settings';
+
 /**
  * Facebook English locale
  */
-$string['auth_lenauth_facebook_settings'] = 'Facebook Settings';
-$string['auth_lenauth_facebook_dashboard'] = 'Facebook App Dashboard';
 $string['facebook_app_id'] = 'App ID';
 $string['facebook_desc'] = '
     <ol>
-        <li>You need to have any social account at <a href="https://www.facebook.com/" target="_blank">Facebook</a></li>
-        <li><a href="https://developers.facebook.com/apps/" target="_blank">Register</a> as Facebook developer</li>
-        <li>At developers console you need to create an Application (<strong>+ Add a New App</strong> button) with category <strong>WWW Web-site</strong> and arbitrary title</li>
-        <li>Fill in the application settings <strong>Site URL</strong> as <strong>{$a->wwwroot}</strong>. Next, click on the link <strong><a href="https://developers.facebook.com/apps/" target="_blank">Skip to Developer Dashboard</a></strong></li>
-        <li>As a result, you will be given <strong>App ID</strong> and <strong>App Secret</strong> (to become visible, click <strong>Show</strong>). Copy them here.</li>
-        <li><strong>IMPORTANT!</strong> at developers console go to tab <strong>Advanced</strong> and fill the field <strong>Valid OAuth redirect URIs</strong>: fill there <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=facebook</strong></li>
+        <li>У Вас должен быть зарегистрирован любой аккаунт на <a href="https://www.facebook.com/" target="_blank">Facebook</a></li>
+        <li><a href="https://developers.facebook.com/apps/" target="_blank">Зарегистрируйтесь</a> как разработчик Facebook. <em>Процедура ни к чему не обязывает.</em></li>
+        <li>В <a href="https://developers.facebook.com/apps/" target="_blank">консоли разработчика</a> необходимо создать новый ID приложения (кнопка <strong>Добавить новое приложение</strong>).
+            <ol>
+                <li><strong>Отображаемое название</strong>: Ваше название</li>
+                <li><strong>Эл. адрес для связи</strong>: Ваш адрес электронной почты</li>
+                <li>Нажмите кнопку <strong>Создайте ID приложения</strong> и, по необходимости, выполните проверку безопасности</li>
+            </ol>
+        </li>
+        <li>Добавьте продукт <strong>Вход через Facebook</strong>
+            <ol>
+                <li>нажмите кнопку &laquo;<strong>Настроить</strong>&raquo;</li>
+                <li>выберите платформу приложения &laquo;<strong>WWW (Веб)</strong>&raquo;
+                    <ol>
+                        <li>Ваш сайт
+                            <ul>
+                                <li>URL сайта: <strong style="color:red">{$a->wwwroot}</strong>, &laquo;<strong>Save</strong>&raquo;, &laquo;<strong>Продолжить</strong>&raquo;</li>
+                            </ul>
+                        </li>
+                        <li><strong>Настройка Facebook SDK для Javascript</strong> &mdash; &laquo;<strong>Далее</strong>&raquo;</li>
+                        <li><strong>Проверка статуса входа</strong> &mdash; &laquo;<strong>Далее</strong>&raquo;</li>
+                        <li><strong>Добавление кнопки &laquo;Вход через Facebook&raquo;</strong> &mdash; &laquo;<strong>Далее</strong>&raquo;</li>
+                    </ol>
+                </li>
+            </ol>
+        </li>
+        <li>В <a href="https://developers.facebook.com/apps/" target="_blank">консоли разработчика Facebook</a> в данном проекте в подкатегории &laquo;<strong>Настройки</strong>&raquo; &rarr; &laquo;<strong>Основное</strong>&raquo;:
+            <ol>Заполните следующие значения:
+                <li>Домены приложений: <strong style="color:red">{$a->wwwroot}</strong></li>
+            </ol>
+            <ol>Скопируйте и сохраните сюда следующие значения:
+                <li><strong>Идентификатор приложения</strong></li>
+                <li><strong>Секрет приложения</strong></li>
+            </ol>
+        </li>
+        <li>В подкатегории &laquo;<strong>Товары</strong>&raquo;  &rarr; &laquo;<strong>Вход через Facebook</strong>&raquo; &rarr; &laquo;<strong>Настройки</strong>&raquo; в разделе &laquo;<strong>Клиентские настройки OAuth</strong>&raquo; в поле &laquo;<strong>Действительные URI перенаправления для OAuth</strong>&raquo; вставьте значение <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=facebook</strong></li>
     </ol>';
 $string['facebook_app_secret'] = 'App secret';
 $string['facebook_button_text_default'] = 'Facebook';
@@ -98,8 +131,6 @@ $string['auth_lenauth_facebook_binding'] = 'Facebook Social ID';
 /**
  * Google English locale
  */
-$string['auth_lenauth_google_settings'] = 'Google Settings';
-$string['auth_lenauth_google_dashboard'] = 'Project settings';
 $string['google_client_id'] = 'Client ID';
 $string['google_desc'] = '
     <ol>

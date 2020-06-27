@@ -39,10 +39,9 @@ class LenAuth extends \auth_plugin_base
             /**
              * Facebook settings
              * @link https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow/v2.0
-             * @link https://developers.facebook.com/docs/graph-api/reference/v2.0/user
+             * @link https://developers.facebook.com/docs/graph-api/using-graph-api/#me
              */
             'settings' => [
-                'request_token_url' => 'https://graph.facebook.com/oauth/access_token',
                 'request_api_url'   => 'https://graph.facebook.com/me',
             ],
         ],
@@ -50,6 +49,7 @@ class LenAuth extends \auth_plugin_base
             'fields' => [
                 'client_id' => [
                     'type' => 'text',
+                    'paramtype' => PARAM_URL
                 ],
                 'client_secret' => [
                     'type' => 'password'
@@ -246,6 +246,18 @@ class LenAuth extends \auth_plugin_base
     protected $sendOAuthRequest = true;
 
     /**
+     * @var string Current provider name
+     */
+    protected $provider = '';
+
+    /**
+     * @var string Auth code to get access token
+     */
+    protected $code = '';
+
+    protected $sesskey = '';
+
+    /**
      * cURL default request type. Highly recommended is POST
      *
      * @var    string
@@ -257,16 +269,24 @@ class LenAuth extends \auth_plugin_base
     protected $fieldId;
 
     /**
-     * Constructor.
+     * LenAuth constructor.
+     *
+     * @param string $provider
      */
-    public function __construct()
+    public function __construct(string $provider = '')
     {
         global $DB, $CFG, $USER;
         $this->db = $DB;
         $this->cfg = $CFG;
         $this->user = $USER;
         $this->authtype = 'lenauth';
+        $this->sesskey = sesskey();
         $this->errorlogtag = '[AUTH lenauth]';
+        if ($provider) {
+            if (in_array($provider, array_keys(self::SETTINGS))) {
+                $this->setProvider($provider);
+            }
+        }
     }
 
     public function getConfig(string $setting = '')
@@ -308,7 +328,7 @@ class LenAuth extends \auth_plugin_base
         );
         //check for user (username) exist and authentication method
         if (!empty($user) && ($user->auth == 'lenauth')) {
-            if ($code = optional_param('code', '', PARAM_ALPHANUMEXT)) {
+            if ($this->code = optional_param('code', '', PARAM_ALPHANUMEXT)) {
                 return true;
             }
         }
@@ -398,32 +418,128 @@ class LenAuth extends \auth_plugin_base
     }
 
     /**
+     * Get provider
+     *
+     * @param string $provider Provider name
+     *
+     * @return string
+     */
+    protected function getProvider(string $provider = '') : string
+    {
+        $provider = $provider ? $provider : $this->provider;
+        return in_array($provider, array_keys(self::SETTINGS)) ? $provider : '';
+    }
+
+    /**
+     * Set provider variable
+     *
+     * @param string $provider Provider name
+     *
+     * @return bool
+     */
+    protected function setProvider(string $provider) : bool
+    {
+        if (in_array($provider, array_keys(self::SETTINGS))) {
+            $this->provider = $provider;
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Function to generate valid redirect URI to use it without problems
      * Param $provider checks service we use and makes URI. Used in code for much faster work.
      *
      * @param  string $provider current OAuth provider
      * @return string
      */
-    protected function redirectURI(string $provider)
+    protected function redirectURI(string $provider = '') : string
     {
-        return $this->cfg->wwwroot . '/auth/lenauth/redirect.php?provider=' . $provider;
-    }
-
-    public function oAuthLink(string $provider) : string
-    {
-        switch ($provider) {
-            case 'facebook':
-                return 'https://www.facebook.com/v' . $this->getConfig('facebook_version')
-                    . '/dialog/oauth'
-                    . '?client_id=' . $this->getConfig('facebook_app_id')
-                    . '&redirect_uri=' . urlencode($this->redirectURI($provider));
-                break;
+        if ($this->getProvider($provider)) {
+            return $this->cfg->wwwroot . '/auth/lenauth/redirect.php?provider=' . $this->getProvider($provider);
         }
         return '';
     }
 
     /**
+     * Getting oAuth dialog URL by provider name
      *
+     * @param string $provider Provider name
+     *
+     * @return string
+     */
+    public function OAuthLink(string $provider = '') : string
+    {
+        if ($provider = $this->getProvider($provider)) {
+            switch ($provider) {
+                case 'facebook':
+                    /**
+                     * https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow/#logindialog
+                     */
+                    return 'https://www.facebook.com/v' . $this->getConfig('facebook_version')
+                        . '/dialog/oauth'
+                        . '?client_id=' . $this->getConfig('facebook_app_id')
+                        . '&redirect_uri=' . urlencode($this->redirectURI($provider))
+                        . '&state=' . $this->sesskey;
+                case 'google':
+                    /**
+                     * https://developers.google.com/identity/protocols/oauth2/web-server#creatingclient
+                     */
+                    return 'https://accounts.google.com/o/oauth2/v2/auth'
+                        . '?client_id=' . $this->getConfig('google_client_id')
+                        . '&redirect_uri=' . urlencode($this->redirectURI($provider))
+                        . '&response_type=code'
+                        /**
+                         * https://developers.google.com/identity/protocols/oauth2/scopes
+                         * https://developers.google.com/identity/protocols/oauth2/scopes#people
+                         */
+                        . '&scope=' . urlencode('https://www.googleapis.com/auth/userinfo.email')
+                        . '&state=' . $this->sesskey;
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Getting URL for access token request by provider name
+     *
+     * @param string $provider Provider name
+     *
+     * @return string
+     */
+    protected function accessTokenURL(string $provider = '') : string
+    {
+        if ($provider = $this->getProvider($provider)) {
+            switch ($provider) {
+                case 'facebook':
+                    /**
+                     * https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow/#exchangecode
+                     */
+                    return 'https://graph.facebook.com/v' . $this->getConfig('facebook_version') . '/oauth/access_token'
+                        . '?client_id=' . $this->getConfig('facebook_app_id')
+                        . '&redirect_uri=' . urlencode($this->redirectURI($provider))
+                        . '&client_secret=' . $this->getConfig('facebook_app_secret')
+                        . '&code=' . $this->code;
+            }
+        }
+        return '';
+    }
+
+    protected function requestAPIURL(string $provider = '') : string
+    {
+        if ($provider = $this->getProvider($provider)) {
+            switch ($provider) {
+                case 'facebook':
+                    /**
+                     * https://developers.facebook.com/docs/graph-api/using-graph-api#me
+                     */
+                    return 'https://graph.facebook.com/me';
+            }
+        }
+        return '';
+    }
+
+    /**
      * This function returns user object from Moodle database with given $socialUId param,
      * if user with this social_uid exists, function will return this user object,
      * if not - false
@@ -593,716 +709,786 @@ class LenAuth extends \auth_plugin_base
     public function loginpage_hook()
     {
         global $SESSION;
-        $accessToken = false;
-        $code = required_param('code', PARAM_ALPHANUMEXT);
-        $provider = required_param('provider', PARAM_ALPHANUM);
-        @setcookie('auth_lenauth_provider', $provider, time() + 604800, '/');
-        $configFieldStr = $provider . '_social_id_field';
-        $this->fieldShortName = $this->getConfig($configFieldStr);
-        $this->fieldId = $this->getFieldId();
+        if (!isloggedin()) {
+            if ($provider = optional_param('provider', '', PARAM_ALPHANUM)) {
+                if ($code = optional_param('code', '', PARAM_ALPHANUMEXT)) {
+                    if ($this->setProvider($provider)) {
+                        $accessToken = false;
+                        $this->code = $code;
+                        @setcookie('auth_lenauth_provider', $this->provider, time() + 604800, '/');
+                        $this->fieldShortName = $this->getConfig($this->provider . '_social_id_field');
+                        $this->fieldId = $this->getFieldId();
 
-        $params = $curlOptions = [];
-        $encodeParams = $hasCode = $redirectURI = true;
-        $curlHeader = false;
-        //if we have access_token in $_COOKIE, so do not need to make request fot the one
-        $this->sendOAuthRequest = !isset($_COOKIE[$provider]['access_token']);
-        //if service is not enabled, why should we make request? hack protect. maybe
-        $enabledStr = $provider . '_enabled';
-        if (empty($this->getConfig($enabledStr))) {
-            throw new \moodle_exception('Service not enabled in your LenAuth Settings', 'auth_lenauth');
-        }
-        switch ($provider) {
-            case 'facebook':
-                /**
-                 * @link https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow/v2.0#exchangecode
-                 */
-                $params['client_id'] = $this->getConfig('facebook_app_id');
-                $params['client_secret'] = $this->getConfig('facebook_app_secret');
-                break;
-            case 'google':
-                /**
-                 * @link https://developers.google.com/accounts/docs/OAuth2Login#exchangecode
-                 */
-                $params['client_id']     = $this->getConfig('google_client_id');
-                $params['client_secret'] = $this->getConfig('google_client_secret');
-                $params['grant_type']    = self::SETTINGS[$provider]['settings']['grant_type'];
-                break;
-            case 'yahoo':
-                $params['grant_type']    = self::SETTINGS[$provider]['settings']['grant_type'];
-                $curlOptions = [
-                    'USERPWD' => $this->getConfig('yahoo_consumer_key') . ':'
-                        . $this->getConfig('yahoo_consumer_secret')
-                ];
-                break;
-            case 'twitter':
-                if (!empty($this->getConfig('twitter_enabled'))) {
-                    if (!isset($_COOKIE[$provider]['access_token'])) {
-                        $params = array_merge(
-                            $this->twitterRequestArray($this->getConfig('twitter_consumer_secret') . '&'),
-                            ['oauth_callback' => $this->redirectURI($provider)]
-                        );
-                        $hasCode = $redirectURI = false;
-                        $this->sendOAuthRequest = (isset($_REQUEST['oauth_token'], $_REQUEST['oauth_verifier'])) ? false : true;
-                        $OAuthVerifier = false;
-                        if (!$this->sendOAuthRequest && isset($_COOKIE[$provider]['oauth_token_secret'])) {
-                            $accessToken = $SESSION->twitter_access_token
-                                = optional_param('oauth_token', '', PARAM_TEXT);
-                            setcookie($provider . '[access_token]', $accessToken, time()
-                                + self::SETTINGS[$provider]['settings']['expire'], '/');
-                            $OAuthVerifier = $SESSION->twitter_oauth_verifier
-                                = optional_param('oauth_verifier', '', PARAM_TEXT);
-                            setcookie($provider . '[oauth_verifier]', $OAuthVerifier, time()
-                                + self::SETTINGS[$provider]['settings']['expire'], '/');
-                        } else {
-                            $curlHeader = $this->setTwitterHeader($params);
+                        $params = $curlOptions = [];
+                        $encodeParams = $hasCode = $redirectURI = true;
+                        $curlHeader = false;
+                        //if we have access_token in $_COOKIE, so do not need to make request fot the one
+                        $this->sendOAuthRequest = !isset($_COOKIE[$this->provider]['access_token']);
+                        //if service is not enabled, why should we make request? hack protect. maybe
+                        $enabledStr = $this->provider . '_enabled';
+                        if (empty($this->getConfig($enabledStr))) {
+                            throw new \moodle_exception('Service not enabled in your LenAuth Settings', 'auth_lenauth');
                         }
-                        $encodeParams = false;
-                    } else {
-                        $this->sendOAuthRequest = false;
-                    }
-                }
-                break;
-            case 'vk':
-                /**
-                 * @link http://vk.com/dev/auth_sites
-                 */
-                $params['client_id'] = $this->getConfig('vk_app_id');
-                $params['client_secret'] = $this->getConfig('vk_app_secret');
-                break;
-            case 'yandex':
-                $params['grant_type'] = self::SETTINGS[$provider]['settings']['grant_type'];
-                $params['client_id'] = $this->getConfig('yandex_app_id');
-                $params['client_secret'] = $this->getConfig('yandex_app_password');
-                break;
-            case 'mailru':
-                $params['client_id'] = $this->getConfig('mailru_site_id');
-                $params['client_secret'] = $this->getConfig('mailru_client_secret');
-                $params['grant_type'] = self::SETTINGS[$provider]['settings']['grant_type'];
-                break;
-            default: // if authorization provider is wrong
-                throw new \moodle_exception('Unknown OAuth Provider', 'auth_lenauth');
-        }
-        // url for catch token value
-        // exception for Yahoo OAuth, because it like..
-        if ($hasCode) {
-            $params['code'] = $code;
-        }
-        if ($redirectURI) {
-            $params['redirect_uri'] = $this->redirectURI($provider);
-        }
-        //require cURL from Moodle core
-        require_once $this->cfg->libdir . '/filelib.php';
-        $curl = new \curl();
-        //hack for twitter and Yahoo
-        if (!empty($curlOptions) && is_array($curlOptions)) {
-            $curl->setopt($curlOptions);
-        }
-        $curl->resetHeader(); // clean cURL header from garbage
-        //Twitter and Yahoo has an own cURL headers, so let them to be!
-        if (!$curlHeader) {
-            $curl->setHeader('Content-Type: application/x-www-form-urlencoded');
-        } else {
-            $curl->setHeader($curlHeader);
-        }
-        $curlTokensValues = $xOAuthRequestAuthURL = $OAuthVerifier = '';
-        // cURL REQUEST for tokens if we hasnt it in $_COOKIE
-        if ($this->sendOAuthRequest) {
-            switch (\core_text::strtolower($this->curlType)) {
-                case 'post':
-                    $curlTokensValues = $curl->post(
-                        self::SETTINGS[$provider]['settings']['request_token_url'],
-                        //hack for twitter
-                        $encodeParams ? $this->generateQueryData($params) : $params
-                    );
-                    break;
-                default:
-                    $curlTokensValues = $curl->get(
-                        self::SETTINGS[$provider]['settings']['request_token_url'] . '?' .
-                        ($encodeParams ? $this->generateQueryData($params) : $params)
-                    );
-                    break;
-            }
-        }
-        // check for token response
-        if (!empty($curlTokensValues) || !$this->sendOAuthRequest) {
-            $tokenValues  = [];
-            // parse token values
-            switch ($provider) {
-                case 'facebook':
-                    if ($this->sendOAuthRequest || !isset($_COOKIE[$provider]['access_token'])) {
-                        parse_str($curlTokensValues, $tokenValues);
-                        $expires      = $tokenValues['expires']; //5183999 = 2 months
-                        $accessToken  = $tokenValues['access_token'];
-                        if (!empty($expires) && !empty($accessToken)) {
-                            setcookie($provider . '[access_token]', $accessToken, time() + $expires, '/');
-                        } else {
-                            throw new \moodle_exception('Can not get access for "access_token" '
-                            . 'or/and "expires" params after request', 'auth_lenauth');
-                        }
-                    } else {
-                        if (isset($_COOKIE[$provider]['access_token'])) {
-                            $accessToken = $_COOKIE[$provider]['access_token'];
-                        } else {
-                            throw new \moodle_exception('Someting wrong, maybe expires', 'auth_lenauth');
-                        }
-                    }
-                    break;
-                case 'google':
-                    if ($this->sendOAuthRequest || !isset($_COOKIE[$provider]['access_token'])) {
-                        $tokenValues = json_decode($curlTokensValues, true);
-                        $expires = $tokenValues['expires_in']; //3600 = 1 hour
-                        $accessToken = $tokenValues['access_token'];
-                        if (!empty($accessToken) && !empty($expires)) {
-                            setcookie($provider . '[access_token]', $accessToken, time() + $expires, '/');
-                        } else {
-                            throw new \moodle_exception('Can not get access for "access_token" '
-                            . 'or/and "expires" params after request', 'auth_lenauth');
-                        }
-                    } else {
-                        if (isset($_COOKIE[$provider]['access_token'])) {
-                            $accessToken = $_COOKIE[$provider]['access_token'];
-                        } else {
-                            throw new \moodle_exception('Someting wrong, maybe expires', 'auth_lenauth');
-                        }
-                    }
-                    break;
-                case 'yahoo':
-                    if ($this->sendOAuthRequest || !isset($_COOKIE[$provider]['access_token'])) {
-                        $tokenValues  = json_decode($curlTokensValues, true);
-                        $expires      = $tokenValues['expires_in']; //3600 = 1 hour
-                        $accessToken  = $tokenValues['access_token'];
-                        //$refresh_token = $tokenValues['refresh_token'];
-                        $userId       = $tokenValues['xoauth_yahoo_guid'];
-                        if (!empty($expires) && !empty($accessToken)) {
-                            setcookie($provider . '[access_token]', $accessToken, time() + $expires, '/');
-                            if (!empty($userId)) {
-                                setcookie($provider . '[user_id]', $userId, time() + $expires, '/');
-                            }
-                        } else {
-                            throw new \moodle_exception('Can not get access for "access_token" '
-                            . 'or/and "expires" params after request', 'auth_lenauth');
-                        }
-                    } else {
-                        if (isset($_COOKIE[$provider]['access_token'], $_COOKIE[$provider]['user_id'])) {
-                            $accessToken = $_COOKIE[$provider]['access_token'];
-                            $userId = $_COOKIE[$provider]['user_id'];
-                        } else {
-                            throw new \moodle_exception('Someting wrong, maybe expires', 'auth_lenauth');
-                        }
-                    }
-                    break;
-                case 'twitter':
-                    if ($this->sendOAuthRequest || !isset($_COOKIE[$provider]['oauth_token_secret'])) {
-                        parse_str($curlTokensValues, $tokenValues);
-                        $accessToken = $SESSION->twitter_access_token = $tokenValues['oauth_token'];
-                        setcookie(
-                            $provider . '[oauth_token_secret]',
-                            $tokenValues['oauth_token_secret'],
-                            time() + self::SETTINGS[$provider]['settings']['expire'],
-                            '/'
-                        );
-                    } else {
-                        if (isset(
-                            $_COOKIE[$provider]['access_token'],
-                            $_COOKIE[$provider]['oauth_token_secret']
-                        )
-                            || isset($SESSION->twitter_access_token, $SESSION->twitter_oauth_verifier)) {
-                            $accessToken = isset($_COOKIE[$provider]['access_token'])
-                                ? $_COOKIE[$provider]['access_token'] : $SESSION->twitter_access_token;
-                            $OAuthVerifier = (isset($_COOKIE[$provider]['oauth_verifier']))
-                                ? $_COOKIE[$provider]['oauth_verifier'] : $SESSION->twitter_oauth_verifier;
-                        } else {
-                            throw new \moodle_exception('Someting wrong, maybe expires', 'auth_lenauth');
-                        }
-                    }
-                    break;
-                case 'vk':
-                    if ($this->sendOAuthRequest || !isset($_COOKIE[$provider]['access_token'])) {
-                        $tokenValues  = json_decode($curlTokensValues, true);
-                        if (isset($tokenValues['error'])) {
-                            throw new \moodle_exception('Native VK Error ' . $tokenValues['error']
-                                . (isset($tokenValues['error_description']) ? ' with description: '
-                                    . $tokenValues['error_description'] : ''), 'auth_lenauth');
-                        }
-                        $expires = $tokenValues['expires_in']; //86400 = 24 hours
-                        $accessToken = $tokenValues['access_token'];
-                        if (!empty($accessToken) && !empty($expires)) {
-                            setcookie($provider . '[access_token]', $accessToken, time() + $expires, '/');
-                        }
-                        $userId = $tokenValues['user_id'];
-                        if (!empty($userId)) {
-                            setcookie($provider . '[user_id]', $userId, time() + $expires, '/');
-                        }
-                        /**
-                         * VK user may do not enter email
-                         */
-                        $userEmail = (isset($tokenValues['email'])) ? $tokenValues['email'] : false;
-                        if (!empty($userEmail)) {
-                            setcookie($provider . '[user_email]', $userEmail, time() + $expires, '/');
-                        }
-                    } else {
-                        if (isset($_COOKIE[$provider]['access_token'], $_COOKIE[$provider]['user_id'])) {
-                            $accessToken = $_COOKIE[$provider]['access_token'];
-                            $userId = $_COOKIE[$provider]['user_id'];
-                            if (isset($_COOKIE[$provider]['user_email'])) {
-                                $userEmail = $_COOKIE[$provider]['user_email'];
-                            }
-                        } else {
-                            throw new \moodle_exception('Someting wrong, maybe expires', 'auth_lenauth');
-                        }
-                    }
-                    break;
-                case 'yandex':
-                    if ($this->sendOAuthRequest || !isset($_COOKIE[$provider]['access_token'])) {
-                        $tokenValues = json_decode($curlTokensValues, true);
-                        $expires = $tokenValues['expires_in']; //31536000 = 1 year
-                        $accessToken = $tokenValues['access_token'];
-                        if (!empty($expires) && !empty($accessToken)) {
-                            setcookie($provider . '[access_token]', $accessToken, time() + $expires, '/');
-                        } else {
-                            throw new \moodle_exception('Can not get access for "access_token" '
-                                . 'or/and "expires" params after request', 'auth_lenauth');
-                        }
-                    } else {
-                        if (isset($_COOKIE[$provider]['access_token'])) {
-                            $accessToken = $_COOKIE[$provider]['access_token'];
-                        } else {
-                            throw new \moodle_exception('Someting wrong, maybe expires', 'auth_lenauth');
-                        }
-                    }
-                    break;
-                case 'mailru':
-                    if ($this->sendOAuthRequest || !isset($_COOKIE[$provider]['access_token'])) {
-                        $tokenValues = json_decode($curlTokensValues, true);
-                        $expires = $tokenValues['expires_in']; //86400 = 24 hours
-                        $accessToken = $tokenValues['access_token'];
-                        if (!empty($expires) && !empty($accessToken)) {
-                            setcookie($provider . '[access_token]', $accessToken, time() + $expires, '/');
-                        } else {
-                            //check native errors if exists
-                            if (isset($tokenValues['error'])) {
-                                switch ($tokenValues['error']) {
-                                    case 'invalid_client':
-                                        throw new \moodle_exception('Mail.RU invalid OAuth settings. Check your Private Key and Secret Key', 'auth_lenauth');
-                                    default:
-                                        throw new \moodle_exception('Mail.RU Unknown Error with code: ' . $tokenValues['error']);
-                                }
-                            }
-                            if (empty($expires) || empty($accessToken)) {
-                                throw new \moodle_exception('Can not get access for "access_token" or/and "expires" params after request', 'auth_lenauth');
-                            }
-                        }
-                    } else {
-                        if (isset($_COOKIE[$provider]['access_token'])) {
-                            $accessToken = $_COOKIE[$provider]['access_token'];
-                        } else {
-                            throw new \moodle_exception('Someting wrong, maybe expires', 'auth_lenauth');
-                        }
-                    }
-                    break;
-                default:
-                    throw new \moodle_exception('Unknown OAuth Provider', 'auth_lenauth');
-            }
-        }
-        if (!empty($accessToken)) {
-            $queryParams = []; // array to generate data for final request to get user data
-            $requestAPIURL = self::SETTINGS[$provider]['settings']['request_api_url'];
-            //some services check accounts for verifier, so we will check it too. No unverified accounts, only verified! only hardCORE!
-            $isVerified = true;
-            $imageURL = '';
-            switch ($provider) {
-                case 'facebook':
-                    $queryParams['access_token'] = $accessToken;
-                    $curlResponse = $curl->get($requestAPIURL . '?' . $this->generateQueryData($queryParams));
-                    $curlFinalData = json_decode($curlResponse, true);
-                    $socialUId = $curlFinalData['id'];
-                    $userEmail = $curlFinalData['email'];
-                    $firstName = $curlFinalData['first_name'];
-                    $lastName = $curlFinalData['last_name'];
-                    $isVerified = $curlFinalData['verified'];
-                    if ($this->getConfig('retrieve_avatar')) {
-                        $imageURL = 'http://graph.facebook.com/' . $socialUId . '/picture';
-                    }
-                    break;
-                /**
-                 * @link https://developers.google.com/accounts/docs/OAuth2Login#obtaininguserprofileinformation
-                 */
-                case 'google':
-                    $queryParams['access_token'] = $accessToken;
-                    $queryParams['alt'] = 'json';
-                    $curlResponse = $curl->get($requestAPIURL . '?' . $this->generateQueryData($queryParams));
-                    $curlFinalData = json_decode($curlResponse, true);
-                    if (isset($curlFinalData['error'])) {
-                        if (!empty($curlFinalData['error']['errors']) && is_array($curlFinalData['error']['errors'])) {
-                            foreach ($curlFinalData['error']['errors'] as $error) {
-                                throw new \moodle_exception('Native Google error. Message: '
-                                    . $error['message'], 'auth_lenauth');
-                            }
-                        } else {
-                            throw new \moodle_exception('Native Google error', 'auth_lenauth');
-                        }
-                    }
-                    $socialUId = $curlFinalData['id'];
-                    $userEmail = $curlFinalData['emails'][0]['value'];
-                    $firstName = $curlFinalData['name']['givenName'];
-                    $lastName = $curlFinalData['name']['familyName'];
-                    if ($this->getConfig('retrieve_avatar')) {
-                        $imageURL = isset($curlFinalData['image']['url']) ? $curlFinalData['image']['url'] : '';
-                    }
-                    break;
-                case 'yahoo':
-                    $requestAPIURL = 'https://social.yahooapis.com/v1/user/' . $userId . '/profile?format=json';
-                    $queryParams['access_token'] = $accessToken;
-                    $nowHeader = [
-                        'Authorization: Bearer ' . $accessToken,
-                        'Accept: application/json',
-                        'Content-Type: application/json',
-                    ];
-                    $curl->resetHeader();
-                    $curl->setHeader($nowHeader);
-                    $curlResponse = $curl->get($requestAPIURL, $queryParams);
-                    $curl->resetHeader();
-                    $curlFinalData = json_decode($curlResponse, true);
-                    $socialUId = $curlFinalData['profile']['guid'];
-                    $emails = $curlFinalData['profile']['emails'];
-                    if (!empty($emails) && is_array($emails)) {
-                        foreach ($emails as $emailArray) {
-                            $userEmail = $emailArray['handle'];
-                            if (isset($emailArray['primary'])) {
+                        switch ($this->getProvider()) {
+                            case 'yahoo':
+                                $params['grant_type'] = self::SETTINGS[$this->provider]['settings']['grant_type'];
+                                $curlOptions = [
+                                    'USERPWD' => $this->getConfig('yahoo_consumer_key') . ':'
+                                        . $this->getConfig('yahoo_consumer_secret')
+                                ];
                                 break;
-                            }
-                        }
-                    }
-                    $firstName = $curlFinalData['profile']['givenName'];
-                    $lastName = $curlFinalData['profile']['familyName'];
-                    if ($this->getConfig('retrieve_avatar')) {
-                        $imageURL = isset($curlFinalData['profile']['image']['imageUrl'])
-                            ? $curlFinalData['profile']['image']['imageUrl'] : '';
-                    }
-                    break;
-                case 'twitter':
-                    if (!$OAuthVerifier) {
-                        header('Location: ' . self::SETTINGS[$provider]['settings']['request_api_url']
-                            . '?' . http_build_query(['oauth_token' => $accessToken]));
-                        die;
-                    }
-                    $queryParams = array_merge(
-                        $this->twitterRequestArray(),
-                        [
-                            'oauth_verifier' => $OAuthVerifier,
-                            'oauth_token' => $accessToken,
-                            'oauth_token_secret' => $_COOKIE[$provider]['oauth_token_secret']
-                        ]
-                    );
-                    $curlHeader = $this->setTwitterHeader(
-                        $queryParams,
-                        $accessToken,
-                        $_COOKIE[$provider]['oauth_token_secret']
-                    );
-                    $curl->setHeader($curlHeader);
-                    $curlFinalDataPre = $curl->post(
-                        self::SETTINGS[$provider]['settings']['token_url'],
-                        $queryParams
-                    );
-                    $json_decoded = json_decode($curlFinalDataPre, true);
-                    if (isset($json_decoded['error']) && isset($json_decoded['request'])) {
-                        throw new \moodle_exception('Native Twitter Error: ' . $json_decoded['error']
-                            . '. For request ' . $json_decoded['request'], 'auth_lenauth');
-                    }
-                    parse_str($curlFinalDataPre, $curlFinalData);
-                    $socialUId = $curlFinalData['user_id'];
-                    if ($this->getConfig('retrieve_avatar')) {
-                        $imageURL_pre = 'https://twitter.com/' . $curlFinalData['screen_name']
-                            . '/profile_image?size=original';
-                        $imageHeader = get_headers($imageURL_pre, 1);
-                        $imageURL = $imageHeader['location'];
-                    }
-                    break;
-                case 'vk':
-                    /**
-                     * @link http://vk.com/dev/api_requests
-                     */
-                    $queryParams['access_token'] = $accessToken;
-                    $queryParams['user_id'] = !empty($userId) ? $userId : false;
-                    $queryParams['v'] = self::SETTINGS['vk']['meta']['api_version'];
-                    $curlResponse = $curl->post($requestAPIURL, $this->generateQueryData($queryParams));
-                    $curlFinalData = json_decode($curlResponse, true);
-                    $socialUId = $queryParams['user_id'];
-                    /**
-                     * If user_email is empty, its not so scare, because its second login and
-                     */
-                    $userEmail = isset($userEmail) ? $userEmail : false; //hack, because VK has bugs sometimes
-                    $firstName = $curlFinalData['response'][0]['first_name'];
-                    $lastName = $curlFinalData['response'][0]['last_name'];
-                    /**
-                     * @link http://vk.com/dev/users.get
-                     */
-                    $fieldsArray = ['avatar' => 'photo_200'];
-                    $additionalFieldsPre = $curl->get('http://api.vk.com/method/users.get?user_ids='
-                        . $socialUId . '&fields=' . join(',', $fieldsArray));
-                    $additionalFields = json_decode($additionalFieldsPre, true);
-                    if ($this->getConfig('retrieve_avatar')) {
-                        $imageURL = isset($additionalFields['response'][0][$fieldsArray['avatar']])
-                            ? $additionalFields['response'][0][$fieldsArray['avatar']] : '';
-                    }
-                    break;
-                /**
-                 * @link http://api.yandex.ru/oauth/doc/dg/reference/accessing-protected-resource.xml
-                 * @link http://api.yandex.ru/login/doc/dg/reference/request.xml
-                 */
-                case 'yandex':
-                    $queryParams['format'] = self::SETTINGS[$provider]['settings']['format'];
-                    $queryParams['oauth_token'] = $accessToken;
-                    $curlResponse = $curl->get($requestAPIURL . '?' . $this->generateQueryData($queryParams));
-                    $curlFinalData = json_decode($curlResponse, true);
-                    $socialUId = $curlFinalData['id'];
-                    $userEmail = $curlFinalData['default_email'];
-                    $firstName = $curlFinalData['first_name'];
-                    $lastName = $curlFinalData['last_name'];
-                    //$nickname = $curlFinalData['display_name'];
-                    if ($this->getConfig('retrieve_avatar')) {
-                        /**
-                         * @link https://tech.yandex.ru/passport/doc/dg/reference/response-docpage/#norights_5
-                         */
-                        $yandexAvatarSize = 'islands-200';
-                        if (isset($curlFinalData['default_avatar_id'])) {
-                            $imageURL = 'https://avatars.yandex.net/get-yapic/'
-                                . $curlFinalData['default_avatar_id'] . '/' . $yandexAvatarSize;
-                        }
-                    }
-                    break;
-                case 'mailru':
-                    $queryParams['app_id'] = $params['client_id'];
-                    $secretKey = $params['client_secret'];
-                    /**
-                     * @link http://api.mail.ru/docs/reference/rest/users-getinfo/
-                     */
-                    $queryParams['method'] = 'users.getInfo';
-                    $queryParams['session_key'] = $accessToken;
-                    $queryParams['secure'] = 1;
-                    /**
-                     * Additional security from mail.ru
-                     * @link http://api.mail.ru/docs/guides/restapi/#sig
-                     */
-                    ksort($queryParams);
-                    $sig = '';
-                    foreach ($queryParams as $k => $v) {
-                        $sig .= "{$k}={$v}";
-                    }
-                    $queryParams['sig'] = md5($sig . $secretKey);
-                    $curlResponse = $curl->post($requestAPIURL, $this->generateQueryData($queryParams));
-                    $curlFinalData = json_decode($curlResponse, true);
-
-                    $socialUId = $curlFinalData[0]['uid'];
-                    $userEmail = $curlFinalData[0]['email'];
-                    $firstName = $curlFinalData[0]['first_name'];
-                    $lastName = $curlFinalData[0]['last_name'];
-                    $isVerified = $curlFinalData[0]['is_verified'];
-                    //$birthday = $curlFinalData[0]['birthday']; //dd.mm.YYYY
-                    if ($this->getConfig('retrieve_avatar')) {
-                        $imageURL = isset($curlFinalData[0]['pic_big']) ? $curlFinalData[0]['pic_big'] : '';
-                    }
-                    break;
-                default:
-                    throw new \moodle_exception('Unknown OAuth Provider', 'auth_lenauth');
-            }
-            //development mode
-            if ($this->cfg->debugdeveloper == 1 && $this->getConfig('dev_mode')) {
-                throw new \moodle_exception('lenauth_debug_info_not_error', 'auth_lenauth', '', 'AUTHPROVIDER: ' . $provider . ' >>>>>REQUEST:' . http_build_query($queryParams, '', '<--->') . ' >>>>>RESPONSE: ' . http_build_query($curlFinalData, '', ' <---> '));
-            }
-            /**
-             * Check for email returned by webservice. If exist - check for user with this email in Moodle Database
-             */
-            if (!empty($curlFinalData)) {
-                if (!empty($socialUId)) {
-                    if ($isVerified) {
-                        if (!empty($userEmail)) {
-                            if ($err = email_is_not_allowed($userEmail)) {
-                                throw new \moodle_exception($err, 'auth_lenauth');
-                            }
-                            $userLenAuth = $this->db->get_record(
-                                'user',
-                                [
-                                    'email' => $userEmail,
-                                    'deleted' => 0,
-                                    'mnethostid' => $this->cfg->mnet_localhost_id,
-                                ]
-                            );
-                        } else {
-                            if (empty($userLenAuth)) {
-                                $userLenAuth = $this->getUserDataBySocialId($socialUId);
-                            }
-                            /*if (empty($userLenAuth)) {
-                                $userLenAuth = $this->db->get_record('user', array('username' => $userName, 'deleted' => 0, 'mnethostid' => $this->cfg->mnet_localhost_id));
-                            }*/
-                        }
-                    } else {
-                        throw new \moodle_exception('Your social account is not verified', 'auth_lenauth');
-                    }
-                } else {
-                    throw new \moodle_exception('Empty Social UID', 'auth_lenauth');
-                }
-            } else {
-                @setcookie($provider, null, time() - 3600);
-                throw new \moodle_exception('Final request returns nothing', 'auth_lenauth');
-            }
-            $lastUserNumber = intval($this->getConfig('last_user_number'));
-            $lastUserNumber = empty($lastUserNumber) ? 1 : $lastUserNumber + 1;
-            //$userName = $this->getConfig('user_prefix . $lastUserNumber; //@todo
-            /**
-             * If user with email from webservice not exists, we will create an account
-             */
-            if (empty($userLenAuth)) {
-                $userName = $this->getConfig('user_prefix') . $lastUserNumber;
-                //check for username exists in DB
-                $userLenAuthCheck = $this->db->get_record('user', ['username' => $userName]);
-                $i_check = 0;
-                while (!empty($userLenAuthCheck)) {
-                    $userName = $this->getConfig('user_prefix') . $lastUserNumber;
-                    $userLenAuthCheck = $this->db->get_record('user', ['username' => $userName]);
-                    $i_check++;
-                    if ($i_check > 20) {
-                        throw new \moodle_exception('Something wrong with usernames of LenAuth users. Limit of 20 queries is out. Check last mdl_user table of Moodle', 'auth_lenauth');
-                    }
-                }
-                // create user HERE
-                $userLenAuth = create_user_record($userName, '', 'lenauth');
-                /**
-                 * User exists...
-                 */
-            } else {
-                $userName = $userLenAuth->username;
-            }
-            set_config('last_user_number', $lastUserNumber, 'auth_lenauth');
-            if (!empty($socialUId)) {
-                $userSocialUIdCustomField = [
-                    'userid' => $userLenAuth->id,
-                    'fieldid' => $this->fieldId,
-                    'data' => $socialUId,
-                ];
-                if (!$this->db->record_exists(
-                    'user_info_data',
-                    ['userid' => $userLenAuth->id, 'fieldid' => $this->fieldId]
-                )) {
-                    $this->db->insert_record('user_info_data', $userSocialUIdCustomField);
-                } else {
-                    $record = $this->db->get_record(
-                        'user_info_data',
-                        ['userid' => $userLenAuth->id, 'fieldid' => $this->fieldId]
-                    );
-                    $userSocialUIdCustomField['id'] = $record->id;
-                    $this->db->update_record('user_info_data', $userSocialUIdCustomField);
-                }
-            }
-
-            //add_to_log(SITEID, 'auth_lenauth', '', '', $userName . '/' . $userEmail . '/' . $userid);
-
-            // complete Authenticate user
-            authenticate_user_login($userName, null);
-
-            // fill $newUser object with response data from webservices
-            $newUser = new \stdClass();
-            if (!empty($userEmail)) {
-                $newUser->email = $userEmail;
-            }
-            if (!empty($firstName)) {
-                $newUser->firstname = $firstName;
-            }
-            if (!empty($lastName)) {
-                $newUser->lastname = $lastName;
-            }
-            if (!empty($this->getConfig('default_country'))) {
-                $newUser->country = $this->getConfig('default_country');
-            }
-            if ($userLenAuth) {
-                if ($userLenAuth->suspended == 1) {
-                    throw new \moodle_exception('user_suspended', 'auth_lenauth');
-                }
-                // update user record
-                if (!empty($newUser)) {
-                    $newUser->id = $userLenAuth->id;
-                    /*require_once $this->cfg->libdir . '/gdlib.php';
-
-                    $fs = get_file_storage();
-                    $file_obj = $fs->create_file_from_url(array(
-                        'contextid' => context_user::instance($newUser->id, MUST_EXIST)->id,
-                        'component' => 'user',
-                        'filearea'  => 'icon',
-                        'itemid'    => 0,
-                        'filepath'  => '/',
-                        'source'    => '',
-                        'filename'  => 'f' . $newUser->id . '.' . $ext
-                   ), $imageURL);
-                    //$newUser->picture = $file_obj->get_id();*/
-
-                    $userLenAuth = (object) array_merge((array) $userLenAuth, (array) $newUser);
-                    $this->db->update_record('user', $userLenAuth);
-                    if ($this->getConfig('retrieve_avatar')) {
-                        //processing user avatar from social webservice
-                        if (!empty($imageURL) && intval($userLenAuth->picture) === 0) {
-                            $imageHeader = get_headers($imageURL, 1);
-                            if (isset($imageHeader['Content-Type'])
-                                && is_string($imageHeader['Content-Type'])
-                                && in_array($imageHeader['Content-Type'], array_keys(self::ALLOWED_ICONS_TYPES))) {
-                                $mime = $imageHeader['Content-Type'];
-                            } else {
-                                foreach ($imageHeader['Content-Type'] as $ct) {
-                                    if (!empty($ct)
-                                        && is_string($ct)
-                                        && in_array($ct, array_keys(self::ALLOWED_ICONS_TYPES))) {
-                                        $mime = $ct;
-                                        break;
+                            case 'twitter':
+                                if (!empty($this->getConfig('twitter_enabled'))) {
+                                    if (!isset($_COOKIE[$this->provider]['access_token'])) {
+                                        $params = array_merge(
+                                            $this->twitterRequestArray($this->getConfig('twitter_consumer_secret') . '&'),
+                                            ['oauth_callback' => $this->redirectURI()]
+                                        );
+                                        $hasCode = $redirectURI = false;
+                                        $this->sendOAuthRequest = (isset($_REQUEST['oauth_token'], $_REQUEST['oauth_verifier'])) ? false : true;
+                                        $OAuthVerifier = false;
+                                        if (!$this->sendOAuthRequest && isset($_COOKIE[$this->provider]['oauth_token_secret'])) {
+                                            $accessToken = $SESSION->twitter_access_token
+                                                = optional_param('oauth_token', '', PARAM_TEXT);
+                                            setcookie($this->provider . '[access_token]', $accessToken, time()
+                                                + self::SETTINGS[$this->provider]['settings']['expire'], '/');
+                                            $OAuthVerifier = $SESSION->twitter_oauth_verifier
+                                                = optional_param('oauth_verifier', '', PARAM_TEXT);
+                                            setcookie($this->provider . '[oauth_verifier]', $OAuthVerifier, time()
+                                                + self::SETTINGS[$this->provider]['settings']['expire'], '/');
+                                        } else {
+                                            $curlHeader = $this->setTwitterHeader($params);
+                                        }
+                                        $encodeParams = false;
+                                    } else {
+                                        $this->sendOAuthRequest = false;
                                     }
                                 }
-                            }
-                            $ext = $this->getImageExtensionFromMime($mime);
-                            if ($ext) {
-                                //create temp file
-                                $tempFileName = substr(microtime(), 0, 10) . '.tmp';
-                                $templFolder = $this->cfg->tempdir . '/filestorage';
-                                if (!file_exists($templFolder)) {
-                                    mkdir($templFolder, $this->cfg->directorypermissions);
+                                break;
+                        }
+                        //require cURL from Moodle core
+                        require_once $this->cfg->libdir . '/filelib.php';
+                        $curl = new \curl();
+                        //hack for twitter and Yahoo
+                        if (!empty($curlOptions) && is_array($curlOptions)) {
+                            $curl->setopt($curlOptions);
+                        }
+                        $curl->resetHeader(); // clean cURL header from garbage
+                        //Twitter and Yahoo has an own cURL headers, so let them to be!
+                        if (!$curlHeader) {
+                            $curl->setHeader('Content-Type: application/x-www-form-urlencoded');
+                        } else {
+                            $curl->setHeader($curlHeader);
+                        }
+                        $curlTokensValues = $xOAuthRequestAuthURL = $OAuthVerifier = '';
+                        // cURL REQUEST for tokens if we hasnt it in $_COOKIE
+                        if ($this->sendOAuthRequest) {
+                            $accessTokenURL = $this->accessTokenURL();
+                            if (isset(self::SETTINGS[$this->provider]['settings']['access_token_curl'])
+                                && in_array(
+                                    self::SETTINGS[$this->provider]['settings']['access_token_curl'],
+                                    ['get', 'post']
+                                )) {
+                                switch (self::SETTINGS[$this->provider]['settings']['access_token_curl']) {
+                                    case 'get':
+                                        $curlTokensValues = $curl->get($accessTokenURL);
+                                        break;
+                                    case 'post':
+                                        $curlTokensValues = $curl->post(
+                                            $accessTokenURL,
+                                            //hack for twitter
+                                            $encodeParams ? $this->generateQueryData($params) : $params
+                                        );
+                                        break;
                                 }
-                                @chmod($templFolder, 0777);
-                                $tempFile = $templFolder . '/' . $tempFileName;
-                                if (copy($imageURL, $tempFile)) {
-                                    require_once $this->cfg->libdir . '/gdlib.php';
-                                    $userIconId = process_new_icon(\context_user::instance(
-                                        $newUser->id,
-                                        MUST_EXIST
-                                    ), 'user', 'icon', 0, $tempFile);
-                                    if ($userIconId) {
-                                        $this->db->set_field(
-                                            'user',
-                                            'picture',
-                                            $userIconId,
-                                            ['id' => $newUser->id]
+                            } else {
+                                $curlTokensValues = $curl->get($accessTokenURL);
+                            }
+                        }
+                        // check for token response
+                        if (!empty($curlTokensValues) || !$this->sendOAuthRequest) {
+                            $tokenValues = [];
+                            switch ($this->provider) {
+                                case 'facebook':
+                                    if ($this->sendOAuthRequest || !isset($_COOKIE[$this->provider]['access_token'])) {
+                                        $tokenValues = json_decode($curlTokensValues, true);
+                                        $expires = $tokenValues['expires_in']; //5183999 = 2 months
+                                        $accessToken = $tokenValues['access_token'];
+                                        if (!empty($expires) && !empty($accessToken)) {
+                                            setcookie(
+                                                $this->getProvider() . '[access_token]',
+                                                $accessToken,
+                                                time() + $expires,
+                                                '/'
+                                            );
+                                        } else {
+                                            throw new \moodle_exception('Can not get access for "access_token" '
+                                                . 'or/and "expires" params after request', 'auth_lenauth');
+                                        }
+                                    } else {
+                                        if (isset($_COOKIE[$this->provider]['access_token'])) {
+                                            $accessToken = $_COOKIE[$this->provider]['access_token'];
+                                        } else {
+                                            throw new \moodle_exception(
+                                                'Someting wrong, maybe expires',
+                                                'auth_lenauth'
+                                            );
+                                        }
+                                    }
+                                    break;
+                                case 'google':
+                                    if ($this->sendOAuthRequest || !isset($_COOKIE[$this->provider]['access_token'])) {
+                                        $tokenValues = json_decode($curlTokensValues, true);
+                                        $expires = $tokenValues['expires_in']; //3600 = 1 hour
+                                        $accessToken = $tokenValues['access_token'];
+                                        if (!empty($accessToken) && !empty($expires)) {
+                                            setcookie(
+                                                $this->provider . '[access_token]',
+                                                $accessToken,
+                                                time() + $expires,
+                                                '/'
+                                            );
+                                        } else {
+                                            throw new \moodle_exception('Can not get access for "access_token" '
+                                                . 'or/and "expires" params after request', 'auth_lenauth');
+                                        }
+                                    } else {
+                                        if (isset($_COOKIE[$this->provider]['access_token'])) {
+                                            $accessToken = $_COOKIE[$this->provider]['access_token'];
+                                        } else {
+                                            throw new \moodle_exception(
+                                                'Someting wrong, maybe expires',
+                                                'auth_lenauth'
+                                            );
+                                        }
+                                    }
+                                    break;
+                                case 'yahoo':
+                                    if ($this->sendOAuthRequest || !isset($_COOKIE[$this->provider]['access_token'])) {
+                                        $tokenValues = json_decode($curlTokensValues, true);
+                                        $expires = $tokenValues['expires_in']; //3600 = 1 hour
+                                        $accessToken = $tokenValues['access_token'];
+                                        //$refresh_token = $tokenValues['refresh_token'];
+                                        $userId = $tokenValues['xoauth_yahoo_guid'];
+                                        if (!empty($expires) && !empty($accessToken)) {
+                                            setcookie(
+                                                $this->provider . '[access_token]',
+                                                $accessToken,
+                                                time() + $expires,
+                                                '/'
+                                            );
+                                            if (!empty($userId)) {
+                                                setcookie(
+                                                    $this->provider . '[user_id]',
+                                                    $userId,
+                                                    time() + $expires,
+                                                    '/'
+                                                );
+                                            }
+                                        } else {
+                                            throw new \moodle_exception('Can not get access for "access_token" '
+                                                . 'or/and "expires" params after request', 'auth_lenauth');
+                                        }
+                                    } else {
+                                        if (isset($_COOKIE[$this->provider]['access_token'], $_COOKIE[$this->provider]['user_id'])) {
+                                            $accessToken = $_COOKIE[$this->provider]['access_token'];
+                                            $userId = $_COOKIE[$this->provider]['user_id'];
+                                        } else {
+                                            throw new \moodle_exception(
+                                                'Someting wrong, maybe expires',
+                                                'auth_lenauth'
+                                            );
+                                        }
+                                    }
+                                    break;
+                                case 'twitter':
+                                    if ($this->sendOAuthRequest || !isset($_COOKIE[$this->provider]['oauth_token_secret'])) {
+                                        parse_str($curlTokensValues, $tokenValues);
+                                        $accessToken = $SESSION->twitter_access_token = $tokenValues['oauth_token'];
+                                        setcookie(
+                                            $this->provider . '[oauth_token_secret]',
+                                            $tokenValues['oauth_token_secret'],
+                                            time() + self::SETTINGS[$this->provider]['settings']['expire'],
+                                            '/'
+                                        );
+                                    } else {
+                                        if (isset(
+                                            $_COOKIE[$this->provider]['access_token'],
+                                            $_COOKIE[$this->provider]['oauth_token_secret']
+                                        )
+                                            || isset($SESSION->twitter_access_token, $SESSION->twitter_oauth_verifier)) {
+                                            $accessToken = isset($_COOKIE[$this->provider]['access_token'])
+                                                ? $_COOKIE[$this->provider]['access_token'] : $SESSION->twitter_access_token;
+                                            $OAuthVerifier = (isset($_COOKIE[$this->provider]['oauth_verifier']))
+                                                ? $_COOKIE[$this->provider]['oauth_verifier'] : $SESSION->twitter_oauth_verifier;
+                                        } else {
+                                            throw new \moodle_exception(
+                                                'Someting wrong, maybe expires',
+                                                'auth_lenauth'
+                                            );
+                                        }
+                                    }
+                                    break;
+                                case 'vk':
+                                    if ($this->sendOAuthRequest || !isset($_COOKIE[$this->provider]['access_token'])) {
+                                        $tokenValues = json_decode($curlTokensValues, true);
+                                        if (isset($tokenValues['error'])) {
+                                            throw new \moodle_exception('Native VK Error ' . $tokenValues['error']
+                                                . (isset($tokenValues['error_description']) ? ' with description: '
+                                                    . $tokenValues['error_description'] : ''), 'auth_lenauth');
+                                        }
+                                        $expires = $tokenValues['expires_in']; //86400 = 24 hours
+                                        $accessToken = $tokenValues['access_token'];
+                                        if (!empty($accessToken) && !empty($expires)) {
+                                            setcookie(
+                                                $this->provider . '[access_token]',
+                                                $accessToken,
+                                                time() + $expires,
+                                                '/'
+                                            );
+                                        }
+                                        $userId = $tokenValues['user_id'];
+                                        if (!empty($userId)) {
+                                            setcookie($this->provider . '[user_id]', $userId, time() + $expires, '/');
+                                        }
+                                        /**
+                                         * VK user may do not enter email
+                                         */
+                                        $userEmail = (isset($tokenValues['email'])) ? $tokenValues['email'] : false;
+                                        if (!empty($userEmail)) {
+                                            setcookie(
+                                                $this->provider . '[user_email]',
+                                                $userEmail,
+                                                time() + $expires,
+                                                '/'
+                                            );
+                                        }
+                                    } else {
+                                        if (isset($_COOKIE[$this->provider]['access_token'], $_COOKIE[$this->provider]['user_id'])) {
+                                            $accessToken = $_COOKIE[$this->provider]['access_token'];
+                                            $userId = $_COOKIE[$this->provider]['user_id'];
+                                            if (isset($_COOKIE[$this->provider]['user_email'])) {
+                                                $userEmail = $_COOKIE[$this->provider]['user_email'];
+                                            }
+                                        } else {
+                                            throw new \moodle_exception(
+                                                'Someting wrong, maybe expires',
+                                                'auth_lenauth'
+                                            );
+                                        }
+                                    }
+                                    break;
+                                case 'yandex':
+                                    if ($this->sendOAuthRequest || !isset($_COOKIE[$this->provider]['access_token'])) {
+                                        $tokenValues = json_decode($curlTokensValues, true);
+                                        $expires = $tokenValues['expires_in']; //31536000 = 1 year
+                                        $accessToken = $tokenValues['access_token'];
+                                        if (!empty($expires) && !empty($accessToken)) {
+                                            setcookie(
+                                                $this->provider . '[access_token]',
+                                                $accessToken,
+                                                time() + $expires,
+                                                '/'
+                                            );
+                                        } else {
+                                            throw new \moodle_exception('Can not get access for "access_token" '
+                                                . 'or/and "expires" params after request', 'auth_lenauth');
+                                        }
+                                    } else {
+                                        if (isset($_COOKIE[$this->provider]['access_token'])) {
+                                            $accessToken = $_COOKIE[$this->provider]['access_token'];
+                                        } else {
+                                            throw new \moodle_exception(
+                                                'Someting wrong, maybe expires',
+                                                'auth_lenauth'
+                                            );
+                                        }
+                                    }
+                                    break;
+                                case 'mailru':
+                                    if ($this->sendOAuthRequest || !isset($_COOKIE[$this->provider]['access_token'])) {
+                                        $tokenValues = json_decode($curlTokensValues, true);
+                                        $expires = $tokenValues['expires_in']; //86400 = 24 hours
+                                        $accessToken = $tokenValues['access_token'];
+                                        if (!empty($expires) && !empty($accessToken)) {
+                                            setcookie(
+                                                $this->provider . '[access_token]',
+                                                $accessToken,
+                                                time() + $expires,
+                                                '/'
+                                            );
+                                        } else {
+                                            //check native errors if exists
+                                            if (isset($tokenValues['error'])) {
+                                                switch ($tokenValues['error']) {
+                                                    case 'invalid_client':
+                                                        throw new \moodle_exception(
+                                                            'Mail.RU invalid OAuth settings. Check your Private Key and Secret Key',
+                                                            'auth_lenauth'
+                                                        );
+                                                    default:
+                                                        throw new \moodle_exception('Mail.RU Unknown Error with code: ' . $tokenValues['error']);
+                                                }
+                                            }
+                                            if (empty($expires) || empty($accessToken)) {
+                                                throw new \moodle_exception(
+                                                    'Can not get access for "access_token" or/and "expires" params after request',
+                                                    'auth_lenauth'
+                                                );
+                                            }
+                                        }
+                                    } else {
+                                        if (isset($_COOKIE[$this->provider]['access_token'])) {
+                                            $accessToken = $_COOKIE[$this->provider]['access_token'];
+                                        } else {
+                                            throw new \moodle_exception(
+                                                'Someting wrong, maybe expires',
+                                                'auth_lenauth'
+                                            );
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    throw new \moodle_exception('Unknown OAuth Provider', 'auth_lenauth');
+                            }
+                        }
+                        if (!empty($accessToken)) {
+                            $queryParams = []; // array to generate data for final request to get user data
+                            $requestAPIURL = $this->requestAPIURL();
+                            $isVerified = true;
+                            $imageURL = '';
+                            switch ($this->provider) {
+                                case 'facebook':
+                                    $queryParams['access_token'] = $accessToken;
+                                    $queryParams['fields'] = 'email,name';
+                                    $curlResponse = $curl->get($requestAPIURL . '?' . $this->generateQueryData($queryParams));
+                                    $curlFinalData = json_decode($curlResponse, true);print_r($curlFinalData);die;
+                                    $id = $curlFinalData['id'];
+                                    $name = $curlFinalData['name'];
+                                    /**
+                                     * https://developers.facebook.com/docs/graph-api/reference/user/
+                                     * https://developers.facebook.com/docs/graph-api/using-graph-api#reading
+                                     */
+                                    die('rr=https://graph.facebook.com/v7.0/' . $id . '/?access_token=' . $accessToken);
+                                    $r = $curl->get('https://graph.facebook.com/' . $id . '/?fields=email&access_token=' . $accessToken);
+                                    print_r($r);die('eerrss');
+                                    $userEmail = $curlFinalData['email'];
+                                    $firstName = $curlFinalData['first_name'];
+                                    $lastName = $curlFinalData['last_name'];
+                                    $isVerified = $curlFinalData['verified'];
+                                    if ($this->getConfig('retrieve_avatar')) {
+                                        $imageURL = 'http://graph.facebook.com/' . $socialUId . '/picture';
+                                    }
+                                    break;
+                                /**
+                                 * @link https://developers.google.com/accounts/docs/OAuth2Login#obtaininguserprofileinformation
+                                 */
+                                case 'google':
+                                    $queryParams['access_token'] = $accessToken;
+                                    $queryParams['alt'] = 'json';
+                                    $curlResponse = $curl->get($requestAPIURL . '?' . $this->generateQueryData($queryParams));
+                                    $curlFinalData = json_decode($curlResponse, true);
+                                    if (isset($curlFinalData['error'])) {
+                                        if (!empty($curlFinalData['error']['errors']) && is_array($curlFinalData['error']['errors'])) {
+                                            foreach ($curlFinalData['error']['errors'] as $error) {
+                                                throw new \moodle_exception('Native Google error. Message: '
+                                                    . $error['message'], 'auth_lenauth');
+                                            }
+                                        } else {
+                                            throw new \moodle_exception('Native Google error', 'auth_lenauth');
+                                        }
+                                    }
+                                    $socialUId = $curlFinalData['id'];
+                                    $userEmail = $curlFinalData['emails'][0]['value'];
+                                    $firstName = $curlFinalData['name']['givenName'];
+                                    $lastName = $curlFinalData['name']['familyName'];
+                                    if ($this->getConfig('retrieve_avatar')) {
+                                        $imageURL = isset($curlFinalData['image']['url']) ? $curlFinalData['image']['url'] : '';
+                                    }
+                                    break;
+                                case 'yahoo':
+                                    $requestAPIURL = 'https://social.yahooapis.com/v1/user/' . $userId . '/profile?format=json';
+                                    $queryParams['access_token'] = $accessToken;
+                                    $nowHeader = [
+                                        'Authorization: Bearer ' . $accessToken,
+                                        'Accept: application/json',
+                                        'Content-Type: application/json',
+                                    ];
+                                    $curl->resetHeader();
+                                    $curl->setHeader($nowHeader);
+                                    $curlResponse = $curl->get($requestAPIURL, $queryParams);
+                                    $curl->resetHeader();
+                                    $curlFinalData = json_decode($curlResponse, true);
+                                    $socialUId = $curlFinalData['profile']['guid'];
+                                    $emails = $curlFinalData['profile']['emails'];
+                                    if (!empty($emails) && is_array($emails)) {
+                                        foreach ($emails as $emailArray) {
+                                            $userEmail = $emailArray['handle'];
+                                            if (isset($emailArray['primary'])) {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    $firstName = $curlFinalData['profile']['givenName'];
+                                    $lastName = $curlFinalData['profile']['familyName'];
+                                    if ($this->getConfig('retrieve_avatar')) {
+                                        $imageURL = isset($curlFinalData['profile']['image']['imageUrl'])
+                                            ? $curlFinalData['profile']['image']['imageUrl'] : '';
+                                    }
+                                    break;
+                                case 'twitter':
+                                    if (!$OAuthVerifier) {
+                                        header('Location: ' . self::SETTINGS[$this->provider]['settings']['request_api_url']
+                                            . '?' . http_build_query(['oauth_token' => $accessToken]));
+                                        die;
+                                    }
+                                    $queryParams = array_merge(
+                                        $this->twitterRequestArray(),
+                                        [
+                                            'oauth_verifier' => $OAuthVerifier,
+                                            'oauth_token' => $accessToken,
+                                            'oauth_token_secret' => $_COOKIE[$this->provider]['oauth_token_secret']
+                                        ]
+                                    );
+                                    $curlHeader = $this->setTwitterHeader(
+                                        $queryParams,
+                                        $accessToken,
+                                        $_COOKIE[$this->provider]['oauth_token_secret']
+                                    );
+                                    $curl->setHeader($curlHeader);
+                                    $curlFinalDataPre = $curl->post(
+                                        self::SETTINGS[$this->provider]['settings']['token_url'],
+                                        $queryParams
+                                    );
+                                    $json_decoded = json_decode($curlFinalDataPre, true);
+                                    if (isset($json_decoded['error']) && isset($json_decoded['request'])) {
+                                        throw new \moodle_exception('Native Twitter Error: ' . $json_decoded['error']
+                                            . '. For request ' . $json_decoded['request'], 'auth_lenauth');
+                                    }
+                                    parse_str($curlFinalDataPre, $curlFinalData);
+                                    $socialUId = $curlFinalData['user_id'];
+                                    if ($this->getConfig('retrieve_avatar')) {
+                                        $imageURL_pre = 'https://twitter.com/' . $curlFinalData['screen_name']
+                                            . '/profile_image?size=original';
+                                        $imageHeader = get_headers($imageURL_pre, 1);
+                                        $imageURL = $imageHeader['location'];
+                                    }
+                                    break;
+                                case 'vk':
+                                    /**
+                                     * @link http://vk.com/dev/api_requests
+                                     */
+                                    $queryParams['access_token'] = $accessToken;
+                                    $queryParams['user_id'] = !empty($userId) ? $userId : false;
+                                    $queryParams['v'] = self::SETTINGS['vk']['meta']['api_version'];
+                                    $curlResponse = $curl->post($requestAPIURL, $this->generateQueryData($queryParams));
+                                    $curlFinalData = json_decode($curlResponse, true);
+                                    $socialUId = $queryParams['user_id'];
+                                    /**
+                                     * If user_email is empty, its not so scare, because its second login and
+                                     */
+                                    $userEmail = isset($userEmail) ? $userEmail : false; //hack, because VK has bugs sometimes
+                                    $firstName = $curlFinalData['response'][0]['first_name'];
+                                    $lastName = $curlFinalData['response'][0]['last_name'];
+                                    /**
+                                     * @link http://vk.com/dev/users.get
+                                     */
+                                    $fieldsArray = ['avatar' => 'photo_200'];
+                                    $additionalFieldsPre = $curl->get('http://api.vk.com/method/users.get?user_ids='
+                                        . $socialUId . '&fields=' . join(',', $fieldsArray));
+                                    $additionalFields = json_decode($additionalFieldsPre, true);
+                                    if ($this->getConfig('retrieve_avatar')) {
+                                        $imageURL = isset($additionalFields['response'][0][$fieldsArray['avatar']])
+                                            ? $additionalFields['response'][0][$fieldsArray['avatar']] : '';
+                                    }
+                                    break;
+                                /**
+                                 * @link http://api.yandex.ru/oauth/doc/dg/reference/accessing-protected-resource.xml
+                                 * @link http://api.yandex.ru/login/doc/dg/reference/request.xml
+                                 */
+                                case 'yandex':
+                                    $queryParams['format'] = self::SETTINGS[$this->provider]['settings']['format'];
+                                    $queryParams['oauth_token'] = $accessToken;
+                                    $curlResponse = $curl->get($requestAPIURL . '?' . $this->generateQueryData($queryParams));
+                                    $curlFinalData = json_decode($curlResponse, true);
+                                    $socialUId = $curlFinalData['id'];
+                                    $userEmail = $curlFinalData['default_email'];
+                                    $firstName = $curlFinalData['first_name'];
+                                    $lastName = $curlFinalData['last_name'];
+                                    //$nickname = $curlFinalData['display_name'];
+                                    if ($this->getConfig('retrieve_avatar')) {
+                                        /**
+                                         * @link https://tech.yandex.ru/passport/doc/dg/reference/response-docpage/#norights_5
+                                         */
+                                        $yandexAvatarSize = 'islands-200';
+                                        if (isset($curlFinalData['default_avatar_id'])) {
+                                            $imageURL = 'https://avatars.yandex.net/get-yapic/'
+                                                . $curlFinalData['default_avatar_id'] . '/' . $yandexAvatarSize;
+                                        }
+                                    }
+                                    break;
+                                case 'mailru':
+                                    $queryParams['app_id'] = $params['client_id'];
+                                    $secretKey = $params['client_secret'];
+                                    /**
+                                     * @link http://api.mail.ru/docs/reference/rest/users-getinfo/
+                                     */
+                                    $queryParams['method'] = 'users.getInfo';
+                                    $queryParams['session_key'] = $accessToken;
+                                    $queryParams['secure'] = 1;
+                                    /**
+                                     * Additional security from mail.ru
+                                     *
+                                     * @link http://api.mail.ru/docs/guides/restapi/#sig
+                                     */
+                                    ksort($queryParams);
+                                    $sig = '';
+                                    foreach ($queryParams as $k => $v) {
+                                        $sig .= "{$k}={$v}";
+                                    }
+                                    $queryParams['sig'] = md5($sig . $secretKey);
+                                    $curlResponse = $curl->post($requestAPIURL, $this->generateQueryData($queryParams));
+                                    $curlFinalData = json_decode($curlResponse, true);
+
+                                    $socialUId = $curlFinalData[0]['uid'];
+                                    $userEmail = $curlFinalData[0]['email'];
+                                    $firstName = $curlFinalData[0]['first_name'];
+                                    $lastName = $curlFinalData[0]['last_name'];
+                                    $isVerified = $curlFinalData[0]['is_verified'];
+                                    //$birthday = $curlFinalData[0]['birthday']; //dd.mm.YYYY
+                                    if ($this->getConfig('retrieve_avatar')) {
+                                        $imageURL = isset($curlFinalData[0]['pic_big']) ? $curlFinalData[0]['pic_big'] : '';
+                                    }
+                                    break;
+                                default:
+                                    throw new \moodle_exception('Unknown OAuth Provider', 'auth_lenauth');
+                            }
+                            //development mode
+                            if ($this->cfg->debugdeveloper == 1 && $this->getConfig('dev_mode')) {
+                                throw new \moodle_exception(
+                                    'lenauth_debug_info_not_error',
+                                    'auth_lenauth',
+                                    '',
+                                    'AUTHPROVIDER: ' . $this->provider . ' >>>>>REQUEST:' . http_build_query(
+                                        $queryParams,
+                                        '',
+                                        '<--->'
+                                    ) . ' >>>>>RESPONSE: ' . http_build_query(
+                                        $curlFinalData,
+                                        '',
+                                        ' <---> '
+                                    )
+                                );
+                            }
+                            /**
+                             * Check for email returned by webservice. If exist - check for user with this email in Moodle Database
+                             */
+                            if (!empty($curlFinalData)) {
+                                if (!empty($socialUId)) {
+                                    if ($isVerified) {
+                                        if (!empty($userEmail)) {
+                                            if ($err = email_is_not_allowed($userEmail)) {
+                                                throw new \moodle_exception($err, 'auth_lenauth');
+                                            }
+                                            $userLenAuth = $this->db->get_record(
+                                                'user',
+                                                [
+                                                    'email' => $userEmail,
+                                                    'deleted' => 0,
+                                                    'mnethostid' => $this->cfg->mnet_localhost_id,
+                                                ]
+                                            );
+                                        } else {
+                                            if (empty($userLenAuth)) {
+                                                $userLenAuth = $this->getUserDataBySocialId($socialUId);
+                                            }
+                                            /*if (empty($userLenAuth)) {
+                                                $userLenAuth = $this->db->get_record('user', array('username' => $userName, 'deleted' => 0, 'mnethostid' => $this->cfg->mnet_localhost_id));
+                                            }*/
+                                        }
+                                    } else {
+                                        throw new \moodle_exception(
+                                            'Your social account is not verified',
+                                            'auth_lenauth'
                                         );
                                     }
-                                    unset($tempFile);
+                                } else {
+                                    throw new \moodle_exception('Empty Social UID', 'auth_lenauth');
                                 }
-                                @chmod($templFolder, $this->cfg->directorypermissions);
+                            } else {
+                                @setcookie($this->provider, null, time() - 3600);
+                                throw new \moodle_exception('Final request returns nothing', 'auth_lenauth');
                             }
+                            $lastUserNumber = intval($this->getConfig('last_user_number'));
+                            $lastUserNumber = empty($lastUserNumber) ? 1 : $lastUserNumber + 1;
+                            //$userName = $this->getConfig('user_prefix . $lastUserNumber; //@todo
+                            /**
+                             * If user with email from webservice not exists, we will create an account
+                             */
+                            if (empty($userLenAuth)) {
+                                $userName = $this->getConfig('user_prefix') . $lastUserNumber;
+                                //check for username exists in DB
+                                $userLenAuthCheck = $this->db->get_record('user', ['username' => $userName]);
+                                $i_check = 0;
+                                while (!empty($userLenAuthCheck)) {
+                                    $userName = $this->getConfig('user_prefix') . $lastUserNumber;
+                                    $userLenAuthCheck = $this->db->get_record('user', ['username' => $userName]);
+                                    $i_check++;
+                                    if ($i_check > 20) {
+                                        throw new \moodle_exception(
+                                            'Something wrong with usernames of LenAuth users. Limit of 20 queries is out. Check last mdl_user table of Moodle',
+                                            'auth_lenauth'
+                                        );
+                                    }
+                                }
+                                // create user HERE
+                                $userLenAuth = create_user_record($userName, '', 'lenauth');
+                                /**
+                                 * User exists...
+                                 */
+                            } else {
+                                $userName = $userLenAuth->username;
+                            }
+                            set_config('last_user_number', $lastUserNumber, 'auth_lenauth');
+                            if (!empty($socialUId)) {
+                                $userSocialUIdCustomField = [
+                                    'userid' => $userLenAuth->id,
+                                    'fieldid' => $this->fieldId,
+                                    'data' => $socialUId,
+                                ];
+                                if (!$this->db->record_exists(
+                                    'user_info_data',
+                                    ['userid' => $userLenAuth->id, 'fieldid' => $this->fieldId]
+                                )) {
+                                    $this->db->insert_record('user_info_data', $userSocialUIdCustomField);
+                                } else {
+                                    $record = $this->db->get_record(
+                                        'user_info_data',
+                                        ['userid' => $userLenAuth->id, 'fieldid' => $this->fieldId]
+                                    );
+                                    $userSocialUIdCustomField['id'] = $record->id;
+                                    $this->db->update_record('user_info_data', $userSocialUIdCustomField);
+                                }
+                            }
+
+                            //add_to_log(SITEID, 'auth_lenauth', '', '', $userName . '/' . $userEmail . '/' . $userid);
+
+                            // complete Authenticate user
+                            authenticate_user_login($userName, null);
+
+                            // fill $newUser object with response data from webservices
+                            $newUser = new \stdClass();
+                            if (!empty($userEmail)) {
+                                $newUser->email = $userEmail;
+                            }
+                            if (!empty($firstName)) {
+                                $newUser->firstname = $firstName;
+                            }
+                            if (!empty($lastName)) {
+                                $newUser->lastname = $lastName;
+                            }
+                            if (!empty($this->getConfig('default_country'))) {
+                                $newUser->country = $this->getConfig('default_country');
+                            }
+                            if ($userLenAuth) {
+                                if ($userLenAuth->suspended == 1) {
+                                    throw new \moodle_exception('user_suspended', 'auth_lenauth');
+                                }
+                                // update user record
+                                if (!empty($newUser)) {
+                                    $newUser->id = $userLenAuth->id;
+                                    /*require_once $this->cfg->libdir . '/gdlib.php';
+
+                                    $fs = get_file_storage();
+                                    $file_obj = $fs->create_file_from_url(array(
+                                        'contextid' => context_user::instance($newUser->id, MUST_EXIST)->id,
+                                        'component' => 'user',
+                                        'filearea'  => 'icon',
+                                        'itemid'    => 0,
+                                        'filepath'  => '/',
+                                        'source'    => '',
+                                        'filename'  => 'f' . $newUser->id . '.' . $ext
+                                   ), $imageURL);
+                                    //$newUser->picture = $file_obj->get_id();*/
+
+                                    $userLenAuth = (object)array_merge((array)$userLenAuth, (array)$newUser);
+                                    $this->db->update_record('user', $userLenAuth);
+                                    if ($this->getConfig('retrieve_avatar')) {
+                                        //processing user avatar from social webservice
+                                        if (!empty($imageURL) && intval($userLenAuth->picture) === 0) {
+                                            $imageHeader = get_headers($imageURL, 1);
+                                            if (isset($imageHeader['Content-Type'])
+                                                && is_string($imageHeader['Content-Type'])
+                                                && in_array(
+                                                    $imageHeader['Content-Type'],
+                                                    array_keys(self::ALLOWED_ICONS_TYPES)
+                                                )) {
+                                                $mime = $imageHeader['Content-Type'];
+                                            } else {
+                                                foreach ($imageHeader['Content-Type'] as $ct) {
+                                                    if (!empty($ct)
+                                                        && is_string($ct)
+                                                        && in_array($ct, array_keys(self::ALLOWED_ICONS_TYPES))) {
+                                                        $mime = $ct;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            $ext = $this->getImageExtensionFromMime($mime);
+                                            if ($ext) {
+                                                //create temp file
+                                                $tempFileName = substr(microtime(), 0, 10) . '.tmp';
+                                                $templFolder = $this->cfg->tempdir . '/filestorage';
+                                                if (!file_exists($templFolder)) {
+                                                    mkdir($templFolder, $this->cfg->directorypermissions);
+                                                }
+                                                @chmod($templFolder, 0777);
+                                                $tempFile = $templFolder . '/' . $tempFileName;
+                                                if (copy($imageURL, $tempFile)) {
+                                                    require_once $this->cfg->libdir . '/gdlib.php';
+                                                    $userIconId = process_new_icon(\context_user::instance(
+                                                        $newUser->id,
+                                                        MUST_EXIST
+                                                    ), 'user', 'icon', 0, $tempFile);
+                                                    if ($userIconId) {
+                                                        $this->db->set_field(
+                                                            'user',
+                                                            'picture',
+                                                            $userIconId,
+                                                            ['id' => $newUser->id]
+                                                        );
+                                                    }
+                                                    unset($tempFile);
+                                                }
+                                                @chmod($templFolder, $this->cfg->directorypermissions);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                complete_user_login($userLenAuth); // complete user login
+
+                                // Redirection
+                                $urlToGo = $this->cfg->wwwroot;
+                                if (user_not_fully_set_up($userLenAuth)) {
+                                    $urlToGo = $this->cfg->wwwroot . '/user/edit.php';
+                                } elseif (isset($SESSION->wantsurl) && (strpos(
+                                    $SESSION->wantsurl,
+                                    $this->cfg->wwwroot
+                                ) === 0)) {
+                                    $urlToGo = $SESSION->wantsurl;
+                                    unset($SESSION->wantsurl);
+                                } else {
+                                    unset($SESSION->wantsurl);
+                                }
+                            }
+                            redirect($urlToGo);
+                        } else {
+                            throw new \moodle_exception('access_token_empty', 'auth_lenauth');
                         }
                     }
                 }
-
-                complete_user_login($userLenAuth); // complete user login
-
-                // Redirection
-                $urlToGo = $this->cfg->wwwroot;
-                if (user_not_fully_set_up($userLenAuth)) {
-                    $urlToGo = $this->cfg->wwwroot . '/user/edit.php';
-                } elseif (isset($SESSION->wantsurl) && (strpos($SESSION->wantsurl, $this->cfg->wwwroot) === 0)) {
-                    $urlToGo = $SESSION->wantsurl;
-                    unset($SESSION->wantsurl);
-                } else {
-                    unset($SESSION->wantsurl);
-                }
             }
-            redirect($urlToGo);
-        } else {
-            throw new \moodle_exception('access_token_empty', 'auth_lenauth');
         }
     }
 
