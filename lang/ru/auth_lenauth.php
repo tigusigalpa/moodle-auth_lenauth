@@ -114,12 +114,26 @@ $string['facebook_desc'] = '
             </ol>
         </li>
         <li>В <a href="https://developers.facebook.com/apps/" target="_blank">консоли разработчика Facebook</a> в данном проекте в подкатегории &laquo;<strong>Настройки</strong>&raquo; &rarr; &laquo;<strong>Основное</strong>&raquo;:
-            <ol>Заполните следующие значения:
+            <ol><strong>Заполните следующие значения</strong>:
                 <li>Домены приложений: <strong style="color:red">{$a->wwwroot}</strong></li>
             </ol>
-            <ol>Скопируйте и сохраните сюда следующие значения:
-                <li><strong>Идентификатор приложения</strong></li>
-                <li><strong>Секрет приложения</strong></li>
+            <ol><strong>Опубликуйте приложение</strong>:<br /><em>без публикации приложения, оно не будет работать</em>
+                <li>Введите &laquo;URL-адрес политики конфиденциальности&raquo;: <em style="color:red">Чтобы приложение стало доступно для публикации <strong>обязательно введите URL-адрес вашей политики конфиденциальности</strong></em></li>
+                <li>Переключите в активный статус чекбокс &laquo;<strong>Опубликовано</strong>&raquo; в верху страницы</li>
+            </ol>
+            <ol><strong>Скопируйте и сохраните сюда следующие значения</strong>:
+                <li><strong style="color:red">Идентификатор приложения</strong></li>
+                <li><strong style="color:red">Секрет приложения</strong></li>
+            </ol>
+        </li>
+        <li>В <a href="https://developers.facebook.com/apps/" target="_blank">консоли разработчика Facebook</a> в данном проекте в подкатегории &laquo;<strong>Настройки</strong>&raquo; &rarr; &laquo;<strong>Дополнительно</strong>&raquo;:
+            <ol>
+                <li>В блоке &laquo;<strong>Повысить версию API</strong>&raquo; выберите актуальную для приложения версию API и соотнесите ее с полем &laquo;<strong>{$a->versionstr}</strong>&raquo; в настройках LenAuth</li>
+            </ol>
+        </li>
+        <li><strong>Проверьте разрешения</strong>:
+            <ol>
+                <li>В <a href="https://developers.facebook.com/apps/" target="_blank">консоли разработчика Facebook</a> в данном проекте в подкатегории &laquo;<strong>Проверка приложения</strong>&raquo; &rarr; &laquo;<strong>Мои разрешения и функции</strong>&raquo; проверьте разрешения в блоке &laquo;<strong>Одобренные элементы</strong>&raquo;, минимальные разрешения: &laquo;<strong>email</strong>&raquo;, &laquo;<strong>default</strong>&raquo;.</li>
             </ol>
         </li>
         <li>В подкатегории &laquo;<strong>Товары</strong>&raquo;  &rarr; &laquo;<strong>Вход через Facebook</strong>&raquo; &rarr; &laquo;<strong>Настройки</strong>&raquo; в разделе &laquo;<strong>Клиентские настройки OAuth</strong>&raquo; в поле &laquo;<strong>Действительные URI перенаправления для OAuth</strong>&raquo; вставьте значение <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=facebook</strong></li>
@@ -134,15 +148,50 @@ $string['auth_lenauth_facebook_binding'] = 'ID Фейсбука';
 $string['google_client_id'] = 'Client ID';
 $string['google_desc'] = '
     <ol>
-        <li>У Вас должен быть зарегистрирован любой аккаунт в <a href="https://accounts.google.com/SignUp" target="_blank">Google</a></li>
-        <li><a href="https://console.developers.google.com/" target="_blank">Создайте приложение</a> (<strong>Create Project</strong>) в консоли разработчиков Google</li>
-        <li>В консоли разработчика в разделе <strong>APIs &amp; auth &raquo; Credentials</strong> создайте <strong>OAuth Client ID</strong></li>
-        <li><strong>ВНИМАНИЕ!</strong> Приложение Google позволяет вводить несколько <strong>Redirect URI</strong>, Вам же необходимо ввести только один, а именно &mdash; <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=google</strong></li>
-        <li>В приложении в разделе <strong>APIs &amp; auth &raquo; Credentials</strong> скопируйте сюда <strong>CLIENT ID</strong> и <strong>CLIENT SECRET</strong></li>
-        <li>Параметр <strong>Project ID</strong> не обязателен, его Вы можете скопировать из пункта меню <strong>Overview</strong> в консоли сверху страницы</li>
+        <li>У Вас должен быть зарегистрирован любой аккаунт в <a href="https://accounts.google.com/signup/" target="_blank">Google</a></li>
+        <li><a href="https://console.developers.google.com/apis/dashboard" target="_blank">Создайте приложение</a> (<strong>NEW PROJECT</strong>) в консоли разработчиков Google:
+            <ol>
+                <li>Project name: <em><strong style="color:red">выберите имя проекта</strong></em></li>
+                <li>Location: <em><strong style="color:red">выберите Location</strong></em></li>
+            </ol>
+        </li>
+        <li>Настройте приложение:
+            <ol>
+                <li>в консоли разработчика проекта нажмите на кнопку &laquo;<strong>+ ENABLE APIS AND SERVICES</strong>&raquo;</li>
+                <li>в категории &laquo;<strong>Social</strong>&raquo; выберите &laquo;<strong>Google People API</strong>&raquo;</li>
+                <li>на следующей странице настройки API нажмите кнопку &laquo;<strong>ENABLE</strong>&raquo;</li>
+                <li>нажмите кнопку &laquo;<strong>CREATE CREDENTIALS</strong>&raquo;
+                    <ol>
+                        <li><em>Which API are you using?</em> &laquo;<strong>People API</strong>&raquo;</li>
+                        <li><em>Where will you be calling the API from?</em> &laquo;<strong>Web server (e.g. node.js, Tomcat)</strong>&raquo;</li>
+                        <li><em>What data will you be accessing?</em> &laquo;<strong>User data</strong>&raquo;</li>
+                        <li>нажмите кнопку &laquo;<strong>What credentials do I need?</strong>&raquo;</li>
+                        <li>во всплывающем окне &laquo;<strong>Set up OAuth consent screen</strong>&raquo; нажмите кнопку &laquo;<strong>NOT NOW</strong>&raquo;</li>
+                        <li>Name: <em><strong style="color:red">выберите название</strong></em></li>
+                        <li>Authorized redirect URIs: <strong style="color:red">{$a->wwwroot}/auth/lenauth/redirect.php?provider=google</strong></li>
+                        <li>нажмите кнопку &laquo;<strong>Refresh</strong>&raquo;</li>
+                        <li>во всплывающем окне &laquo;<strong>Set up OAuth consent screen</strong>&raquo; нажмите кнопку &laquo;<strong>SET UP CONSENT SCREEN</strong>&raquo; (вас отправит на новую страницу):
+                            <ol>
+                                <li>User Type: &laquo;<strong>External</strong>&raquo;</li>
+                                <li>нажмите кнопку &laquo;<strong>CREATE</strong>&raquo;</li>
+                                <li>Application name: <em><strong style="color:red">выберите название</strong></em></li>
+                                <li>Scopes for Google APIs: <strong>email, profile, openid</strong></li>
+                                <li>Authorized domains: <strong style="color:red">{$a->wwwroot}</strong></li>
+                                <li>нажмите &laquo;<strong>Save</strong>&raquo;</li>
+                            </ol>
+                        </li>
+                    </ol>
+                </li>
+                <li>Перейдите в раздел &laquo;<strong>Credentials</strong>&raquo; и скопируйте оттуда следующие данные в соответствующие поля настроек LenAuth:
+                    <ol>
+                        <li>&laquo;<strong>Client ID</strong>&raquo;</li>
+                        <li>&laquo;<strong>Client secret</strong>&raquo;</li>
+                    </ol>
+                </li>
+            </ol>
+        </li>
     </ol>';
-$string['google_client_secret'] = 'CLIENT SECRET';
-$string['google_project_id'] = 'Project ID';
+$string['google_client_secret'] = 'Client secret';
 $string['google_button_text_default'] = 'Google';
 $string['google_binding'] = 'ID Гугл';
 

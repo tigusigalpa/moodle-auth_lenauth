@@ -142,7 +142,6 @@ $string['google_desc'] = '
         <li>Parameter <strong>Project ID</strong> is not required, you can copy it from menu section <strong>Overview</strong> at console at the top of page</li>
     </ol>';
 $string['google_client_secret'] = 'Client secret';
-$string['google_project_id'] = 'Project ID';
 $string['google_button_text_default'] = 'Google';
 $string['google_binding'] = 'Google Social ID';
 

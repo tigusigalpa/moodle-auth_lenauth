@@ -30,8 +30,7 @@ switch ($provider) {
     case 'facebook':
         if ($state = optional_param('state', '', PARAM_ALPHANUM)) {
             if (confirm_sesskey($state)) {
-                $code = explode('#', required_param('code', PARAM_ALPHANUMEXT))[0];
-                if (empty($code)) {
+                if (!$code = explode('#', required_param('code', PARAM_ALPHANUMEXT))[0]) {
                     $error_inurl = optional_param('error', '', PARAM_TEXT);
                     switch ($error_inurl) {
                         case 'access_denied':
@@ -52,19 +51,24 @@ switch ($provider) {
             }
         }
         break;
-    case 'google':print_r($_GET);die;
-        $code = optional_param('code', '', PARAM_TEXT);
-        if (empty($code)) {
-            $error_inurl = optional_param('error', '', PARAM_TEXT);
-            switch ($error_inurl) {
-                case 'access_denied':
-                    $error = true;
-                    $error_code = $error_inurl;
-                    break;
-            }
-            if (empty($error_inurl)) {
-                $error = true;
-                $error_code = get_string('empty_code_param', 'auth_lenauth');
+    case 'google':
+        //$_GET
+        //Array ( [provider] => google [state] => 08iyL8kILu [code] => 4/1QGcmYMQ6bvwmppE21mtpkK0YLvTA2UuDV-hv7bJa7smQOTtwsC2eGMXd7S7jdNx6i1bmTKjgzzwBboFGNedCgs [scope] => email https://www.googleapis.com/auth/userinfo.email openid [authuser] => 0 [prompt] => consent )
+        if ($state = optional_param('state', '', PARAM_ALPHANUM)) {
+            if (confirm_sesskey($state)) {
+                if (!$code = required_param('code', PARAM_RAW)) {
+                    $error_inurl = optional_param('error', '', PARAM_TEXT);
+                    switch ($error_inurl) {
+                        case 'access_denied':
+                            $error = true;
+                            $error_code = $error_inurl;
+                            break;
+                    }
+                    if (empty($error_inurl)) {
+                        $error = true;
+                        $error_code = get_string('empty_code_param', 'auth_lenauth');
+                    }
+                }
             }
         }
         break;

@@ -54,9 +54,6 @@ class LenAuth extends \auth_plugin_base
                 'client_secret' => [
                     'type' => 'password'
                 ],
-                'project_id' => [
-                    'type' => 'text',
-                ],
             ],
             /**
              * Google settings
@@ -64,9 +61,7 @@ class LenAuth extends \auth_plugin_base
              * @link https://developers.google.com/+/api/oauth
              */
             'settings' => [
-                'request_token_url' => 'https://accounts.google.com/o/oauth2/token',
-                'grant_type'        => 'authorization_code',
-                'request_api_url'   => 'https://www.googleapis.com/plus/v1/people/me',
+                'access_token_curl' => 'post'
             ],
         ],
         'yahoo' => [
@@ -491,9 +486,9 @@ class LenAuth extends \auth_plugin_base
                         . '&response_type=code'
                         /**
                          * https://developers.google.com/identity/protocols/oauth2/scopes
-                         * https://developers.google.com/identity/protocols/oauth2/scopes#people
+                         * https://developers.google.com/identity/protocols/oauth2/scopes#google-sign-in
                          */
-                        . '&scope=' . urlencode('https://www.googleapis.com/auth/userinfo.email')
+                        . '&scope=' . urlencode('email profile')//https://oauth2.googleapis.com/token
                         . '&state=' . $this->sesskey;
             }
         }
@@ -520,6 +515,11 @@ class LenAuth extends \auth_plugin_base
                         . '&redirect_uri=' . urlencode($this->redirectURI($provider))
                         . '&client_secret=' . $this->getConfig('facebook_app_secret')
                         . '&code=' . $this->code;
+                case 'google':
+                    /**
+                     * https://developers.google.com/identity/protocols/oauth2/web-server#exchange-authorization-code
+                     */
+                    return 'https://oauth2.googleapis.com/token';
             }
         }
         return '';
@@ -534,6 +534,12 @@ class LenAuth extends \auth_plugin_base
                      * https://developers.facebook.com/docs/graph-api/using-graph-api#me
                      */
                     return 'https://graph.facebook.com/me';
+                case 'google':
+                    /**
+                     * https://developers.google.com/people/api/rest/v1/people/get#http-request
+                     * https://developers.google.com/identity/protocols/oauth2/native-app#callinganapi
+                     */
+                    return 'https://people.googleapis.com/v1/people/me';
             }
         }
         return '';
@@ -711,7 +717,7 @@ class LenAuth extends \auth_plugin_base
         global $SESSION;
         if (!isloggedin()) {
             if ($provider = optional_param('provider', '', PARAM_ALPHANUM)) {
-                if ($code = optional_param('code', '', PARAM_ALPHANUMEXT)) {
+                if ($code = optional_param('code', '', PARAM_RAW)) {
                     if ($this->setProvider($provider)) {
                         $accessToken = false;
                         $this->code = $code;
@@ -730,6 +736,15 @@ class LenAuth extends \auth_plugin_base
                             throw new \moodle_exception('Service not enabled in your LenAuth Settings', 'auth_lenauth');
                         }
                         switch ($this->getProvider()) {
+                            case 'google':
+                                $params = [
+                                    'client_id' => $this->getConfig('google_client_id'),
+                                    'client_secret' => $this->getConfig('google_client_secret'),
+                                    'code' => $code,
+                                    'grant_type' => 'authorization_code',
+                                    'redirect_uri' => $this->redirectURI('google')
+                                ];
+                                break;
                             case 'yahoo':
                                 $params['grant_type'] = self::SETTINGS[$this->provider]['settings']['grant_type'];
                                 $curlOptions = [
@@ -841,6 +856,7 @@ class LenAuth extends \auth_plugin_base
                                         $tokenValues = json_decode($curlTokensValues, true);
                                         $expires = $tokenValues['expires_in']; //3600 = 1 hour
                                         $accessToken = $tokenValues['access_token'];
+                                        //id_token
                                         if (!empty($accessToken) && !empty($expires)) {
                                             setcookie(
                                                 $this->provider . '[access_token]',
@@ -1085,9 +1101,9 @@ class LenAuth extends \auth_plugin_base
                                  */
                                 case 'google':
                                     $queryParams['access_token'] = $accessToken;
-                                    $queryParams['alt'] = 'json';
+                                    $queryParams['personFields'] = 'emailAddresses,names';
                                     $curlResponse = $curl->get($requestAPIURL . '?' . $this->generateQueryData($queryParams));
-                                    $curlFinalData = json_decode($curlResponse, true);
+                                    $curlFinalData = json_decode($curlResponse, true);print_r($curlFinalData);die;
                                     if (isset($curlFinalData['error'])) {
                                         if (!empty($curlFinalData['error']['errors']) && is_array($curlFinalData['error']['errors'])) {
                                             foreach ($curlFinalData['error']['errors'] as $error) {

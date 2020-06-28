@@ -66,7 +66,8 @@ if ($ADMIN->fulltree) {
             'auth_lenauth/' . $socialName . '_desc',
             $socialName . '_desc',
             get_string($socialName . '_desc', 'auth_lenauth', [
-                'wwwroot' => $CFG->wwwroot
+                'wwwroot' => $CFG->wwwroot,
+                'versionstr' => get_string('version')
             ])
         ));
         $settings->add(new \admin_setting_configcheckbox(
